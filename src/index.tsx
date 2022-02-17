@@ -1,14 +1,30 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { Provider } from 'react-redux';
+import { Router } from 'react-router';
+
+import store, { history } from './store';
+
 import './index.css';
-import App from './App';
+
+import App from './containers/App/App';
+import { ThemeModeProvider } from './components/ThemeMode.component';
+import { YandexMetrika } from './components/YandexMetrika.component';
+
 import reportWebVitals from './reportWebVitals';
 
 ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
+    <React.StrictMode>
+        <Provider store={store}>
+            <ThemeModeProvider>
+                <Router history={history}>
+                    <App />
+                </Router>
+            </ThemeModeProvider>
+            <YandexMetrika />
+        </Provider>
+    </React.StrictMode>,
+    document.getElementById('root')
 );
 
 // If you want to start measuring performance in your app, pass a function
