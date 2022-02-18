@@ -6,7 +6,17 @@ export const YandexMetrika = () => {
 
     return (
         <>
-            <YMInitializer accounts={[YM_ID]} options={{ webvisor: true }} version="2" />
+            <YMInitializer
+                accounts={[YM_ID]}
+                options={{
+                    clickmap: true,
+                    trackLinks: true,
+                    accurateTrackBounce: true,
+                    webvisor: true,
+                    trackHash: true,
+                }}
+                version="2"
+            />
             <noscript>
                 <div>
                     <img
