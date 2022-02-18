@@ -73,7 +73,7 @@ const StyledLinearProgress = styled(LinearProgress)(() => ({
 
 const StyledAppointmentsAppointment = styled(Appointments.Appointment)(() => ({
     [`&.${classes.appointment}`]: {
-        borderRadius: 0,
+        borderRadius: '3px',
         borderBottom: 0,
     },
     [`&.${classes.parityOtherAppointment}`]: {
@@ -172,6 +172,7 @@ const AppointmentContent = ({ data, ...restProps }: Appointments.AppointmentCont
                     )}{' '}
                     {data.title}
                 </div>
+                <div className={classes.text}>🕑 {data.time}</div>
                 {data.type !== 0 && (
                     <div className={classNames(classes.text, classes.content)}>
                         • Вид занятий: {getLessonTypeStrArr(data.type).join(', ')}

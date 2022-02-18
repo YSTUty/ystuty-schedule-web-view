@@ -10,6 +10,8 @@ import Select from '@mui/material/Select';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 
+import { ThemeModeButton } from '../../components/ThemeMode.component';
+
 import { apiPath } from '../../utils';
 
 export const STORE_GROUP_NAME_KEY = 'lastGroupName';
@@ -99,7 +101,13 @@ export const useSelectGroupComponent = (usingDefault = true) => {
     }, []);
 
     const render = () => (
-        <div>
+        <Box
+            sx={{
+                display: 'flex',
+                alignItems: 'center',
+                color: 'text.primary',
+            }}
+        >
             <FormControl sx={{ m: 1, minWidth: 120 }}>
                 <InputLabel htmlFor="grouped-native-select">Группа</InputLabel>
                 <Select
@@ -127,7 +135,10 @@ export const useSelectGroupComponent = (usingDefault = true) => {
                     ])}
                 </Select>
             </FormControl>
-        </div>
+            <FormControl sx={{ pl: 1 }}>
+                <ThemeModeButton />
+            </FormControl>
+        </Box>
     );
 
     return [render, selected] as const;

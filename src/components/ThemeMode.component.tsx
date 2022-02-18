@@ -16,22 +16,9 @@ export const ThemeModeButton = () => {
     const theme = useTheme();
     const colorMode = React.useContext(ThemeModeContext);
     return (
-        <Box
-            sx={{
-                display: 'flex',
-                // width: '100%',
-                alignItems: 'center',
-                justifyContent: 'center',
-                // bgcolor: 'background.default',
-                color: 'text.primary',
-                // borderRadius: 1,
-                // p: 3,
-            }}
-        >
-            <IconButton onClick={colorMode.toggleColorMode} color="inherit">
-                {theme.palette.mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
-            </IconButton>
-        </Box>
+        <IconButton onClick={colorMode.toggleColorMode} color="inherit">
+            {theme.palette.mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
+        </IconButton>
     );
 };
 
