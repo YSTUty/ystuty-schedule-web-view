@@ -31,14 +31,8 @@ export const useScheduleLoader = (setScheduleData: Function) => {
                                     day.lessons.map((lesson) =>
                                         createEvent({
                                             ...lesson,
-                                            start:
-                                                day.info.date.replace(/T.*$/, '').replace(/-/g, '/') +
-                                                ' ' +
-                                                lesson.time.split('-')[0],
-                                            end:
-                                                day.info.date.replace(/T.*$/, '').replace(/-/g, '/') +
-                                                ' ' +
-                                                lesson.time.split('-')[1],
+                                            start: lesson.startAt,
+                                            end: lesson.endAt,
                                             title: lesson.lessonName,
                                             typeArr: Object.values(LessonFlags).filter(
                                                 (e: any) => (lesson.type & e) === e && e !== LessonFlags.None

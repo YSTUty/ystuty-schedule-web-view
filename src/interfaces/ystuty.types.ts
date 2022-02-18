@@ -98,6 +98,14 @@ export interface Lesson {
      */
     time: string;
     /**
+     * Timestamp начала пары
+     */
+    startAt?: string | Date;
+    /**
+     * Timestamp конца пары
+     */
+    endAt?: string | Date;
+    /**
      * Оригинальная строка с порядковым номером пары на дню со интервалом времени
      */
     originalTimeTitle: string;
@@ -130,15 +138,19 @@ export interface Lesson {
      */
     isStream: boolean;
     /**
-     * Длительность пары
+     * Длительность пары в часах
      */
     duration: number;
     /**
-     * Есть ли разделение по подгруппам
+     * Длительность пары в минутах
+     */
+    durationMinutes: number;
+    /**
+     * Разделение по подгруппам
      */
     isDivision: boolean;
     /**
-     * Буква корпуса, номер аудитори
+     * Буква корпуса и номер аудитори
      */
     auditoryName?: string;
     /**
@@ -146,7 +158,7 @@ export interface Lesson {
      */
     teacherName?: string;
     /**
-     * Дополнительная инфа
+     * Дополнительная информация
      */
     subInfo?: string;
 }
