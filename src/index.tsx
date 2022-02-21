@@ -10,18 +10,21 @@ import './index.css';
 import App from './containers/App/App';
 import { ThemeModeProvider } from './components/ThemeMode.component';
 import { YandexMetrika } from './components/YandexMetrika.component';
+import LocalizerComponent from './components/Localizer.component';
 
 import reportWebVitals from './reportWebVitals';
 
 ReactDOM.render(
     <React.StrictMode>
         <Provider store={store}>
-            <ThemeModeProvider>
-                <Router history={history}>
-                    <App />
-                </Router>
-            </ThemeModeProvider>
-            <YandexMetrika />
+            <LocalizerComponent>
+                <ThemeModeProvider>
+                    <Router history={history}>
+                        <App />
+                    </Router>
+                </ThemeModeProvider>
+                <YandexMetrika />
+            </LocalizerComponent>
         </Provider>
     </React.StrictMode>,
     document.getElementById('root')

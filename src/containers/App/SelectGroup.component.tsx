@@ -11,6 +11,7 @@ import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 
 import { ThemeModeButton } from '../../components/ThemeMode.component';
+import VersionComponent from '../../components/Version.component';
 
 import { apiPath } from '../../utils';
 
@@ -137,6 +138,9 @@ export const useSelectGroupComponent = (usingDefault = true) => {
             </FormControl>
             <FormControl sx={{ pl: 1 }}>
                 <ThemeModeButton />
+            </FormControl>
+            <FormControl sx={{ pl: 1 }}>
+                <VersionComponent />
             </FormControl>
         </Box>
     );
