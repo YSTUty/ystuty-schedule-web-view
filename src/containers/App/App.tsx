@@ -14,9 +14,10 @@ const App = () => {
     const [scheduleData1, setScheduleData] = React.useState<any[]>([]);
     const [scheduleData2, setScheduleData2] = React.useState<any[]>([]);
 
-    const [Selector, groupNames] = useSelectGroupComponent();
-    const [loadSchedule1] = useScheduleLoader(setScheduleData);
-    const [loadSchedule2] = useScheduleLoader(setScheduleData2);
+    const [loadSchedule1, fetching1] = useScheduleLoader(setScheduleData);
+    const [loadSchedule2, fetching2] = useScheduleLoader(setScheduleData2);
+    const [Selector, groupNames] = useSelectGroupComponent(true);
+    const fetchingSchedule = React.useMemo(() => fetching1 || fetching2, [fetching1, fetching2]);
 
     React.useEffect(() => {
         const [groupName1, groupName2] = groupNames;
@@ -50,11 +51,11 @@ const App = () => {
 
     return (
         <>
-            <Selector />
+            <Selector fetchingSchedule={fetchingSchedule} />
 
             <hr />
             {!!1 ? (
-                <MaterialContainer scheduleData={scheduleData} />
+                <MaterialContainer scheduleData={scheduleData} fetchingSchedule={fetchingSchedule} />
             ) : (
                 // <SchedulerReact scheduleData={scheduleData} />
                 <FullcalendarContainer scheduleData={scheduleData1} />

@@ -69,12 +69,15 @@ export const useSelectGroupComponent = (usingDefault = true) => {
     const handleChange = React.useCallback(
         ({ target: { value } }) => {
             value = typeof value === 'string' ? value.split(',') : value;
-            const values = value.length > 0 ? value : [DEFAULT_GROUP];
-            setSelected(values);
-            setHash(values);
-            store2.set(STORE_GROUP_NAME_KEY, values[0]);
+            let values: string[] = value.length > 0 ? value : [DEFAULT_GROUP];
+            values = values.length > 2 ? [values[0], ...values.slice(2)].slice(0, 2) : values;
+            if (values.some((e, i) => selected[i] !== e)) {
+                setSelected(values);
+                setHash(values.join(','));
+                store2.set(STORE_GROUP_NAME_KEY, values[0]);
+            }
         },
-        [setSelected, setHash]
+        [setSelected, setHash, selected]
     );
 
     const fixSelected = React.useCallback(() => {
@@ -86,9 +89,7 @@ export const useSelectGroupComponent = (usingDefault = true) => {
             .filter((e) => e > -1)
             .map((e) => groups[e]);
         value = value.filter((w, i) => value.indexOf(w) === i);
-        if (selected.length > 0 && selected.some((e, i) => value[i] !== e)) {
-            handleChange({ target: { value } });
-        }
+        handleChange({ target: { value } });
     }, [institutes, selected, handleChange]);
 
     React.useEffect(() => {
@@ -101,7 +102,7 @@ export const useSelectGroupComponent = (usingDefault = true) => {
         loadGroupsList();
     }, []);
 
-    const render = () => (
+    const render = (props: { fetchingSchedule: boolean }) => (
         <Box
             sx={{
                 display: 'flex',
@@ -124,6 +125,7 @@ export const useSelectGroupComponent = (usingDefault = true) => {
                             ))}
                         </Box>
                     )}
+                    disabled={!!props.fetchingSchedule}
                 >
                     {!usingDefault && <MenuItem value="">---</MenuItem>}
                     {institutes.map((institute) => [

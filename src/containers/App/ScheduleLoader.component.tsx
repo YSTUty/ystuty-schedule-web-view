@@ -12,7 +12,6 @@ export const useScheduleLoader = (setScheduleData: Function) => {
                 return;
             }
 
-            setScheduleData([]);
             setFetching(true);
             fetch(`${apiPath}/ystu/schedule/group/${groupName}`)
                 .then((response) => response.json())
@@ -48,6 +47,7 @@ export const useScheduleLoader = (setScheduleData: Function) => {
                     }
                 )
                 .catch((e) => {
+                    setScheduleData([]);
                     alert(e.message);
                 })
                 .finally(() => {
@@ -57,5 +57,5 @@ export const useScheduleLoader = (setScheduleData: Function) => {
         [setScheduleData, fetching, setFetching]
     );
 
-    return [loadSchedule] as const;
+    return [loadSchedule, fetching] as const;
 };

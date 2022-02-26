@@ -58,7 +58,7 @@ const StyledButtonGroup = styled(ButtonGroup)(({ theme: { spacing, palette } }) 
 }));
 
 const LESSON_TYPES = [LessonFlags.Lecture, LessonFlags.Labaratory, LessonFlags.Practical, LessonFlags.CourseProject];
-const LESSON_TYPE_SHORT_NAMES = ['Лек', 'ЛР', 'ПР', 'КП'];
+// const LESSON_TYPE_SHORT_NAMES = ['Лек', 'ЛР', 'ПР', 'КП'];
 const LESSON_TYPE_NAMES = ['Лекции', 'Лабы', 'Практики', 'Курсовые'];
 
 const getButtonClass = (lessonTypes: LessonFlags[], type: LessonFlags) =>
@@ -72,11 +72,11 @@ const LessonTypeSelector = () => {
         <StyledButtonGroup className={classes.locationSelector}>
             {LESSON_TYPES.map((type, index) => (
                 <Button
-                    className={classNames(classes.button, getButtonClass(lessonTypes, type))}
+                    className={classNames(classes.button, classes.longButtonText, getButtonClass(lessonTypes, type))}
                     onClick={() => dispatch(scheduleSlice.actions.toggleSelectedTypeLessons(type))}
                     key={type}
                 >
-                    <span className={classes.shortButtonText}>{LESSON_TYPE_SHORT_NAMES[index]}</span>
+                    {/* <span className={classes.shortButtonText}>{LESSON_TYPE_SHORT_NAMES[index]}</span> */}
                     <span className={classes.longButtonText}>{LESSON_TYPE_NAMES[index]}</span>
                 </Button>
             ))}

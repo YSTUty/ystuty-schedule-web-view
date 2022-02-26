@@ -182,9 +182,7 @@ const AppointmentContent = ({ data, ...restProps }: Appointments.AppointmentCont
                     <div className={classNames(classes.text, classes.content)}>• Аудитория: {data.auditoryName}</div>
                 )}
                 {data.teacherName && (
-                    <div className={classNames(classes.text, classes.content)}>
-                        • Преподаватель: {data.teacherName}{' '}
-                    </div>
+                    <div className={classNames(classes.text, classes.content)}>• Преподаватель: {data.teacherName}</div>
                 )}
                 {data.isDivision && <div className={classNames(classes.text, classes.content)}>• По П/Г</div>}
                 {data.isStream && <div className={classNames(classes.text, classes.content)}>• В потоке</div>}
@@ -334,8 +332,8 @@ const resources = [
     },
 ];
 
-const MaterialContainer = (props: { scheduleData: { name: string; data: any[] }[] }) => {
-    const { scheduleData = [] } = props;
+const MaterialContainer = (props: { scheduleData: { name: string; data: any[] }[]; fetchingSchedule: Boolean }) => {
+    const { scheduleData = [], fetchingSchedule } = props;
     const [data, setData] = React.useState<any[]>([]);
     const { lessonTypes, lessonFilter = '' } = useSelector((state) => state.schedule);
 
@@ -375,7 +373,7 @@ const MaterialContainer = (props: { scheduleData: { name: string; data: any[] }[
 
                 <MonthView />
                 <WeekView startDayHour={6} endDayHour={23} excludedDays={[0]} />
-                <DayView displayName="Days" startDayHour={6} endDayHour={23} intervalCount={2} />
+                <DayView displayName="Days" startDayHour={6} endDayHour={23} intervalCount={3} />
 
                 <Appointments appointmentComponent={Appointment} appointmentContentComponent={AppointmentContent} />
                 <AppointmentTooltip contentComponent={AppointmentTooltipContent} />
@@ -384,7 +382,7 @@ const MaterialContainer = (props: { scheduleData: { name: string; data: any[] }[
 
                 <CurrentTimeIndicator shadePreviousCells shadePreviousAppointments updateInterval={60e3} />
                 <Toolbar
-                    {...(data.length < 1 /* loading */ ? { rootComponent: ToolbarWithLoading } : null)}
+                    {...(fetchingSchedule ? { rootComponent: ToolbarWithLoading } : null)}
                     flexibleSpaceComponent={FlexibleSpace}
                 />
                 <DateNavigator />
