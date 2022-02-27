@@ -1,67 +1,46 @@
 import React from 'react';
+import { useHistory } from 'react-router';
 import store2 from 'store2';
 
-import FullcalendarContainer from '../Fullcalendar/Fullcalendar';
-import MaterialContainer from '../Material/Material';
-// import SchedulerReact from '../SchedulerReact/SchedulerReact';
+import LazyLoadComponent from '../../components/LazyLoad.component';
 
-import { useSelectGroupComponent } from './SelectGroup.component';
-import { useScheduleLoader } from './ScheduleLoader.component';
+import * as appConstants from '../../constants/app.constants';
+import * as deviceUtils from '../../utils/device.utils';
+import * as pwaUtils from '../../utils/pwa.utils';
+import WithVersionCheckerConnect from '../../shared/WithVersionChecker.util';
+import appVersion from '../../utils/app-version';
 
-const BETA_CONFIRM_KEY = 'betaConfirm';
+const PWAInstructionComponent = LazyLoadComponent(
+    React.lazy(() => import('../PWAInstruction/PWAInstruction.component'))
+);
+const ScheduleView = LazyLoadComponent(React.lazy(() => import('../ScheduleView/ScheduleView')));
 
 const App = () => {
-    const [scheduleData1, setScheduleData] = React.useState<any[]>([]);
-    const [scheduleData2, setScheduleData2] = React.useState<any[]>([]);
-
-    const [loadSchedule1, fetching1] = useScheduleLoader(setScheduleData);
-    const [loadSchedule2, fetching2] = useScheduleLoader(setScheduleData2);
-    const [Selector, groupNames] = useSelectGroupComponent(true);
-    const fetchingSchedule = React.useMemo(() => fetching1 || fetching2, [fetching1, fetching2]);
+    const {
+        location: { pathname },
+    } = useHistory();
 
     React.useEffect(() => {
-        const [groupName1, groupName2] = groupNames;
-        loadSchedule1(groupName1);
-
-        if (groupName2) {
-            loadSchedule2(groupName2);
-        } else {
-            setScheduleData2([]);
-        }
-    }, [groupNames]);
-
-    const scheduleData = React.useMemo(() => {
-        const [name1, name2] = groupNames;
-        const data = [{ name: name1, data: scheduleData1 }];
-        if (scheduleData2.length > 0 && name2) {
-            data.push({ name: name2, data: scheduleData2 });
-        }
-        return data;
-    }, [groupNames, scheduleData1, scheduleData2]);
-
-    React.useEffect(() => {
-        const isConfirmed = store2.get(BETA_CONFIRM_KEY, false);
-        if (!isConfirmed) {
-            const confirm = window.confirm(
-                'Сайт находится в Альфа версии!\n\nДанные могут быть ошибочны, а дизайн странным...\nТочно продолжить?'
-            );
-            store2.set(BETA_CONFIRM_KEY, confirm);
-        }
+        pwaUtils.checkPWA();
+        store2.set('appVersion', appVersion.v);
     }, []);
+
+    if (window.location.hostname === appConstants.pwaHostname) {
+        if (!deviceUtils.isPWA()) {
+            // return null;
+            // TODO: redirect to main domain?
+        }
+
+        if (pathname === '/pwa') {
+            return <PWAInstructionComponent />;
+        }
+    }
 
     return (
         <>
-            <Selector fetchingSchedule={fetchingSchedule} />
-
-            <hr />
-            {!!1 ? (
-                <MaterialContainer scheduleData={scheduleData} fetchingSchedule={fetchingSchedule} />
-            ) : (
-                // <SchedulerReact scheduleData={scheduleData} />
-                <FullcalendarContainer scheduleData={scheduleData1} />
-            )}
+            <ScheduleView />
         </>
     );
 };
 
-export default App;
+export default WithVersionCheckerConnect(App);

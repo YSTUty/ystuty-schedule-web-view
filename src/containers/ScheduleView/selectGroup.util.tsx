@@ -1,5 +1,5 @@
 import React from 'react';
-import { useHash } from 'react-use';
+import { useHash, useNetworkState } from 'react-use';
 import store2 from 'store2';
 
 import InputLabel from '@mui/material/InputLabel';
@@ -16,10 +16,14 @@ import VersionComponent from '../../components/Version.component';
 import { apiPath } from '../../utils';
 
 export const STORE_GROUP_NAME_KEY = 'lastGroupName';
+export const STORE_ALLOW_MULTIPLE_GROUP_KEY = 'allowMultipleGroup';
+const STORE_CACHED_INSTITUTES_KEY = 'CACHED_INSTITUTES';
 
-const DEFAULT_GROUP = store2.get(STORE_GROUP_NAME_KEY, 'ЭИС-46');
+const DEFAULT_GROUP: string = store2.get(STORE_GROUP_NAME_KEY, 'ЭИС-46');
 
 export const useSelectGroupComponent = (usingDefault = true) => {
+    const [allowedMultiple, setAllowedMultiple] = React.useState(!!store2.get(STORE_ALLOW_MULTIPLE_GROUP_KEY, false));
+    const { online, previous: previousOnline, since } = useNetworkState();
     const [institutes, setInstitutes] = React.useState<{ name: string; groups: string[] }[]>([
         { name: 'Default', groups: [DEFAULT_GROUP] },
     ]);
@@ -32,6 +36,26 @@ export const useSelectGroupComponent = (usingDefault = true) => {
     }, [hash]);
     const [selected, setSelected] = React.useState<string[]>(usingDefault ? defaultValues : ['']);
     const [fetching, setFetching] = React.useState(false);
+    const [isCached, setIsCached] = React.useState(false);
+
+    const applyInstitutes = React.useCallback(
+        (items: { name: string; groups: string[] }[] | null) => {
+            if (!items) {
+                items = store2.get(STORE_CACHED_INSTITUTES_KEY, null);
+                if (!items) {
+                    return;
+                }
+                setIsCached(true);
+            } else if (items.length > 0) {
+                store2.set(STORE_CACHED_INSTITUTES_KEY, items);
+                setIsCached(false);
+            }
+
+            // items.sort();
+            setInstitutes(items);
+        },
+        [setInstitutes, setIsCached]
+    );
 
     const loadGroupsList = React.useCallback(() => {
         if (fetching) {
@@ -50,28 +74,30 @@ export const useSelectGroupComponent = (usingDefault = true) => {
                         | { error: { error: string; message: string } }
                 ) => {
                     if ('error' in response) {
-                        alert(response.error.message);
+                        alert(`Error: ${response.error.message}`);
                         return;
                     }
-                    let institutes = response!.items;
-                    // institutes.sort();
-                    setInstitutes(institutes);
+                    applyInstitutes(response!.items);
                 }
             )
             .catch((e) => {
-                alert(e.message);
+                applyInstitutes(null);
+                if (online) {
+                    alert(`Fail: ${e.message}`);
+                }
             })
             .finally(() => {
                 setFetching(false);
             });
-    }, [setInstitutes, fetching, setFetching]);
+    }, [fetching, setFetching, applyInstitutes, online]);
 
     const handleChange = React.useCallback(
         ({ target: { value } }) => {
             value = typeof value === 'string' ? value.split(',') : value;
             let values: string[] = value.length > 0 ? value : [DEFAULT_GROUP];
             values = values.length > 2 ? [values[0], ...values.slice(2)].slice(0, 2) : values;
-            if (values.some((e, i) => selected[i] !== e)) {
+
+            if (values.some((e, i) => selected[i] !== e) || values.length !== selected.length) {
                 setSelected(values);
                 setHash(values.join(','));
                 store2.set(STORE_GROUP_NAME_KEY, values[0]);
@@ -80,26 +106,55 @@ export const useSelectGroupComponent = (usingDefault = true) => {
         [setSelected, setHash, selected]
     );
 
-    const fixSelected = React.useCallback(() => {
-        const groups = institutes.flatMap((e) => e.groups.map((e) => e));
-        const lowerGroups = groups.map((e) => e.toLowerCase());
-        const lowerSelected = selected.map((e) => e.toLowerCase());
-        let value = lowerSelected
-            .map((e) => lowerGroups.findIndex((g) => g === e))
-            .filter((e) => e > -1)
-            .map((e) => groups[e]);
-        value = value.filter((w, i) => value.indexOf(w) === i);
-        handleChange({ target: { value } });
-    }, [institutes, selected, handleChange]);
+    const fixSelected = React.useCallback(
+        (_selected: string[] = selected) => {
+            const groups = institutes.flatMap((e) => e.groups.map((e) => e));
+            const lowerGroups = groups.map((e) => e.toLowerCase());
+            const lowerSelected = _selected.map((e) => e.toLowerCase());
+            let value = lowerSelected
+                .map((e) => lowerGroups.findIndex((g) => g === e))
+                .filter((e) => e > -1)
+                .map((e) => groups[e]);
+            value = value.filter((w, i) => value.indexOf(w) === i);
+            handleChange({ target: { value } });
+        },
+        [institutes, selected, handleChange]
+    );
 
+    const allowMultiple = React.useCallback(
+        (state = true) => {
+            setAllowedMultiple(state);
+            store2.set(STORE_ALLOW_MULTIPLE_GROUP_KEY, state);
+        },
+        [setAllowedMultiple]
+    );
+
+    // Check correct names after institutes loading
     React.useEffect(() => {
         if (institutes.length > 1) {
             fixSelected();
         }
     }, [institutes]);
 
+    // On location hash changed
+    React.useEffect(() => {
+        if (defaultValues.some((e, i) => selected[i] !== e) || defaultValues.length !== selected.length) {
+            fixSelected(defaultValues);
+        }
+    }, [defaultValues]);
+
+    React.useEffect(() => {
+        if (online && (online !== previousOnline || (since && Date.now() - since.getTime() > 2 * 60e3))) {
+            loadGroupsList();
+        }
+    }, [online, previousOnline, since]);
+
     React.useEffect(() => {
         loadGroupsList();
+
+        if (window.location.search.includes('allow_multiple')) {
+            allowMultiple();
+        }
     }, []);
 
     const render = (props: { fetchingSchedule: boolean }) => (
@@ -113,18 +168,22 @@ export const useSelectGroupComponent = (usingDefault = true) => {
             <FormControl sx={{ m: 1, minWidth: 120 }}>
                 <InputLabel htmlFor="grouped-native-select">Группа</InputLabel>
                 <Select
-                    multiple
+                    multiple={allowedMultiple || selected.length > 1}
                     value={selected}
                     onChange={handleChange}
                     id="grouped-native-select"
                     label="Группа"
-                    renderValue={(selected) => (
-                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                            {selected.map((value) => (
-                                <Chip key={value} label={value} />
-                            ))}
-                        </Box>
-                    )}
+                    renderValue={
+                        ((allowedMultiple || selected.length > 1) &&
+                            ((selected: string[]) => (
+                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                    {selected.map((value) => (
+                                        <Chip key={value} label={value} />
+                                    ))}
+                                </Box>
+                            ))) ||
+                        undefined
+                    }
                     disabled={!!props.fetchingSchedule}
                 >
                     {!usingDefault && <MenuItem value="">---</MenuItem>}
@@ -147,5 +206,5 @@ export const useSelectGroupComponent = (usingDefault = true) => {
         </Box>
     );
 
-    return [render, selected] as const;
+    return [render, selected, isCached] as const;
 };

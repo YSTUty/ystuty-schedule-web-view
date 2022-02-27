@@ -1,0 +1,116 @@
+.Container {
+    width: 100%;
+    background: 0 0;
+    position: relative;
+    z-index: 2;
+    padding: 20px;
+}
+
+.Caption {
+    margin-bottom: 20px;
+    border-bottom: 1px solid #323946;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    justify-content: space-between;
+    padding-bottom: 15px;
+}
+
+.CaptionText {
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: .3px;
+    text-transform: uppercase;
+    font-family: rubik, Arial, sans-serif;
+    display: flex;
+    align-items: center;
+
+    svg {
+        font-size: 26px;
+        margin: 0 9px 0 -1px;
+    }
+}
+
+.Item {
+    margin-bottom: 20px;
+}
+
+.ItemHead {
+    margin-bottom: 5px;
+    font-size: 15px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+}
+
+.Number {
+    height: 22px;
+    width: 22px;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #004589;
+    color: #fff;
+    margin-right: 12px;
+    font-size: 13px;
+}
+
+.ItemBottom {
+    color: #f07c00;
+    padding-left: 34px;
+}
+
+.CaptionIcon {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    background: hsla(40, 74%, 44%, 0.3);
+    margin-left: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3px;
+
+    svg {
+        height: 20px;
+        width: 20px;
+    }
+}
+
+.btnLeft {
+    height: 35px;
+    padding: 0 15px 0 25px;
+    display: flex;
+    align-items: center;
+    background: #f07c00;
+    cursor: pointer;
+    border-radius: 6px;
+    position: relative;
+
+    svg {
+        position: absolute;
+        top: 50%;
+        left: 4px;
+        -webkit-transform: translateY(-50%);
+        transform: translateY(-50%);
+    }
+}
+
+.Install {
+    height: 42px;
+    background-color: #37cc44;
+    border-radius: 6px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.Alert {
+    padding: 15px;
+    border: 1px solid #f07c00;
+    border-radius: 6px;
+    background: rgba(49, 130, 206, 0.15);
+    text-align: center;
+}

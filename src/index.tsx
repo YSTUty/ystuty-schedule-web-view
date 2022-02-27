@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { Router } from 'react-router';
 
+import './utils/hawk.util';
 import store, { history } from './store';
 
 import './index.css';
@@ -11,7 +12,9 @@ import App from './containers/App/App';
 import { ThemeModeProvider } from './components/ThemeMode.component';
 import { YandexMetrika } from './components/YandexMetrika.component';
 import LocalizerComponent from './components/Localizer.component';
+import LoadingUpdatesComponent from './components/LoadingUpdates.component';
 
+import ServiceWorkerProvider from './shared/ServiceWorker.provider';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
 
@@ -21,7 +24,11 @@ ReactDOM.render(
             <LocalizerComponent>
                 <ThemeModeProvider>
                     <Router history={history}>
-                        <App />
+                        <ServiceWorkerProvider>
+                            <LoadingUpdatesComponent>
+                                <App />
+                            </LoadingUpdatesComponent>
+                        </ServiceWorkerProvider>
                     </Router>
                 </ThemeModeProvider>
                 <YandexMetrika />
