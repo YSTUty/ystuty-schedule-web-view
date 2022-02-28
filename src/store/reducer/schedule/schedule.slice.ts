@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { LessonFlags } from '../../../interfaces/ystuty.types';
 
 const initialState = {
+    selectedGroups: [] as string[],
     lessonTypes: [LessonFlags.Lecture, LessonFlags.Labaratory, LessonFlags.Practical, LessonFlags.CourseProject],
     lessonFilter: '',
 };
@@ -22,6 +23,9 @@ export const scheduleSlice = createSlice({
         },
         updateLessonFilter: (state, action: PayloadAction<string>) => {
             state.lessonFilter = action.payload;
+        },
+        setSelected: (state, action: PayloadAction<string[]>) => {
+            state.selectedGroups = action.payload;
         },
     },
 });

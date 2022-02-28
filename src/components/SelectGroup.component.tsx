@@ -1,5 +1,6 @@
 import React from 'react';
 import { useHash, useNetworkState } from 'react-use';
+import { useDispatch, useSelector } from 'react-redux';
 import store2 from 'store2';
 
 import InputLabel from '@mui/material/InputLabel';
@@ -9,11 +10,15 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
+import IconButton from '@mui/material/IconButton';
 
-import { ThemeModeButton } from '../../components/ThemeMode.component';
-import VersionComponent from '../../components/Version.component';
+import MultipleIcon from '@mui/icons-material/LocalPizza';
 
-import { apiPath } from '../../utils';
+import { ThemeModeButton } from './ThemeMode.component';
+import VersionComponent from './Version.component';
+
+import scheduleSlice from '../store/reducer/schedule/schedule.slice';
+import { apiPath } from '../utils';
 
 export const STORE_GROUP_NAME_KEY = 'lastGroupName';
 export const STORE_ALLOW_MULTIPLE_GROUP_KEY = 'allowMultipleGroup';
@@ -21,7 +26,11 @@ const STORE_CACHED_INSTITUTES_KEY = 'CACHED_INSTITUTES';
 
 const DEFAULT_GROUP: string = store2.get(STORE_GROUP_NAME_KEY, 'ЭИС-46');
 
-export const useSelectGroupComponent = (usingDefault = true) => {
+export const SelectGroupComponent = (props: { fetchingSchedule: boolean; usingDefault?: boolean }) => {
+    const { fetchingSchedule, usingDefault = true } = props;
+    const dispatch = useDispatch();
+    const { selectedGroups: selected } = useSelector((state) => state.schedule);
+
     const [allowedMultiple, setAllowedMultiple] = React.useState(!!store2.get(STORE_ALLOW_MULTIPLE_GROUP_KEY, false));
     const { online, previous: previousOnline, since } = useNetworkState();
     const [institutes, setInstitutes] = React.useState<{ name: string; groups: string[] }[]>([
@@ -34,7 +43,6 @@ export const useSelectGroupComponent = (usingDefault = true) => {
         store2.set(STORE_GROUP_NAME_KEY, values[0]);
         return values;
     }, [hash]);
-    const [selected, setSelected] = React.useState<string[]>(usingDefault ? defaultValues : ['']);
     const [fetching, setFetching] = React.useState(false);
     const [isCached, setIsCached] = React.useState(false);
 
@@ -98,12 +106,12 @@ export const useSelectGroupComponent = (usingDefault = true) => {
             values = values.length > 2 ? [values[0], ...values.slice(2)].slice(0, 2) : values;
 
             if (values.some((e, i) => selected[i] !== e) || values.length !== selected.length) {
-                setSelected(values);
+                dispatch(scheduleSlice.actions.setSelected(values));
                 setHash(values.join(','));
                 store2.set(STORE_GROUP_NAME_KEY, values[0]);
             }
         },
-        [setSelected, setHash, selected]
+        [dispatch, setHash, selected]
     );
 
     const fixSelected = React.useCallback(
@@ -125,8 +133,12 @@ export const useSelectGroupComponent = (usingDefault = true) => {
         (state = true) => {
             setAllowedMultiple(state);
             store2.set(STORE_ALLOW_MULTIPLE_GROUP_KEY, state);
+            if (!state) {
+                const value = selected[0];
+                handleChange({ target: { value } });
+            }
         },
-        [setAllowedMultiple]
+        [setAllowedMultiple, handleChange, selected]
     );
 
     // Check correct names after institutes loading
@@ -157,7 +169,9 @@ export const useSelectGroupComponent = (usingDefault = true) => {
         }
     }, []);
 
-    const render = (props: { fetchingSchedule: boolean }) => (
+    const isMultiple = allowedMultiple || selected.length > 1;
+
+    return (
         <Box
             sx={{
                 display: 'flex',
@@ -166,15 +180,15 @@ export const useSelectGroupComponent = (usingDefault = true) => {
             }}
         >
             <FormControl sx={{ m: 1, minWidth: 120 }}>
-                <InputLabel htmlFor="grouped-native-select">Группа</InputLabel>
+                <InputLabel htmlFor="grouped-native-select">Групп{isMultiple ? 'ы' : 'а'}</InputLabel>
                 <Select
-                    multiple={allowedMultiple || selected.length > 1}
+                    multiple={isMultiple}
                     value={selected}
                     onChange={handleChange}
                     id="grouped-native-select"
-                    label="Группа"
+                    label={`Групп${isMultiple ? 'ы' : 'а'}`}
                     renderValue={
-                        ((allowedMultiple || selected.length > 1) &&
+                        (isMultiple &&
                             ((selected: string[]) => (
                                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                                     {selected.map((value) => (
@@ -184,7 +198,7 @@ export const useSelectGroupComponent = (usingDefault = true) => {
                             ))) ||
                         undefined
                     }
-                    disabled={!!props.fetchingSchedule}
+                    disabled={!!fetchingSchedule}
                 >
                     {!usingDefault && <MenuItem value="">---</MenuItem>}
                     {institutes.map((institute) => [
@@ -198,6 +212,13 @@ export const useSelectGroupComponent = (usingDefault = true) => {
                 </Select>
             </FormControl>
             <FormControl sx={{ pl: 1 }}>
+                <IconButton
+                    onClick={() => allowMultiple(!allowedMultiple)}
+                    color="inherit"
+                    sx={{ transform: allowedMultiple ? 'rotate(180deg)' : '', transition: 'transform 150ms ease' }}
+                >
+                    <MultipleIcon />
+                </IconButton>
                 <ThemeModeButton />
             </FormControl>
             <FormControl sx={{ pl: 1 }}>
@@ -205,6 +226,4 @@ export const useSelectGroupComponent = (usingDefault = true) => {
             </FormControl>
         </Box>
     );
-
-    return [render, selected, isCached] as const;
 };
