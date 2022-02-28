@@ -17,10 +17,9 @@ import MultipleIcon from '@mui/icons-material/LocalPizza';
 import { ThemeModeButton } from './ThemeMode.component';
 import VersionComponent from './Version.component';
 
-import scheduleSlice from '../store/reducer/schedule/schedule.slice';
+import scheduleSlice, { STORE_GROUP_NAME_KEY } from '../store/reducer/schedule/schedule.slice';
 import { apiPath } from '../utils';
 
-export const STORE_GROUP_NAME_KEY = 'lastGroupName';
 export const STORE_ALLOW_MULTIPLE_GROUP_KEY = 'allowMultipleGroup';
 const STORE_CACHED_INSTITUTES_KEY = 'CACHED_INSTITUTES';
 
@@ -103,7 +102,8 @@ export const SelectGroupComponent = (props: { fetchingSchedule: boolean; usingDe
         ({ target: { value } }) => {
             value = typeof value === 'string' ? value.split(',') : value;
             let values: string[] = value.length > 0 ? value : [DEFAULT_GROUP];
-            values = values.length > 2 ? [values[0], ...values.slice(2)].slice(0, 2) : values;
+            const maxGroups = 2;
+            values = values.length > 2 ? [values[0], ...values.slice(-maxGroups)] : values;
 
             if (values.some((e, i) => selected[i] !== e) || values.length !== selected.length) {
                 dispatch(scheduleSlice.actions.setSelected(values));

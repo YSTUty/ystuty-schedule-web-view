@@ -1,6 +1,7 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
 import store2 from 'store2';
-import { useNetworkState } from 'react-use';
+// import { useNetworkState } from 'react-use';
 
 import { LessonFlags, OneWeek } from '../../interfaces/ystuty.types';
 import { apiPath, createEvent } from '../../utils';
@@ -8,10 +9,14 @@ import { apiPath, createEvent } from '../../utils';
 // TODO: add removing old cache
 const STORE_CACHED_GROUP_KEY = 'CACHED_GROUP::';
 
-export const useScheduleLoader = (setScheduleData: Function) => {
-    const { online } = useNetworkState();
-    const [fetching, setFetching] = React.useState(false);
+export const useScheduleLoader = () => {
+    // const { online } = useNetworkState();
+    const { selectedGroups } = useSelector((state) => state.schedule);
+
+    const [fetchings, setFetchings] = React.useState<Record<string, boolean>>({});
     const [isCached, setIsCached] = React.useState(false);
+
+    const [schedulesData, setSchedulesData] = React.useState<Record<string, { time: number; sources: any[] }>>();
 
     const formatData = React.useCallback(
         (name: string, items: OneWeek[] | null) => {
@@ -46,19 +51,24 @@ export const useScheduleLoader = (setScheduleData: Function) => {
                 []
             );
 
-            setScheduleData(sources);
+            setSchedulesData((state) => ({ ...state, [name]: { time: Date.now(), sources } }));
         },
-        [setScheduleData, setIsCached]
+        [setSchedulesData, setIsCached]
     );
 
     const loadSchedule = React.useCallback(
-        (groupName: string) => {
-            if (fetching) {
+        (name: string) => {
+            if (schedulesData?.[name] && Date.now() - schedulesData[name].time < 60e3) {
+                formatData(name, null);
                 return;
             }
 
-            setFetching(true);
-            fetch(`${apiPath}/ystu/schedule/group/${groupName}`)
+            if (fetchings[name]) {
+                return;
+            }
+
+            setFetchings((s) => ({ ...s, [name]: true }));
+            fetch(`${apiPath}/ystu/schedule/group/${name}`)
                 .then((response) => response.json())
                 .then(
                     (
@@ -68,21 +78,36 @@ export const useScheduleLoader = (setScheduleData: Function) => {
                             alert(`Error: ${response.error.message}`);
                             return;
                         }
-                        formatData(groupName, response!.items);
+                        formatData(name, response!.items);
                     }
                 )
                 .catch((e) => {
-                    formatData(groupName, null);
-                    if (online) {
-                        alert(`Fail: ${e.message}`);
-                    }
+                    console.log(e);
+
+                    formatData(name, null);
+                    // if (online) {
+                    //     alert(`Fail: ${e.message}`);
+                    // }
                 })
                 .finally(() => {
-                    setFetching(false);
+                    setFetchings((s) => ({ ...s, [name]: false }));
                 });
         },
-        [fetching, setFetching, formatData, online]
+        [schedulesData, fetchings, setFetchings, formatData /* online */]
     );
 
-    return [loadSchedule, fetching, isCached] as const;
+    React.useEffect(() => {
+        for (const name of selectedGroups) {
+            loadSchedule(name);
+        }
+    }, [selectedGroups]);
+
+    const scheduleData = React.useMemo(
+        () => selectedGroups.map((name) => ({ name, data: schedulesData?.[name]?.sources! })).filter((e) => !!e.data),
+        [selectedGroups, schedulesData]
+    );
+
+    const isFetching = React.useMemo(() => Object.values(fetchings).some((e) => e), [fetchings]);
+
+    return [scheduleData, isFetching, isCached] as const;
 };
