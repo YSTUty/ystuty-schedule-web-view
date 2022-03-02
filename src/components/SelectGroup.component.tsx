@@ -116,14 +116,17 @@ export const SelectGroupComponent = (props: { fetchingSchedule: boolean; usingDe
 
     const fixSelected = React.useCallback(
         (_selected: string[] = selected) => {
+            let value = _selected;
             const groups = institutes.flatMap((e) => e.groups.map((e) => e));
-            const lowerGroups = groups.map((e) => e.toLowerCase());
-            const lowerSelected = _selected.map((e) => e.toLowerCase());
-            let value = lowerSelected
-                .map((e) => lowerGroups.findIndex((g) => g === e))
-                .filter((e) => e > -1)
-                .map((e) => groups[e]);
-            value = value.filter((w, i) => value.indexOf(w) === i);
+            if (groups.length > 1) {
+                const lowerGroups = groups.map((e) => e.toLowerCase());
+                const lowerSelected = _selected.map((e) => e.toLowerCase());
+                value = lowerSelected
+                    .map((e) => lowerGroups.findIndex((g) => g === e))
+                    .filter((e) => e > -1)
+                    .map((e) => groups[e]);
+                value = value.filter((w, i) => value.indexOf(w) === i);
+            }
             handleChange({ target: { value } });
         },
         [institutes, selected, handleChange]
@@ -163,6 +166,7 @@ export const SelectGroupComponent = (props: { fetchingSchedule: boolean; usingDe
 
     React.useEffect(() => {
         loadGroupsList();
+        fixSelected(defaultValues);
 
         if (window.location.search.includes('allow_multiple')) {
             allowMultiple();
