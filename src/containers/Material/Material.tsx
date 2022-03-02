@@ -373,7 +373,8 @@ const MaterialContainer = (props: { scheduleData: { name: string; data: any[] }[
 
                 <MonthView />
                 <WeekView startDayHour={6} endDayHour={23} excludedDays={[0]} />
-                <DayView displayName="Days" startDayHour={6} endDayHour={23} intervalCount={3} />
+                {/* <DayView displayName="Days" startDayHour={6} endDayHour={23} intervalCount={3} /> */}
+                <DayView startDayHour={6} endDayHour={23} />
 
                 <Appointments appointmentComponent={Appointment} appointmentContentComponent={AppointmentContent} />
                 <AppointmentTooltip contentComponent={AppointmentTooltipContent} />
