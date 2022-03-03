@@ -26,10 +26,10 @@ import { ViewState } from '@devexpress/dx-react-scheduler';
 
 import RoomIcon from '@mui/icons-material/Room';
 import TimeIcon from '@mui/icons-material/MoreTime';
-import PeopleIcon from '@mui/icons-material/People';
+import TeacherIcon from '@mui/icons-material/PermIdentity';
 import LessonIcon from '@mui/icons-material/BookRounded';
-import GroupsIcon from '@mui/icons-material/GroupsOutlined';
-import PeoplesIcon from '@mui/icons-material/PeopleOutlineSharp';
+import DivisionGroupsIcon from '@mui/icons-material/PeopleOutlined';
+import StreamGroupsIcon from '@mui/icons-material/Groups';
 import OnlinePredictionIcon from '@mui/icons-material/OnlinePrediction';
 import InfoIcon from '@mui/icons-material/Info';
 
@@ -247,7 +247,7 @@ const AppointmentTooltipContent = ({ children, appointmentData, ...restProps }: 
             <Grid container alignItems="center">
                 <StyledGrid item xs={2} className={classes.textCenter}>
                     <StyledIcon className={classes.icon}>
-                        <PeoplesIcon />
+                        <StreamGroupsIcon />
                     </StyledIcon>
                 </StyledGrid>
                 <Grid item xs={10}>
@@ -259,7 +259,7 @@ const AppointmentTooltipContent = ({ children, appointmentData, ...restProps }: 
             <Grid container alignItems="center">
                 <StyledGrid item xs={2} className={classes.textCenter}>
                     <StyledIcon className={classes.icon}>
-                        <GroupsIcon />
+                        <DivisionGroupsIcon />
                     </StyledIcon>
                 </StyledGrid>
                 <Grid item xs={10}>
@@ -271,7 +271,7 @@ const AppointmentTooltipContent = ({ children, appointmentData, ...restProps }: 
             <Grid container alignItems="center">
                 <StyledGrid item xs={2} className={classes.textCenter}>
                     <StyledIcon className={classes.icon}>
-                        <PeopleIcon />
+                        <TeacherIcon />
                     </StyledIcon>
                 </StyledGrid>
                 <Grid item xs={10}>
