@@ -3,14 +3,13 @@ import { useHash, useNetworkState } from 'react-use';
 import { useDispatch, useSelector } from 'react-redux';
 import store2 from 'store2';
 
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import ListSubheader from '@mui/material/ListSubheader';
 import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
+import Autocomplete, { autocompleteClasses } from '@mui/material/Autocomplete';
 import Box from '@mui/material/Box';
-import Chip from '@mui/material/Chip';
 import IconButton from '@mui/material/IconButton';
+import TextField from '@mui/material/TextField';
+import Popper, { PopperProps } from '@mui/material/Popper';
+import { styled } from '@mui/material/styles';
 
 import MultipleIcon from '@mui/icons-material/LocalPizza';
 
@@ -25,16 +24,22 @@ const STORE_CACHED_INSTITUTES_KEY = 'CACHED_INSTITUTES';
 
 const DEFAULT_GROUP: string = store2.get(STORE_GROUP_NAME_KEY, 'ЭИС-46');
 
-export const SelectGroupComponent = (props: { fetchingSchedule: boolean; usingDefault?: boolean }) => {
-    const { fetchingSchedule, usingDefault = true } = props;
+const StyledPopper = styled(Popper)({
+    [`& .${autocompleteClasses.listbox}`]: {
+        '& ul': { margin: 0 },
+        '& li': { margin: 0 },
+    },
+});
+
+const MyPopper = (props: PopperProps) => <StyledPopper {...props} style={{ width: 350 }} />;
+
+export const SelectGroupComponent = (props: { fetchingSchedule: boolean }) => {
+    const { fetchingSchedule } = props;
     const dispatch = useDispatch();
     const { selectedGroups: selected } = useSelector((state) => state.schedule);
 
     const [allowedMultiple, setAllowedMultiple] = React.useState(!!store2.get(STORE_ALLOW_MULTIPLE_GROUP_KEY, false));
     const { online, previous: previousOnline, since } = useNetworkState();
-    const [institutes, setInstitutes] = React.useState<{ name: string; groups: string[] }[]>([
-        { name: 'Default', groups: [DEFAULT_GROUP] },
-    ]);
     const [hash, setHash] = useHash();
     const defaultValues = React.useMemo(() => {
         const defaultHash = decodeURI(hash.slice(1)) || DEFAULT_GROUP;
@@ -42,6 +47,9 @@ export const SelectGroupComponent = (props: { fetchingSchedule: boolean; usingDe
         store2.set(STORE_GROUP_NAME_KEY, values[0]);
         return values;
     }, [hash]);
+    const [institutes, setInstitutes] = React.useState<{ name: string; groups: string[] }[]>([
+        { name: 'Default', groups: defaultValues },
+    ]);
     const [fetching, setFetching] = React.useState(false);
     const [isCached, setIsCached] = React.useState(false);
 
@@ -98,9 +106,9 @@ export const SelectGroupComponent = (props: { fetchingSchedule: boolean; usingDe
             });
     }, [fetching, setFetching, applyInstitutes, online]);
 
-    const handleChange = React.useCallback(
-        ({ target: { value } }) => {
-            value = typeof value === 'string' ? value.split(',') : value;
+    const onChangeValues = React.useCallback(
+        (value: string | string[] | null) => {
+            value = typeof value === 'string' ? value.split(',') : value || [DEFAULT_GROUP];
             let values: string[] = value.length > 0 ? value : [DEFAULT_GROUP];
             const maxGroups = 2;
             values = values.length > 2 ? [values[0], ...values.slice(-maxGroups)] : values;
@@ -127,9 +135,9 @@ export const SelectGroupComponent = (props: { fetchingSchedule: boolean; usingDe
                     .map((e) => groups[e]);
                 value = value.filter((w, i) => value.indexOf(w) === i);
             }
-            handleChange({ target: { value } });
+            onChangeValues(value);
         },
-        [institutes, selected, handleChange]
+        [institutes, selected, onChangeValues]
     );
 
     const allowMultiple = React.useCallback(
@@ -138,10 +146,10 @@ export const SelectGroupComponent = (props: { fetchingSchedule: boolean; usingDe
             store2.set(STORE_ALLOW_MULTIPLE_GROUP_KEY, state);
             if (!state) {
                 const value = selected[0];
-                handleChange({ target: { value } });
+                onChangeValues(value);
             }
         },
-        [setAllowedMultiple, handleChange, selected]
+        [setAllowedMultiple, onChangeValues, selected]
     );
 
     // Check correct names after institutes loading
@@ -175,6 +183,15 @@ export const SelectGroupComponent = (props: { fetchingSchedule: boolean; usingDe
 
     const isMultiple = allowedMultiple || selected.length > 1;
 
+    const options = React.useMemo(
+        () =>
+            institutes.reduce(
+                (prev, cur) => ({ ...prev, ...Object.fromEntries(cur.groups.map((g) => [g, cur.name])) }),
+                {} as Record<string, string>
+            ),
+        [institutes]
+    );
+
     return (
         <Box
             sx={{
@@ -184,36 +201,36 @@ export const SelectGroupComponent = (props: { fetchingSchedule: boolean; usingDe
             }}
         >
             <FormControl sx={{ m: 1, minWidth: 120 }}>
-                <InputLabel htmlFor="grouped-native-select">Групп{isMultiple ? 'ы' : 'а'}</InputLabel>
-                <Select
+                <Autocomplete
                     multiple={isMultiple}
-                    value={selected}
-                    onChange={handleChange}
+                    sx={{ minWidth: 200, maxWidth: 400 }}
                     id="grouped-native-select"
-                    label={`Групп${isMultiple ? 'ы' : 'а'}`}
-                    renderValue={
-                        (isMultiple &&
-                            ((selected: string[]) => (
-                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                    {selected.map((value) => (
-                                        <Chip key={value} label={value} />
-                                    ))}
-                                </Box>
-                            ))) ||
-                        undefined
-                    }
+                    options={Object.keys(options)}
+                    disableCloseOnSelect
+                    disableListWrap
+                    getOptionLabel={(option) => option}
+                    groupBy={(option) => options[option]}
+                    renderInput={(params) => (
+                        <TextField
+                            {...params}
+                            label={`Групп${isMultiple ? 'ы' : 'а'}`}
+                            placeholder={((e) => e[Math.floor(Math.random() * e.length)])(Object.keys(options))}
+                        />
+                    )}
+                    PopperComponent={MyPopper}
+                    value={!isMultiple && Array.isArray(selected) ? selected[0] : selected}
+                    onChange={(event, newValue, reason) => {
+                        if (
+                            event.type === 'keydown' &&
+                            (event as React.KeyboardEvent).key === 'Backspace' &&
+                            reason === 'removeOption'
+                        ) {
+                            return;
+                        }
+                        onChangeValues(newValue);
+                    }}
                     disabled={!!fetchingSchedule}
-                >
-                    {!usingDefault && <MenuItem value="">---</MenuItem>}
-                    {institutes.map((institute) => [
-                        <ListSubheader key={institute.name}>{institute.name}</ListSubheader>,
-                        institute.groups.sort().map((e) => (
-                            <MenuItem key={e} value={e}>
-                                {e}
-                            </MenuItem>
-                        )),
-                    ])}
-                </Select>
+                />
             </FormControl>
             <FormControl sx={{ pl: 1 }}>
                 <IconButton
