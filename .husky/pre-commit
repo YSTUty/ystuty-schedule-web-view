@@ -1,0 +1,6 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+node ./scripts/write-version.js
+
+git add ./public/version.json
