@@ -25,14 +25,11 @@ const App = () => {
         store2.set('appVersion', appVersion.v);
     }, []);
 
-    if (window.location.hostname === appConstants.pwaHostname) {
-        if (!deviceUtils.isPWA()) {
-            // return null;
-            // TODO: redirect to main domain?
-        }
-
-        if (pathname === '/pwa') {
+    if (pathname === '/pwa') {
+        if (window.location.hostname === appConstants.pwaHostname) {
             return <PWAInstructionComponent />;
+        } else {
+            window.location.href = `https://${appConstants.pwaHostname}`;
         }
     }
 

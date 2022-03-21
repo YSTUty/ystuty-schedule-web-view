@@ -60,9 +60,5 @@ export const checkPWA = () => {
         window.location.pathname !== '/pwa'
     ) {
         history.push('/pwa');
-        // fix rerendering
-        if (deviceUtils.isIOS()) {
-            window.location.reload();
-        }
     }
 };

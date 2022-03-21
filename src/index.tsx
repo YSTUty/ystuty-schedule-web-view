@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
-import { Router } from 'react-router';
+import { Route, Router, Switch } from 'react-router';
 
 import './utils/hawk.util';
 import store, { history } from './store';
@@ -26,7 +26,10 @@ ReactDOM.render(
                     <Router history={history}>
                         <ServiceWorkerProvider>
                             <LoadingUpdatesComponent>
-                                <App />
+                                <Switch>
+                                    <Route strict path="/(|pwa)" component={App} />
+                                    <Route path="/" component={() => <b>not found</b>} />
+                                </Switch>
                             </LoadingUpdatesComponent>
                         </ServiceWorkerProvider>
                     </Router>
