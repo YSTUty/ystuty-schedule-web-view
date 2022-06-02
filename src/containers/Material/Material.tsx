@@ -156,6 +156,10 @@ const getLessonTypeStrArr = (type: LessonFlags) => {
     if (type & LessonFlags.Practical) types.push('ПР');
     if (type & LessonFlags.Labaratory) types.push('ЛР');
     if (type & LessonFlags.CourseProject) types.push('КП');
+    if (type & LessonFlags.Consultation) types.push('Консультация');
+    if (type & LessonFlags.DifferentiatedTest) types.push('ДИФ.ЗАЧ');
+    if (type & LessonFlags.Test) types.push('ЗАЧ');
+    if (type & LessonFlags.Exam) types.push('ЭКЗ');
     if (type & LessonFlags.None) types.push('???');
     return types;
 };
@@ -322,10 +326,14 @@ const resources = [
         fieldName: 'typeArr',
         title: 'Type',
         instances: [
-            { id: 1 << 1, text: 'Лекция', color: green },
-            { id: 1 << 2, text: 'Практика', color: yellow },
-            { id: 1 << 3, text: 'Лабораторна работа', color: blue },
-            { id: 1 << 4, text: 'Курсовой проект', color: red },
+            { id: LessonFlags.Lecture, text: 'Лекция', color: green },
+            { id: LessonFlags.Practical, text: 'Практика', color: yellow },
+            { id: LessonFlags.Labaratory, text: 'Лабораторна работа', color: blue },
+            { id: LessonFlags.CourseProject, text: 'Курсовой проект', color: red },
+            { id: LessonFlags.Consultation, text: 'Консультация', color: green },
+            { id: LessonFlags.Test, text: 'Зачет', color: teal },
+            { id: LessonFlags.DifferentiatedTest, text: 'Диф. зачет', color: red },
+            { id: LessonFlags.Exam, text: 'Экзамен', color: red },
             // etc...
         ],
         allowMultiple: true,

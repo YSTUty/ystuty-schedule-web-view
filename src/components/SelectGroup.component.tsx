@@ -80,7 +80,7 @@ export const SelectGroupComponent = (props: { fetchingSchedule: boolean }) => {
         // setInstitutes([]);
         setFetching(true);
 
-        fetch(`${apiPath}/ystu/schedule/institutes`)
+        fetch(`${apiPath}/ystu/schedule/institutes?extramural=true`)
             .then((response) => response.json())
             .then(
                 (

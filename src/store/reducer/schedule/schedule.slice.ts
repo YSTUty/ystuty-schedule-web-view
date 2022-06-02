@@ -7,7 +7,16 @@ export const DEFAULT_GROUP: string = store2.get(STORE_GROUP_NAME_KEY, 'ЭИС-46
 
 const initialState = {
     selectedGroups: [DEFAULT_GROUP] as string[],
-    lessonTypes: [LessonFlags.Lecture, LessonFlags.Labaratory, LessonFlags.Practical, LessonFlags.CourseProject],
+    lessonTypes: [
+        LessonFlags.Lecture,
+        LessonFlags.Labaratory,
+        LessonFlags.Practical,
+        LessonFlags.CourseProject,
+        LessonFlags.Consultation,
+        LessonFlags.Test,
+        LessonFlags.DifferentiatedTest,
+        LessonFlags.Exam,
+    ],
     lessonFilter: '',
 };
 

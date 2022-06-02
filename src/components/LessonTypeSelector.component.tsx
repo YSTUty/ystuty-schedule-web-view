@@ -25,12 +25,12 @@ const StyledButtonGroup = styled(ButtonGroup)(({ theme: { spacing, palette } }) 
         height: spacing(4.875),
     },
     [`& .${classes.longButtonText}`]: {
-        '@media (max-width: 800px)': {
+        '@media (max-width: 1200px)': {
             display: 'none',
         },
     },
     [`& .${classes.shortButtonText}`]: {
-        '@media (min-width: 800px)': {
+        '@media (min-width: 1200px)': {
             display: 'none',
         },
     },
@@ -38,9 +38,16 @@ const StyledButtonGroup = styled(ButtonGroup)(({ theme: { spacing, palette } }) 
         paddingLeft: spacing(1),
         paddingRight: spacing(1),
         width: spacing(12),
-        '@media (max-width: 800px)': {
+        '@media (max-width: 1200px)': {
             width: spacing(2),
             fontSize: '0.75rem',
+        },
+        '@media (max-width: 800px)': {
+            width: spacing(1),
+            fontSize: '0.70rem',
+        },
+        '@media (max-width: 600px)': {
+            display: 'none',
         },
     },
     [`& .${classes.selectedButton}`]: {
@@ -57,9 +64,27 @@ const StyledButtonGroup = styled(ButtonGroup)(({ theme: { spacing, palette } }) 
     },
 }));
 
-const LESSON_TYPES = [LessonFlags.Lecture, LessonFlags.Labaratory, LessonFlags.Practical, LessonFlags.CourseProject];
-// const LESSON_TYPE_SHORT_NAMES = ['Лек', 'ЛР', 'ПР', 'КП'];
-const LESSON_TYPE_NAMES = ['Лекции', 'Лабы', 'Практики', 'Курсовые'];
+const LESSON_TYPES = [
+    LessonFlags.Lecture,
+    LessonFlags.Labaratory,
+    LessonFlags.Practical,
+    LessonFlags.CourseProject,
+    LessonFlags.Consultation,
+    LessonFlags.Test,
+    LessonFlags.DifferentiatedTest,
+    LessonFlags.Exam,
+];
+const LESSON_TYPE_SHORT_NAMES = ['Лек', 'ЛР', 'ПР', 'КП', 'КОН', 'ЗАЧ', 'ДИФ', 'ЭКЗ'];
+const LESSON_TYPE_NAMES = [
+    'Лекции',
+    'Лабы',
+    'Практики',
+    'Курсовые',
+    'Консультации',
+    'Зачеты',
+    'Диф. зачеты',
+    'Экзамены',
+];
 
 const getButtonClass = (lessonTypes: LessonFlags[], type: LessonFlags) =>
     lessonTypes.includes(type) && classes.selectedButton;
@@ -68,15 +93,19 @@ const LessonTypeSelector = () => {
     const { lessonTypes } = useSelector((state) => state.schedule);
     const dispatch = useDispatch();
 
+    // TODO: add drop-down list for mobile
     return (
         <StyledButtonGroup className={classes.locationSelector}>
             {LESSON_TYPES.map((type, index) => (
                 <Button
-                    className={classNames(classes.button, classes.longButtonText, getButtonClass(lessonTypes, type))}
+                    className={classNames(
+                        classes.button,
+                        /* classes.longButtonText, */ getButtonClass(lessonTypes, type)
+                    )}
                     onClick={() => dispatch(scheduleSlice.actions.toggleSelectedTypeLessons(type))}
                     key={type}
                 >
-                    {/* <span className={classes.shortButtonText}>{LESSON_TYPE_SHORT_NAMES[index]}</span> */}
+                    <span className={classes.shortButtonText}>{LESSON_TYPE_SHORT_NAMES[index]}</span>
                     <span className={classes.longButtonText}>{LESSON_TYPE_NAMES[index]}</span>
                 </Button>
             ))}
