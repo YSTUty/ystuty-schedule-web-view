@@ -1,9 +1,10 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import store2 from 'store2';
 // import { useNetworkState } from 'react-use';
 
 import { LessonData, LessonFlags, OneWeek } from '../../interfaces/ystuty.types';
+import alertSlice from '../../store/reducer/alert/alert.slice';
 import { apiPath, createEvent } from '../../utils';
 
 // TODO: add removing old cache
@@ -11,6 +12,7 @@ const STORE_CACHED_GROUP_KEY = 'CACHED_GROUP::';
 
 export const useScheduleLoader = () => {
     // const { online } = useNetworkState();
+    const dispatch = useDispatch();
     const { selectedGroups } = useSelector((state) => state.schedule);
 
     const [fetchings, setFetchings] = React.useState<Record<string, boolean>>({});
@@ -75,7 +77,12 @@ export const useScheduleLoader = () => {
                         response: { isCache: boolean; items: OneWeek[] } | { error: { error: string; message: string } }
                     ) => {
                         if ('error' in response) {
-                            alert(`Error: ${response.error.message}`);
+                            dispatch(
+                                alertSlice.actions.add({
+                                    message: `Error: ${response.error.message}`,
+                                    severity: 'error',
+                                })
+                            );
                             return;
                         }
                         formatData(name, response!.items);

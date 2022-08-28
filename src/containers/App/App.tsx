@@ -3,6 +3,7 @@ import { useHistory } from 'react-router';
 import store2 from 'store2';
 
 import LazyLoadComponent from '../../components/LazyLoad.component';
+import { AlertMe } from '../../components/AlertMe.component';
 
 import * as appConstants from '../../constants/app.constants';
 import * as deviceUtils from '../../utils/device.utils';
@@ -35,6 +36,7 @@ const App = () => {
 
     return (
         <>
+            <AlertMe />
             <ScheduleView />
         </>
     );

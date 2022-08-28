@@ -15,8 +15,10 @@ import MultipleIcon from '@mui/icons-material/LocalPizza';
 
 import { ThemeModeButton } from './ThemeMode.component';
 import VersionComponent from './Version.component';
+import { AlertMeToggler } from './AlertMe.component';
 
 import scheduleSlice, { STORE_GROUP_NAME_KEY } from '../store/reducer/schedule/schedule.slice';
+import alertSlice from '../store/reducer/alert/alert.slice';
 import { apiPath } from '../utils';
 
 export const STORE_ALLOW_MULTIPLE_GROUP_KEY = 'allowMultipleGroup';
@@ -89,7 +91,12 @@ export const SelectGroupComponent = (props: { fetchingSchedule: boolean }) => {
                         | { error: { error: string; message: string } }
                 ) => {
                     if ('error' in response) {
-                        alert(`Error: ${response.error.message}`);
+                        dispatch(
+                            alertSlice.actions.add({
+                                message: `Error: ${response.error.message}`,
+                                severity: 'warning',
+                            })
+                        );
                         return;
                     }
                     applyInstitutes(response!.items);
@@ -98,7 +105,12 @@ export const SelectGroupComponent = (props: { fetchingSchedule: boolean }) => {
             .catch((e) => {
                 applyInstitutes(null);
                 if (online) {
-                    alert(`Fail: ${e.message}`);
+                    dispatch(
+                        alertSlice.actions.add({
+                            message: `Error: ${e.message}`,
+                            severity: 'error',
+                        })
+                    );
                 }
             })
             .finally(() => {
@@ -244,6 +256,9 @@ export const SelectGroupComponent = (props: { fetchingSchedule: boolean }) => {
             </FormControl>
             <FormControl sx={{ pl: 1 }}>
                 <VersionComponent />
+            </FormControl>
+            <FormControl sx={{ pl: 1 }}>
+                <AlertMeToggler />
             </FormControl>
         </Box>
     );

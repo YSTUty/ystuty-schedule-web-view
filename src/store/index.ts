@@ -3,9 +3,11 @@ import { configureStore } from '@reduxjs/toolkit';
 import { createBrowserHistory } from 'history';
 
 import scheduleSlice from './reducer/schedule/schedule.slice';
+import alertSlice from './reducer/alert/alert.slice';
 
 export const reducer = combineReducers({
     schedule: scheduleSlice.reducer,
+    alert: alertSlice.reducer,
 });
 
 export type RootState = ReturnType<typeof reducer>;
