@@ -11,7 +11,8 @@ import TextField from '@mui/material/TextField';
 import Popper, { PopperProps } from '@mui/material/Popper';
 import { styled } from '@mui/material/styles';
 
-import MultipleIcon from '@mui/icons-material/LocalPizza';
+import LocalPizza from '@mui/icons-material/LocalPizza';
+import TelegramIcon from '@mui/icons-material/Telegram';
 
 import { ThemeModeButton } from './ThemeMode.component';
 import VersionComponent from './Version.component';
@@ -20,6 +21,7 @@ import { AlertMeToggler } from './AlertMe.component';
 import scheduleSlice, { STORE_GROUP_NAME_KEY } from '../store/reducer/schedule/schedule.slice';
 import alertSlice from '../store/reducer/alert/alert.slice';
 import { apiPath } from '../utils';
+import * as appConstants from '../constants/app.constants';
 
 export const STORE_ALLOW_MULTIPLE_GROUP_KEY = 'allowMultipleGroup';
 const STORE_CACHED_INSTITUTES_KEY = 'CACHED_INSTITUTES';
@@ -250,7 +252,7 @@ export const SelectGroupComponent = (props: { fetchingSchedule: boolean }) => {
                     color="inherit"
                     sx={{ transform: allowedMultiple ? 'rotate(180deg)' : '', transition: 'transform 150ms ease' }}
                 >
-                    <MultipleIcon />
+                    <LocalPizza />
                 </IconButton>
                 <ThemeModeButton />
             </FormControl>
@@ -258,6 +260,14 @@ export const SelectGroupComponent = (props: { fetchingSchedule: boolean }) => {
                 <VersionComponent />
             </FormControl>
             <FormControl sx={{ pl: 1 }}>
+                {appConstants.telegramBotName && (
+                    <IconButton
+                        onClick={() => window.open(`https://t.me/${appConstants.telegramBotName}?start=viewer`)}
+                        color="inherit"
+                    >
+                        <TelegramIcon />
+                    </IconButton>
+                )}
                 <AlertMeToggler />
             </FormControl>
         </Box>
