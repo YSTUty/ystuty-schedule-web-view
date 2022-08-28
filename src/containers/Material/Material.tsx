@@ -160,6 +160,8 @@ const getLessonTypeStrArr = (type: LessonFlags) => {
     if (type & LessonFlags.DifferentiatedTest) types.push('ДИФ.ЗАЧ');
     if (type & LessonFlags.Test) types.push('ЗАЧ');
     if (type & LessonFlags.Exam) types.push('ЭКЗ');
+    if (type & LessonFlags.Library) types.push('Библиотека');
+    if (type & LessonFlags.ResearchWork) types.push('НИР');
     if (type & LessonFlags.None) types.push('???');
     return types;
 };
@@ -337,6 +339,8 @@ const resources = [
             { id: LessonFlags.Test, text: 'Зачет', color: teal },
             { id: LessonFlags.DifferentiatedTest, text: 'Диф. зачет', color: red },
             { id: LessonFlags.Exam, text: 'Экзамен', color: red },
+            { id: LessonFlags.Library, text: 'Библиотека', color: teal },
+            { id: LessonFlags.ResearchWork, text: 'Научно-исследовательская работа', color: yellow },
             // etc...
         ],
         allowMultiple: true,

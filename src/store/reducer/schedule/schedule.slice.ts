@@ -16,6 +16,8 @@ const initialState = {
         LessonFlags.Test,
         LessonFlags.DifferentiatedTest,
         LessonFlags.Exam,
+        LessonFlags.Library,
+        LessonFlags.ResearchWork,
     ],
     lessonFilter: '',
 };
