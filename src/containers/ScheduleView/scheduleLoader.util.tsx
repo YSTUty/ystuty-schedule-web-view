@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import store2 from 'store2';
 // import { useNetworkState } from 'react-use';
 
-import { LessonFlags, OneWeek } from '../../interfaces/ystuty.types';
+import { LessonData, LessonFlags, OneWeek } from '../../interfaces/ystuty.types';
 import { apiPath, createEvent } from '../../utils';
 
 // TODO: add removing old cache
@@ -16,7 +16,7 @@ export const useScheduleLoader = () => {
     const [fetchings, setFetchings] = React.useState<Record<string, boolean>>({});
     const [isCached, setIsCached] = React.useState(false);
 
-    const [schedulesData, setSchedulesData] = React.useState<Record<string, { time: number; sources: any[] }>>();
+    const [schedulesData, setSchedulesData] = React.useState<Record<string, { time: number; sources: LessonData[] }>>();
 
     const formatData = React.useCallback(
         (name: string, items: OneWeek[] | null) => {
@@ -32,23 +32,23 @@ export const useScheduleLoader = () => {
             }
 
             const sources = items.reduce(
-                (prev: any[], week) => [
+                (prev, week) => [
                     ...prev,
                     ...week.days.flatMap((day) =>
                         day.lessons.map((lesson) =>
-                            createEvent({
+                            createEvent<LessonData>({
                                 ...lesson,
-                                start: lesson.startAt,
-                                end: lesson.endAt,
-                                title: lesson.lessonName,
-                                typeArr: Object.values(LessonFlags).filter(
-                                    (e: any) => (lesson.type & e) === e && e !== LessonFlags.None
+                                start: lesson.startAt!,
+                                end: lesson.endAt!,
+                                title: lesson.lessonName!,
+                                typeArr: (Object.values(LessonFlags) as LessonFlags[]).filter(
+                                    (e) => (lesson.type & e) === e && e !== LessonFlags.None
                                 ),
                             })
                         )
                     ),
                 ],
-                []
+                [] as LessonData[]
             );
 
             setSchedulesData((state) => ({ ...state, [name]: { time: Date.now(), sources } }));
