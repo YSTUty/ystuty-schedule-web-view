@@ -36,7 +36,7 @@ import InfoIcon from '@mui/icons-material/Info';
 import LessonFilter from '../../components/LessonFilter.component';
 import LessonTypeSelector from '../../components/LessonTypeSelector.component';
 
-import { LessonFlags } from '../../interfaces/ystuty.types';
+import { LessonData, LessonFlags } from '../../interfaces/ystuty.types';
 
 const PREFIX = 'MA';
 
@@ -314,10 +314,13 @@ const AppointmentTooltipContent = ({ children, appointmentData, ...restProps }: 
     </AppointmentTooltip.Content>
 );
 
-const FlexibleSpace = (props: Toolbar.FlexibleSpaceProps) => (
+const FlexibleSpace = ({
+    allowedLessonTypes,
+    ...props
+}: Toolbar.FlexibleSpaceProps & { allowedLessonTypes?: LessonFlags[] }) => (
     <StyledToolbarFlexibleSpace {...props} className={classes.flexibleSpace}>
         <LessonFilter />
-        <LessonTypeSelector />
+        <LessonTypeSelector allowedLessonTypes={allowedLessonTypes} />
     </StyledToolbarFlexibleSpace>
 );
 
@@ -340,9 +343,12 @@ const resources = [
     },
 ];
 
-const MaterialContainer = (props: { scheduleData: { name: string; data: any[] }[]; fetchingSchedule: Boolean }) => {
+const MaterialContainer = (props: {
+    scheduleData: { name: string; data: LessonData[] }[];
+    fetchingSchedule: Boolean;
+}) => {
     const { scheduleData = [], fetchingSchedule } = props;
-    const [data, setData] = React.useState<any[]>([]);
+    const [data, setData] = React.useState<(LessonData & { startDate: Date; endDate: Date; group?: string })[]>([]);
     const { lessonTypes, lessonFilter = '' } = useSelector((state) => state.schedule);
 
     React.useEffect(() => {
@@ -361,8 +367,9 @@ const MaterialContainer = (props: { scheduleData: { name: string; data: any[] }[
     }, [setData, scheduleData]);
 
     const lowerCaseFilter = lessonFilter.toLowerCase();
-    const dataMemo = React.useMemo(
-        () =>
+    const [allowedLessonTypes, dataMemo] = React.useMemo(() => {
+        return [
+            [...new Set(data.flatMap((e) => e.typeArr))],
             data
                 .filter((item) => lessonTypes.length < 1 || lessonTypes.some((type) => item.typeArr.includes(type)))
                 .filter(
@@ -371,8 +378,8 @@ const MaterialContainer = (props: { scheduleData: { name: string; data: any[] }[
                         dataItem.auditoryName?.toLowerCase()?.includes(lowerCaseFilter) ||
                         dataItem.teacherName?.toLowerCase()?.includes(lowerCaseFilter)
                 ),
-        [data, lessonTypes, lowerCaseFilter]
-    );
+        ];
+    }, [data, lessonTypes, lowerCaseFilter]);
 
     return (
         <Paper style={{ height: '100vh' }}>
@@ -392,7 +399,7 @@ const MaterialContainer = (props: { scheduleData: { name: string; data: any[] }[
                 <CurrentTimeIndicator shadePreviousCells shadePreviousAppointments updateInterval={60e3} />
                 <Toolbar
                     {...(fetchingSchedule ? { rootComponent: ToolbarWithLoading } : null)}
-                    flexibleSpaceComponent={FlexibleSpace}
+                    flexibleSpaceComponent={() => <FlexibleSpace allowedLessonTypes={allowedLessonTypes} />}
                 />
                 <DateNavigator />
                 <ViewSwitcher />

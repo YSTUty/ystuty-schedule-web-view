@@ -89,26 +89,30 @@ const LESSON_TYPE_NAMES = [
 const getButtonClass = (lessonTypes: LessonFlags[], type: LessonFlags) =>
     lessonTypes.includes(type) && classes.selectedButton;
 
-const LessonTypeSelector = () => {
+const LessonTypeSelector = (props: { allowedLessonTypes?: LessonFlags[] }) => {
     const { lessonTypes } = useSelector((state) => state.schedule);
     const dispatch = useDispatch();
 
     // TODO: add drop-down list for mobile
     return (
         <StyledButtonGroup className={classes.locationSelector}>
-            {LESSON_TYPES.map((type, index) => (
-                <Button
-                    className={classNames(
-                        classes.button,
-                        /* classes.longButtonText, */ getButtonClass(lessonTypes, type)
-                    )}
-                    onClick={() => dispatch(scheduleSlice.actions.toggleSelectedTypeLessons(type))}
-                    key={type}
-                >
-                    <span className={classes.shortButtonText}>{LESSON_TYPE_SHORT_NAMES[index]}</span>
-                    <span className={classes.longButtonText}>{LESSON_TYPE_NAMES[index]}</span>
-                </Button>
-            ))}
+            {LESSON_TYPES.map(
+                (type, index) =>
+                    !props.allowedLessonTypes ||
+                    (props.allowedLessonTypes.includes(type) && (
+                        <Button
+                            className={classNames(
+                                classes.button,
+                                /* classes.longButtonText, */ getButtonClass(lessonTypes, type)
+                            )}
+                            onClick={() => dispatch(scheduleSlice.actions.toggleSelectedTypeLessons(type))}
+                            key={type}
+                        >
+                            <span className={classes.shortButtonText}>{LESSON_TYPE_SHORT_NAMES[index]}</span>
+                            <span className={classes.longButtonText}>{LESSON_TYPE_NAMES[index]}</span>
+                        </Button>
+                    ))
+            )}
         </StyledButtonGroup>
     );
 };
