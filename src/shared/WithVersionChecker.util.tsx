@@ -45,6 +45,7 @@ export const apiCheckAppVersion = () => {
                     resolve('reload');
                 })
                 .catch((err) => {
+                    ++resAttempts;
                     reject(err);
                 })
                 .finally(() => {
