@@ -55,8 +55,8 @@ export const checkPWA = () => {
     }
 
     if (
-        window.location.hostname === appConstants.pwaHostname &&
-        !deviceUtils.isPWA() &&
+        ((window.location.hostname === appConstants.pwaHostname && !deviceUtils.isPWA()) ||
+            window.location.hostname === appConstants.pwaHostnameOld) &&
         window.location.pathname !== '/pwa'
     ) {
         history.push('/pwa');
