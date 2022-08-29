@@ -1,4 +1,22 @@
-# Getting Started with Create React App
+<p align="center"><img src="https://ystuty.github.io/docs/assets/img/YSTUty_logo-text-without-bg-shadow.png" width="150"></p>
+
+<p align="center">
+  <img src="https://img.shields.io/github/package-json/v/YSTUty/ystuty-viewer-frontend?style=flat-square" alt="GitHub package.json version"/>
+  <img src="https://img.shields.io/github/last-commit/YSTUty/ystuty-viewer-frontend?style=flat-square" alt="GitHub last commit"/>
+  <!-- <img src="https://img.shields.io/badge/dynamic/json?color=ced&style=flat-square&logo=telegram&label=Used by&suffix= user&query=ip&url=http://ip.jsontest.com" alt="GitHub last commit"/> -->
+  <img src="https://img.shields.io/badge/dynamic/json?color=ced&style=flat-square&logo=GraphQL&label=Доступно&suffix= групп&query=$.groups&url=https://parser.ystu.site/api/ystu/schedule/count%253Fextramural=true" alt="Number of available groups"/>
+  <br/>
+  <a href="https://view.ystuty.ru"><img src="https://img.shields.io/badge/Viwe%20schedule-YSTUty-9cf?style=flat-square&logo=Internet%20Explorer" alt="view.ystuty.ru"/></a>
+  <a href="https://vk.com/ss_ystu"><img src="https://img.shields.io/badge/Bot-Use now-9cf?style=flat-square&logo=vk" alt="vk.com/ss_ystu"/></a>
+  <a href="https://t.me/ss_ystu_bot"><img src="https://img.shields.io/badge/Bot-Use now-229ED9?style=flat-square&logo=telegram" alt="t.me/ss_ystu_bot"/></a>
+</p>
+
+# [YSTUty] Viewer
+> Решение для визуализации данных в виде календаря, использующее данные из сервиса [YSTUty-Parser](https://github.com/YSTUty/ystuty-parser)
+
+---
+
+## Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 

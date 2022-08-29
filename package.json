@@ -1,8 +1,18 @@
 {
   "name": "ystuty-viewer-frontend",
   "version": "0.1.7",
+  "description": "",
+  "author": "xTCry [Vladislav Kh] (https://github.com/xTCry/)",
   "private": true,
   "license": "MIT",
+  "repository": {
+    "url": "https://github.com/YSTUty/ystuty-viewer-frontend.git",
+    "type": "git"
+  },
+  "homepage": "https://github.com/YSTUty/ystuty-viewer-frontend#readme",
+  "bugs": {
+    "url": "https://github.com/YSTUty/ystuty-viewer-frontend/issues"
+  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
