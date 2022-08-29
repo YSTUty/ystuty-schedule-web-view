@@ -124,8 +124,8 @@ export const SelectGroupComponent = (props: { fetchingSchedule: boolean }) => {
         (value: string | string[] | null) => {
             value = typeof value === 'string' ? value.split(',') : value || [DEFAULT_GROUP];
             let values: string[] = value.length > 0 ? value : [DEFAULT_GROUP];
-            const maxGroups = 2;
-            values = values.length > 2 ? [values[0], ...values.slice(-maxGroups)] : values;
+            const maxGroups = 4 - 1;
+            values = values.length > maxGroups ? [values[0], ...values.slice(-maxGroups)] : values;
 
             if (values.some((e, i) => selected[i] !== e) || values.length !== selected.length) {
                 dispatch(scheduleSlice.actions.setSelected(values));
