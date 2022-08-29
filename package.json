@@ -8,7 +8,11 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "prepare": "husky install",
-    "version:patch": "yarn version --patch"
+    "version:patch": "yarn version --patch",
+    "release": "standard-version",
+    "release:major": "standard-version --release-as major",
+    "release:minor": "standard-version --release-as minor",
+    "release:patch": "standard-version --release-as patch"
   },
   "dependencies": {
     "@devexpress/dx-react-core": "^3.0.5",
@@ -43,6 +47,7 @@
     "react-use": "^17.3.2",
     "react-yandex-metrika": "^2.6.0",
     "redux": "^4.1.2",
+    "standard-version": "^9.5.0",
     "store2": "^2.13.1",
     "web-vitals": "^2.1.0",
     "workbox-background-sync": "^5.1.3",
