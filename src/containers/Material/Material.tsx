@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import classNames from 'clsx';
-import { styled } from '@mui/material/styles';
+import { alpha, styled } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
 import LinearProgress from '@mui/material/LinearProgress';
@@ -54,6 +54,9 @@ const classes = {
     toolbarRoot: `${PREFIX}-toolbarRoot`,
     progress: `${PREFIX}-progress`,
     flexibleSpace: `${PREFIX}-flexibleSpace`,
+    weekCellFullSize: `${PREFIX}-weekCellFullSize`,
+    weekEndCell: `${PREFIX}-weekEndCell`,
+    weekEndDayScaleCell: `${PREFIX}-weekEndDayScaleCell`,
 };
 
 const StyledDiv = styled('div')({
@@ -124,6 +127,28 @@ const StyledToolbarFlexibleSpace = styled(Toolbar.FlexibleSpace)(() => ({
         margin: '0 auto 0 0',
         display: 'flex',
         alignItems: 'center',
+    },
+}));
+
+const StyledMonthViewDayScaleCell = styled(MonthView.DayScaleCell)(({ theme: { palette } }) => ({
+    [`&.${classes.weekEndDayScaleCell}`]: {
+        backgroundColor: alpha(palette.action.disabledBackground, 0.06),
+    },
+}));
+
+const StyledMonthViewTimeTableCell = styled(MonthView.TimeTableCell)(({ theme: { palette } }) => ({
+    [`&.${classes.weekCellFullSize}`]: {
+        minHeight: '100px',
+        height: 'calc((100vh / 6) - ((56px + 28px) / 6) - 2px)',
+    },
+    [`&.${classes.weekEndCell}`]: {
+        backgroundColor: alpha(palette.action.disabledBackground, 0.04),
+        '&:hover': {
+            backgroundColor: alpha(palette.action.disabledBackground, 0.04),
+        },
+        '&:focus': {
+            backgroundColor: alpha(palette.action.disabledBackground, 0.04),
+        },
     },
 }));
 
@@ -347,6 +372,27 @@ const resources = [
     },
 ];
 
+const isWeekEnd = (date: Date) => date.getDay() === 0;
+
+const DayScaleCell = (props: MonthView.DayScaleCellProps) => (
+    <StyledMonthViewDayScaleCell
+        className={classNames({
+            [classes.weekEndDayScaleCell]: isWeekEnd(props.startDate),
+        })}
+        {...props}
+    />
+);
+
+const TimeTableCell = (props: MonthView.TimeTableCellProps) => (
+    <StyledMonthViewTimeTableCell
+        className={classNames({
+            [classes.weekCellFullSize]: true,
+            [classes.weekEndCell]: isWeekEnd(props.startDate!),
+        })}
+        {...props}
+    />
+);
+
 const MaterialContainer = (props: {
     scheduleData: { name: string; data: LessonData[] }[];
     fetchingSchedule: Boolean;
@@ -390,7 +436,7 @@ const MaterialContainer = (props: {
             <Scheduler locale="ru" data={dataMemo} firstDayOfWeek={1}>
                 <ViewState />
 
-                <MonthView />
+                <MonthView dayScaleCellComponent={DayScaleCell} timeTableCellComponent={TimeTableCell} />
                 <WeekView startDayHour={6} endDayHour={23} excludedDays={[0]} />
                 {/* <DayView displayName="Days" startDayHour={6} endDayHour={23} intervalCount={3} /> */}
                 <DayView startDayHour={6} endDayHour={23} />
