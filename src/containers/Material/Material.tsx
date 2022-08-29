@@ -21,8 +21,9 @@ import {
     DayView,
     CurrentTimeIndicator,
     Resources,
+    GroupingPanel,
 } from '@devexpress/dx-react-scheduler-material-ui';
-import { ViewState } from '@devexpress/dx-react-scheduler';
+import { GroupingState, IntegratedGrouping, ViewState } from '@devexpress/dx-react-scheduler';
 
 import RoomIcon from '@mui/icons-material/Room';
 import TimeIcon from '@mui/icons-material/MoreTime';
@@ -35,6 +36,7 @@ import InfoIcon from '@mui/icons-material/Info';
 
 import LessonFilter from '../../components/LessonFilter.component';
 import LessonTypeSelector from '../../components/LessonTypeSelector.component';
+import GroupGroupingControl from '../../components/GroupGroupingControl.component';
 
 import { LessonData, LessonFlags } from '../../interfaces/ystuty.types';
 
@@ -137,9 +139,13 @@ const StyledMonthViewDayScaleCell = styled(MonthView.DayScaleCell)(({ theme: { p
 }));
 
 const StyledMonthViewTimeTableCell = styled(MonthView.TimeTableCell)(({ theme: { palette } }) => ({
-    [`&.${classes.weekCellFullSize}`]: {
+    [`&.${classes.weekCellFullSize}1`]: {
         minHeight: '100px',
         height: 'calc((100vh / 6) - ((56px + 28px) / 6) - 2px)',
+    },
+    [`&.${classes.weekCellFullSize}2`]: {
+        minHeight: '100px',
+        height: 'calc((100vh / 6) - ((56px + 28px + 75px) / 6) - 2px)',
     },
     [`&.${classes.weekEndCell}`]: {
         backgroundColor: alpha(palette.action.disabledBackground, 0.04),
@@ -348,10 +354,16 @@ const FlexibleSpace = ({
     <StyledToolbarFlexibleSpace {...props} className={classes.flexibleSpace}>
         <LessonFilter />
         <LessonTypeSelector allowedLessonTypes={allowedLessonTypes} />
+        <GroupGroupingControl />
     </StyledToolbarFlexibleSpace>
 );
 
-const resources = [
+const getResources = (selectedGroups: string[] = []) => [
+    {
+        fieldName: 'group',
+        title: 'Группа',
+        instances: selectedGroups.map((e, i) => ({ id: e, text: e, color: [green, blue, yellow, teal, red][i] })),
+    },
     {
         fieldName: 'typeArr',
         title: 'Type',
@@ -383,23 +395,32 @@ const DayScaleCell = (props: MonthView.DayScaleCellProps) => (
     />
 );
 
-const TimeTableCell = (props: MonthView.TimeTableCellProps) => (
-    <StyledMonthViewTimeTableCell
-        className={classNames({
-            [classes.weekCellFullSize]: true,
-            [classes.weekEndCell]: isWeekEnd(props.startDate!),
-        })}
-        {...props}
-    />
-);
+const getTimeTableCell = (groupingGroups: boolean) => (props: MonthView.TimeTableCellProps) =>
+    (
+        <StyledMonthViewTimeTableCell
+            className={classNames({
+                [classes.weekCellFullSize + (!groupingGroups ? 1 : 2)]: true,
+                [classes.weekEndCell]: isWeekEnd(props.startDate!),
+            })}
+            {...props}
+        />
+    );
 
 const MaterialContainer = (props: {
     scheduleData: { name: string; data: LessonData[] }[];
     fetchingSchedule: Boolean;
 }) => {
     const { scheduleData = [], fetchingSchedule } = props;
+
     const [data, setData] = React.useState<(LessonData & { startDate: Date; endDate: Date; group?: string })[]>([]);
-    const { lessonTypes, lessonFilter = '' } = useSelector((state) => state.schedule);
+    const {
+        lessonTypes,
+        lessonFilter = '',
+        selectedGroups,
+        groupsSplitColor,
+        groupingGroups,
+        isGroupByDate,
+    } = useSelector((state) => state.schedule);
 
     React.useEffect(() => {
         const isComparing = scheduleData.length > 1;
@@ -431,12 +452,26 @@ const MaterialContainer = (props: {
         ];
     }, [data, lessonTypes, lowerCaseFilter]);
 
+    const mainResourceName = selectedGroups.length > 1 && groupsSplitColor ? 'group' : 'typeArr';
+    const hasGroupingGroups = selectedGroups.length > 1 && groupingGroups;
+
     return (
         <Paper style={{ height: '100vh' }}>
             <Scheduler locale="ru" data={dataMemo} firstDayOfWeek={1}>
                 <ViewState />
+                {hasGroupingGroups && (
+                    <GroupingState
+                        grouping={[{ resourceName: mainResourceName }]}
+                        groupByDate={
+                            !isGroupByDate ? undefined : (viewName) => viewName === 'Week' || viewName === 'Month'
+                        }
+                    />
+                )}
 
-                <MonthView dayScaleCellComponent={DayScaleCell} timeTableCellComponent={TimeTableCell} />
+                <MonthView
+                    dayScaleCellComponent={DayScaleCell}
+                    timeTableCellComponent={getTimeTableCell(hasGroupingGroups)}
+                />
                 <WeekView startDayHour={6} endDayHour={23} excludedDays={[0]} />
                 {/* <DayView displayName="Days" startDayHour={6} endDayHour={23} intervalCount={3} /> */}
                 <DayView startDayHour={6} endDayHour={23} />
@@ -444,7 +479,7 @@ const MaterialContainer = (props: {
                 <Appointments appointmentComponent={Appointment} appointmentContentComponent={AppointmentContent} />
                 <AppointmentTooltip contentComponent={AppointmentTooltipContent} />
                 <AppointmentForm readOnly />
-                <Resources data={resources} />
+                <Resources data={getResources(selectedGroups)} mainResourceName={mainResourceName} />
 
                 <CurrentTimeIndicator shadePreviousCells shadePreviousAppointments updateInterval={60e3} />
                 <Toolbar
@@ -453,7 +488,10 @@ const MaterialContainer = (props: {
                 />
                 <DateNavigator />
                 <ViewSwitcher />
-                <TodayButton />
+                <TodayButton messages={{ today: 'Сегодня' }} />
+
+                {hasGroupingGroups && <IntegratedGrouping />}
+                {hasGroupingGroups && <GroupingPanel />}
             </Scheduler>
         </Paper>
     );

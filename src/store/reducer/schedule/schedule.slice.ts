@@ -20,6 +20,9 @@ const initialState = {
         LessonFlags.ResearchWork,
     ],
     lessonFilter: '',
+    groupsSplitColor: true,
+    groupingGroups: false,
+    isGroupByDate: true,
 };
 
 export const scheduleSlice = createSlice({
@@ -41,6 +44,15 @@ export const scheduleSlice = createSlice({
         },
         setSelected: (state, action: PayloadAction<string[]>) => {
             state.selectedGroups = action.payload;
+        },
+        onGroupOrderToggle: (state, action: PayloadAction<boolean | undefined>) => {
+            state.isGroupByDate = action.payload ?? !state.isGroupByDate;
+        },
+        groupsSplitColorToggle: (state, action: PayloadAction<boolean | undefined>) => {
+            state.groupsSplitColor = action.payload ?? !state.groupsSplitColor;
+        },
+        groupingGroupsToggle: (state, action: PayloadAction<boolean | undefined>) => {
+            state.groupingGroups = action.payload ?? !state.groupingGroups;
         },
     },
 });
