@@ -258,14 +258,13 @@ export const SelectGroupComponent = (props: { fetchingSchedule: boolean }) => {
             </FormControl>
             <FormControl sx={{ pl: 1 }}>
                 <VersionComponent />
-            </FormControl>
-            <FormControl sx={{ pl: 1 }}>
                 {appConstants.telegramBotName && (
                     <IconButton
-                        onClick={() => window.open(`https://t.me/${appConstants.telegramBotName}?start=viewer`)}
-                        color="inherit"
+                        // onClick={() => window.open(`https://t.me/${appConstants.telegramBotName}?start=viewer`)}
+                        href={`https://${appConstants.telegramBotName}.t.me?start=viewer`}
+                        target="_blank"
                     >
-                        <TelegramIcon />
+                        <TelegramIcon color="inherit" />
                     </IconButton>
                 )}
                 <AlertMeToggler />
