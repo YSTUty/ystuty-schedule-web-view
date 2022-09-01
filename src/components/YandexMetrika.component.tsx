@@ -1,4 +1,4 @@
-import { YMInitializer } from 'react-yandex-metrika';
+import { YMInitializer } from '@appigram/react-yandex-metrika';
 
 export const YandexMetrika = () => {
     const YM_ID = Number(process.env.REACT_APP_YM_ID);

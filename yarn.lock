@@ -18,6 +18,11 @@
     jsonpointer "^5.0.0"
     leven "^3.1.0"
 
+"@appigram/react-yandex-metrika@^2.8.1":
+  version "2.8.1"
+  resolved "https://registry.yarnpkg.com/@appigram/react-yandex-metrika/-/react-yandex-metrika-2.8.1.tgz#8c4d3a96495e50fec1500ad5249485728dd8e008"
+  integrity sha512-4Ej7BCq31pOcrrVu60NgrZfJjG1POmHdzmlZxY27EaECA+/FmdPTaBX81MZqyZGp8nAQ5xgbDa1mxRxvW1YMzQ==
+
 "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.10.4", "@babel/code-frame@^7.12.13", "@babel/code-frame@^7.16.0", "@babel/code-frame@^7.16.7", "@babel/code-frame@^7.8.3":
   version "7.16.7"
   resolved "https://registry.yarnpkg.com/@babel/code-frame/-/code-frame-7.16.7.tgz#44416b6bd7624b998f5b1af5d470856c40138789"
@@ -8994,11 +8999,6 @@ react-use@^17.3.2:
     throttle-debounce "^3.0.1"
     ts-easing "^0.2.0"
     tslib "^2.1.0"
-
-react-yandex-metrika@^2.6.0:
-  version "2.6.0"
-  resolved "https://registry.yarnpkg.com/react-yandex-metrika/-/react-yandex-metrika-2.6.0.tgz#9c935c8c7ea5505e34391b9b3e86deb6d50053c9"
-  integrity sha512-8K4wExsNZtY3DTxh1G8a+zWH9Pg8fw23MJcoJ4I/562qrHRnh7L5nteq3lnNL58dnNQbuuHIRoGgMjIo+r1GjA==
 
 react@^17.0.2:
   version "17.0.2"
