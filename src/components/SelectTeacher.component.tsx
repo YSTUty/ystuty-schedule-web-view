@@ -8,13 +8,12 @@ import TextField from '@mui/material/TextField';
 import Popper, { PopperProps } from '@mui/material/Popper';
 import { styled } from '@mui/material/styles';
 
-import scheduleSlice, { STORE_GROUP_NAME_KEY } from '../store/reducer/schedule/schedule.slice';
+import scheduleSlice, { DEFAULT_TEACHER, STORE_TEACHER_NAME_KEY } from '../store/reducer/schedule/schedule.slice';
 import alertSlice from '../store/reducer/alert/alert.slice';
 import { apiPath } from '../utils';
+import { ITeacherData } from '../interfaces/ystuty.types';
 
-const STORE_CACHED_INSTITUTES_KEY = 'CACHED_INSTITUTES';
-
-const DEFAULT_GROUP: string = store2.get(STORE_GROUP_NAME_KEY, 'ЭИС-46');
+const STORE_CACHED_TEACHERS_KEY = 'cachedTeachers';
 
 const StyledPopper = styled(Popper)({
     [`& .${autocompleteClasses.listbox}`]: {
@@ -25,65 +24,66 @@ const StyledPopper = styled(Popper)({
 
 const MyPopper = (props: PopperProps) => <StyledPopper {...props} style={{ width: 350 }} />;
 
-export const SelectGroupComponent = (props: {
-    allowMultipleGroupsRef: React.MutableRefObject<(state?: any) => void>;
+export const SelectTeacherComponent = (props: {
+    allowMultipleTeachersRef: React.MutableRefObject<(state?: any) => void>;
 }) => {
-    const { allowMultipleGroupsRef } = props;
+    const { allowMultipleTeachersRef } = props;
     const dispatch = useDispatch();
     const {
-        selectedGroups: selected,
+        selectedTeachers: selected,
         fetchingSchedule,
-        allowedMultipleGroups: allowedMultiple,
+        allowedMultipleTeachers: allowedMultiple,
     } = useSelector((state) => state.schedule);
-
     const { online, previous: previousOnline, since } = useNetworkState();
+
     const [hash, setHash] = useHash();
-    const defaultValues = React.useMemo(() => {
-        const defaultHash = decodeURI(hash.slice(1)) || DEFAULT_GROUP;
-        const values = defaultHash.split(',');
-        store2.set(STORE_GROUP_NAME_KEY, values[0]);
-        return values;
-    }, [hash]);
-    const [institutes, setInstitutes] = React.useState<{ name: string; groups: string[] }[]>([
-        { name: 'Default', groups: defaultValues },
-    ]);
+
+    const [teachers, setTeachers] = React.useState<ITeacherData[]>([]);
     const [fetching, setFetching] = React.useState(false);
     const [isCached, setIsCached] = React.useState(false);
 
-    const applyInstitutes = React.useCallback(
-        (items: { name: string; groups: string[] }[] | null) => {
+    const defaultValues: number[] = React.useMemo(() => {
+        const defaultHash = ((e) =>
+            e
+                ?.split(',')
+                .map<number>((e) => Number(e))
+                .filter((e) => e /* .id */ > 0) || [])(decodeURI(hash.slice(1)));
+        const values = defaultHash.length > 0 ? defaultHash : DEFAULT_TEACHER ? [DEFAULT_TEACHER] : [];
+        // store2.set(STORE_TEACHER_NAME_KEY, values[0]);
+        return values;
+    }, [hash, teachers]);
+
+    const applyTeachers = React.useCallback(
+        (items: ITeacherData[] | null) => {
             if (!items) {
-                items = store2.get(STORE_CACHED_INSTITUTES_KEY, null);
+                items = store2.get(STORE_CACHED_TEACHERS_KEY, null);
                 if (!items) {
                     return;
                 }
                 setIsCached(true);
             } else if (items.length > 0) {
-                store2.set(STORE_CACHED_INSTITUTES_KEY, items);
+                store2.set(STORE_CACHED_TEACHERS_KEY, items);
                 setIsCached(false);
             }
 
             // items.sort();
-            setInstitutes(items);
+            setTeachers(items);
         },
-        [setInstitutes, setIsCached]
+        [setTeachers, setIsCached]
     );
 
-    const loadGroupsList = React.useCallback(() => {
+    const loadTeachersList = React.useCallback(() => {
         if (fetching) {
             return;
         }
 
-        // setInstitutes([]);
         setFetching(true);
 
-        fetch(`${apiPath}/ystu/schedule/institutes?extramural=true`)
+        fetch(`${apiPath}/ystu/schedule/teachers`)
             .then((response) => response.json())
             .then(
                 (
-                    response:
-                        | { items: { name: string; groups: string[] }[] }
-                        | { error: { error: string; message: string } }
+                    response: { items: { name: string; id: number }[] } | { error: { error: string; message: string } }
                 ) => {
                     if ('error' in response) {
                         dispatch(
@@ -94,11 +94,11 @@ export const SelectGroupComponent = (props: {
                         );
                         return;
                     }
-                    applyInstitutes(response!.items);
+                    applyTeachers(response!.items);
                 }
             )
             .catch((e) => {
-                applyInstitutes(null);
+                applyTeachers(null);
                 if (online) {
                     dispatch(
                         alertSlice.actions.add({
@@ -111,59 +111,58 @@ export const SelectGroupComponent = (props: {
             .finally(() => {
                 setFetching(false);
             });
-    }, [fetching, setFetching, applyInstitutes, online]);
+    }, [fetching, setFetching, applyTeachers, online]);
 
     const onChangeValues = React.useCallback(
-        (value: string | string[] | null) => {
-            value = typeof value === 'string' ? value.split(',') : value || [DEFAULT_GROUP];
-            let values: string[] = value.length > 0 ? value : [DEFAULT_GROUP];
-            const maxGroups = 4 - 1;
-            values = values.length > maxGroups ? [values[0], ...values.slice(-maxGroups)] : values;
+        (value: number | number[] | null) => {
+            value = !value ? [] : Array.isArray(value) ? value : [value];
+            let values: number[] = value.length > 0 ? value : DEFAULT_TEACHER ? [DEFAULT_TEACHER] : [];
+            const maxCount = 4 - 1;
+            values = values.length > maxCount ? [values[0], ...values.slice(-maxCount)] : values;
 
-            if (values.some((e, i) => selected[i] !== e) || values.length !== selected.length) {
-                dispatch(scheduleSlice.actions.setSelectedGroups(values));
-                setHash(values.join(','));
-                store2.set(STORE_GROUP_NAME_KEY, values[0]);
+            if (values.length !== selected.length || values.some((e, i) => selected[i] !== e)) {
+                dispatch(scheduleSlice.actions.setSelectedTeachers(values));
+                setHash(values.map((e) => e /* .id */).join(','));
+                store2.set(STORE_TEACHER_NAME_KEY, values[0]);
             }
         },
         [dispatch, setHash, selected]
     );
 
     const fixSelected = React.useCallback(
-        (_selected: string[] = selected) => {
-            let value = _selected;
-            const groups = institutes.flatMap((e) => e.groups.map((e) => e));
-            if (groups.length > 1) {
-                const lowerGroups = groups.map((e) => e.toLowerCase());
-                const lowerSelected = _selected.map((e) => e.toLowerCase());
-                value = lowerSelected
-                    .map((e) => lowerGroups.findIndex((g) => g === e))
-                    .filter((e) => e > -1)
-                    .map((e) => groups[e]);
-                value = value.filter((w, i) => value.indexOf(w) === i);
+        (newSelected: number[] = selected) => {
+            let value = newSelected;
+            if (teachers.length > 1) {
+                value = teachers
+                    .map((teacher) => newSelected.find((selected) => teacher.id === selected))
+                    // .map((selected) => teachers.find((teacher) => teacher.id === selected.id))
+                    .filter(Boolean) as number[];
+                // value = value.filter((w, i) => value.indexOf(w) === i);
             }
             onChangeValues(value);
         },
-        [institutes, selected, onChangeValues]
+        [teachers, selected, onChangeValues]
     );
 
     const allowMultiple = React.useCallback(
         (state = true) => {
-            dispatch(scheduleSlice.actions.setAllowedMultipleGroup(state));
+            dispatch(scheduleSlice.actions.setAllowedMultipleTeachers(state));
             if (!state) {
-                const value = selected[0];
+                const [value] = selected;
                 onChangeValues(value);
+            } else {
+                onChangeValues(selected);
             }
         },
         [onChangeValues, selected]
     );
 
-    // Check correct names after institutes loading
+    // Check correct names after teachers loading
     React.useEffect(() => {
-        if (institutes.length > 1) {
+        if (teachers.length > 1) {
             fixSelected();
         }
-    }, [institutes]);
+    }, [teachers]);
 
     // On location hash changed
     React.useEffect(() => {
@@ -174,46 +173,36 @@ export const SelectGroupComponent = (props: {
 
     React.useEffect(() => {
         if (online && (online !== previousOnline || (since && Date.now() - since.getTime() > 2 * 60e3))) {
-            loadGroupsList();
+            loadTeachersList();
         }
     }, [online, previousOnline, since]);
 
     React.useEffect(() => {
-        loadGroupsList();
+        loadTeachersList();
         fixSelected(defaultValues);
 
-        if (window.location.search.includes('allow_multiple')) {
-            allowMultiple();
-        }
-        allowMultipleGroupsRef.current = allowMultiple;
+        allowMultipleTeachersRef.current = allowMultiple;
     }, []);
 
     const isMultiple = allowedMultiple || selected.length > 1;
-
-    const options = React.useMemo(
-        () =>
-            institutes.reduce(
-                (prev, cur) => ({ ...prev, ...Object.fromEntries(cur.groups.map((g) => [g, cur.name])) }),
-                {} as Record<string, string>
-            ),
-        [institutes]
-    );
 
     return (
         <Autocomplete
             multiple={isMultiple}
             sx={{ minWidth: 200, maxWidth: 400 }}
-            id="grouped-native-select"
-            options={Object.keys(options)}
-            disableCloseOnSelect
+            id="teachers-native-select"
+            options={teachers.map((e) => e.id)}
+            disableCloseOnSelect={isMultiple}
             disableListWrap
-            getOptionLabel={(option) => option}
-            groupBy={(option) => options[option]}
+            getOptionLabel={(option) => teachers.find((e) => option === e.id)?.name || 'NoName'}
+            // groupBy={(option) => options[option]}
             renderInput={(params) => (
                 <TextField
                     {...params}
-                    label={`Групп${isMultiple ? 'ы' : 'а'}`}
-                    placeholder={((e) => e[Math.floor(Math.random() * e.length)])(Object.keys(options))}
+                    label={`Преподавател${isMultiple ? 'и' : 'ь'}`}
+                    placeholder={((e) => (e.length > 0 && e[Math.floor(Math.random() * e.length)].name) || '...')(
+                        teachers
+                    )}
                 />
             )}
             PopperComponent={MyPopper}

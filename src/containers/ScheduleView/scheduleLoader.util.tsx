@@ -5,6 +5,7 @@ import store2 from 'store2';
 
 import { LessonData, LessonFlags, OneWeek } from '../../interfaces/ystuty.types';
 import alertSlice from '../../store/reducer/alert/alert.slice';
+import scheduleSlice from '../../store/reducer/schedule/schedule.slice';
 import { apiPath, createEvent } from '../../utils';
 
 // TODO: add removing old cache
@@ -115,6 +116,13 @@ export const useScheduleLoader = () => {
     );
 
     const isFetching = React.useMemo(() => Object.values(fetchings).some((e) => e), [fetchings]);
+
+    React.useEffect(() => {
+        dispatch(scheduleSlice.actions.setStudScheduleData(scheduleData));
+    }, [scheduleData]);
+    React.useEffect(() => {
+        dispatch(scheduleSlice.actions.setFetchingSchedule(isFetching));
+    }, [isFetching]);
 
     return [scheduleData, isFetching, isCached] as const;
 };

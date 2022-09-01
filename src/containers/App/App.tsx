@@ -6,7 +6,6 @@ import LazyLoadComponent from '../../components/LazyLoad.component';
 import { AlertMe } from '../../components/AlertMe.component';
 
 import * as appConstants from '../../constants/app.constants';
-import * as deviceUtils from '../../utils/device.utils';
 import * as pwaUtils from '../../utils/pwa.utils';
 import WithVersionCheckerConnect from '../../shared/WithVersionChecker.util';
 import appVersion from '../../utils/app-version';
@@ -15,6 +14,7 @@ const PWAInstructionComponent = LazyLoadComponent(
     React.lazy(() => import('../PWAInstruction/PWAInstruction.component'))
 );
 const ScheduleView = LazyLoadComponent(React.lazy(() => import('../ScheduleView/ScheduleView')));
+const TeacherScheduleView = LazyLoadComponent(React.lazy(() => import('../TeacherScheduleView/TeacherScheduleView')));
 
 const App = () => {
     const {
@@ -37,7 +37,7 @@ const App = () => {
     return (
         <>
             <AlertMe />
-            <ScheduleView />
+            {pathname.startsWith('/teacher') ? <TeacherScheduleView /> : <ScheduleView />}
         </>
     );
 };

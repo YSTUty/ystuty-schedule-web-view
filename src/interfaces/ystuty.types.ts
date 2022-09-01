@@ -177,3 +177,66 @@ export type LessonData = (EventInput & Lesson) & {
     title: string;
     typeArr: LessonFlags[];
 };
+
+export interface ITeacherData {
+    name: string;
+    id: number;
+}
+
+export type TeacherDayType = {
+    /**
+     * Номер учебной недели
+     */
+    weekNumber: number;
+    /**
+     * Порядковый номер пары на дню
+     */
+    number: number;
+    /**
+     * Временной интервал пары
+     */
+    timeRange: string;
+    /**
+     * Timestamp начала пары
+     */
+    startAt: string | Date;
+    /**
+     * Timestamp конца пары
+     */
+    endAt: string | Date;
+    /**
+     * Пара дистанционно
+     */
+    isDistant?: true;
+    /**
+     * Название предмета пары
+     */
+    lessonName: string;
+    /**
+     * Флаг типа пары
+     */
+    lessonType: LessonFlags;
+    /**
+     * Длительность пары в часах
+     */
+    duration: number;
+    /**
+     * Длительность пары в минутах
+     */
+    // durationMinutes: number;
+    /**
+     * Буква корпуса и номер аудитори
+     */
+    auditoryName?: string;
+    /**
+     * Названия групп
+     */
+    groups: string[];
+};
+
+export type TeacherLessonData = (EventInput & TeacherDayType) & {
+    start: string | Date;
+    end: string | Date;
+    title: string;
+    typeArr: LessonFlags[];
+};

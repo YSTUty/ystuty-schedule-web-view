@@ -4,9 +4,8 @@ import store2 from 'store2';
 
 import FullcalendarContainer from '../Fullcalendar/Fullcalendar';
 import MaterialContainer from '../Material/Material';
-// import SchedulerReact from '../SchedulerReact/SchedulerReact';
 
-import { SelectGroupComponent } from '../../components/SelectGroup.component';
+import TopPanelComponent from '../../components/TopPanel.component';
 import { useScheduleLoader } from './scheduleLoader.util';
 
 const BETA_CONFIRM_KEY = 'betaConfirm';
@@ -14,7 +13,7 @@ const BETA_CONFIRM_KEY = 'betaConfirm';
 const ScheduleView = () => {
     const state = useNetworkState();
 
-    const [scheduleData, fetchingSchedule] = useScheduleLoader();
+    const [scheduleData] = useScheduleLoader();
 
     React.useEffect(() => {
         const isConfirmed = store2.get(BETA_CONFIRM_KEY, false);
@@ -29,15 +28,10 @@ const ScheduleView = () => {
     return (
         <>
             {process.env.NODE_ENV === 'development' && !state.online && <pre>{JSON.stringify(state, null, 2)}</pre>}
-            <SelectGroupComponent fetchingSchedule={fetchingSchedule} />
+            <TopPanelComponent />
 
             <hr />
-            {!!1 ? (
-                <MaterialContainer scheduleData={scheduleData} fetchingSchedule={fetchingSchedule} />
-            ) : (
-                // <SchedulerReact scheduleData={scheduleData} />
-                <FullcalendarContainer scheduleData={scheduleData} />
-            )}
+            {!!1 ? <MaterialContainer /> : <FullcalendarContainer scheduleData={scheduleData} />}
         </>
     );
 };

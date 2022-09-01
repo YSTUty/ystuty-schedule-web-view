@@ -14,6 +14,12 @@ const classes = {
 const StyledTextField = styled(TextField)(({ theme: { spacing } }) => ({
     [`&.${classes.textField}`]: {
         width: '75px',
+        '@media (min-width: 800px)': {
+            width: '90px',
+        },
+        '@media (min-width: 1200px)': {
+            width: '240px',
+        },
         marginLeft: spacing(1),
         marginTop: 0,
         marginBottom: 0,
