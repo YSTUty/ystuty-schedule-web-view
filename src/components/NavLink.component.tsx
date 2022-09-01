@@ -1,7 +1,10 @@
 import React from 'react';
 import { history } from '../store';
 
-const NavLinkComponent = (props: any) => {
+const NavLinkComponent = React.forwardRef<
+    HTMLAnchorElement | HTMLButtonElement,
+    { tag?: 'a' | 'button'; to?: string; href?: string; isDisabled?: boolean; [P: string]: any }
+>((props, ref) => {
     let { to, href, children, isDisabled, tag, ...otherProps } = props;
     if (!to && href) {
         to = href;
@@ -19,7 +22,7 @@ const NavLinkComponent = (props: any) => {
                 e.preventDefault();
                 e.stopPropagation();
                 if (to !== window.location.pathname) {
-                    history.push(to);
+                    history.push(to!);
                 }
             }
         },
@@ -27,18 +30,18 @@ const NavLinkComponent = (props: any) => {
     );
 
     return 'button' === tag ? (
-        <button type="button" {...otherProps} onClick={onClick}>
+        <button ref={ref as any} type="button" {...otherProps} onClick={onClick}>
             {children}
         </button>
     ) : (
-        <a href={to} {...otherProps} onClick={onClick}>
+        <a ref={ref as any} href={to} {...otherProps} onClick={onClick}>
             {children}
         </a>
     );
-};
+});
 
 NavLinkComponent.defaultProps = {
-    tag: 'a',
+    tag: 'a' as const,
 };
 
 export default NavLinkComponent;
