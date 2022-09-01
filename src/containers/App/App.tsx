@@ -1,12 +1,13 @@
 import React from 'react';
 import { useHistory } from 'react-router';
+import { useNetworkState } from 'react-use';
 import store2 from 'store2';
 
 import LazyLoadComponent from '../../components/LazyLoad.component';
 import { AlertMe } from '../../components/AlertMe.component';
+import TopPanelComponent from '../../components/TopPanel.component';
 
 import * as appConstants from '../../constants/app.constants';
-import * as deviceUtils from '../../utils/device.utils';
 import * as pwaUtils from '../../utils/pwa.utils';
 import WithVersionCheckerConnect from '../../shared/WithVersionChecker.util';
 import appVersion from '../../utils/app-version';
@@ -15,11 +16,13 @@ const PWAInstructionComponent = LazyLoadComponent(
     React.lazy(() => import('../PWAInstruction/PWAInstruction.component'))
 );
 const ScheduleView = LazyLoadComponent(React.lazy(() => import('../ScheduleView/ScheduleView')));
+const TeacherScheduleView = LazyLoadComponent(React.lazy(() => import('../TeacherScheduleView/TeacherScheduleView')));
 
 const App = () => {
     const {
         location: { pathname },
     } = useHistory();
+    const state = useNetworkState();
 
     React.useEffect(() => {
         pwaUtils.checkPWA();
@@ -34,10 +37,16 @@ const App = () => {
         }
     }
 
+    const isTeacherPage = pathname.startsWith('/teacher');
+
     return (
         <>
+            {process.env.NODE_ENV === 'development' && !state.online && <pre>{JSON.stringify(state, null, 2)}</pre>}
             <AlertMe />
-            <ScheduleView />
+            <TopPanelComponent forTeacher={isTeacherPage} />
+
+            <hr />
+            {isTeacherPage ? <TeacherScheduleView /> : <ScheduleView />}
         </>
     );
 };

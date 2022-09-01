@@ -14,6 +14,8 @@ import alertSlice from '../store/reducer/alert/alert.slice';
 export const AlertMe = () => {
     const dispatch = useDispatch();
     const { alerts, show } = useSelector((state) => state.alert);
+    (window as any).alertMe = (message: string, severity: any = 'info') =>
+        dispatch(alertSlice.actions.add({ message, severity }));
 
     return (
         <Box sx={{ width: '100%' }}>

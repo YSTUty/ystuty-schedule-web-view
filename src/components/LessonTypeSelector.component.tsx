@@ -92,8 +92,8 @@ const LESSON_TYPE_NAMES = [
 const getButtonClass = (lessonTypes: LessonFlags[], type: LessonFlags) =>
     lessonTypes.includes(type) && classes.selectedButton;
 
-const LessonTypeSelector = (props: { allowedLessonTypes?: LessonFlags[] }) => {
-    const { lessonTypes } = useSelector((state) => state.schedule);
+const LessonTypeSelector = () => {
+    const { lessonTypes, allowedLessonTypes } = useSelector((state) => state.schedule);
     const dispatch = useDispatch();
 
     // TODO: add drop-down list for mobile
@@ -101,8 +101,8 @@ const LessonTypeSelector = (props: { allowedLessonTypes?: LessonFlags[] }) => {
         <StyledButtonGroup className={classes.locationSelector}>
             {LESSON_TYPES.map(
                 (type, index) =>
-                    !props.allowedLessonTypes ||
-                    (props.allowedLessonTypes.includes(type) && (
+                    !allowedLessonTypes ||
+                    (allowedLessonTypes.includes(type) && (
                         <Button
                             className={classNames(
                                 classes.button,
