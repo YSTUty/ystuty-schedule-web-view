@@ -1,9 +1,11 @@
 import React from 'react';
 import { useHistory } from 'react-router';
+import { useNetworkState } from 'react-use';
 import store2 from 'store2';
 
 import LazyLoadComponent from '../../components/LazyLoad.component';
 import { AlertMe } from '../../components/AlertMe.component';
+import TopPanelComponent from '../../components/TopPanel.component';
 
 import * as appConstants from '../../constants/app.constants';
 import * as pwaUtils from '../../utils/pwa.utils';
@@ -20,6 +22,7 @@ const App = () => {
     const {
         location: { pathname },
     } = useHistory();
+    const state = useNetworkState();
 
     React.useEffect(() => {
         pwaUtils.checkPWA();
@@ -34,10 +37,16 @@ const App = () => {
         }
     }
 
+    const isTeacherPage = pathname.startsWith('/teacher');
+
     return (
         <>
+            {process.env.NODE_ENV === 'development' && !state.online && <pre>{JSON.stringify(state, null, 2)}</pre>}
             <AlertMe />
-            {pathname.startsWith('/teacher') ? <TeacherScheduleView /> : <ScheduleView />}
+            <TopPanelComponent forTeacher={isTeacherPage} />
+
+            <hr />
+            {isTeacherPage ? <TeacherScheduleView /> : <ScheduleView />}
         </>
     );
 };
