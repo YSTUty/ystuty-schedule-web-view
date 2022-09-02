@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.10](https://github.com/YSTUty/ystuty-viewer-frontend/compare/v0.1.9...v0.1.10) (2022-09-02)
+
+
+### ☯ Styling
+
+* **schedule:** updated group schedule style ([09dd991](https://github.com/YSTUty/ystuty-viewer-frontend/commit/09dd991bcde920ff352ec994d62dbb4644642d12))
+
+
+### 🚀 Features
+
+* **schedule:** added `title` attr for appointment content ([23a3e6d](https://github.com/YSTUty/ystuty-viewer-frontend/commit/23a3e6ddc1d1c5f7fa1f626577a4cb0bfa72a231))
+* **schedule:** added saving array of last selection ([026e56f](https://github.com/YSTUty/ystuty-viewer-frontend/commit/026e56fcafec6c051354edc5ec035690371e243d))
+* **schedule:** added support teacher grouping ([db103ce](https://github.com/YSTUty/ystuty-viewer-frontend/commit/db103ce8f0fb7abbd8ac378107a4cb6d2aec9115))
+
 ### [0.1.9](https://github.com/YSTUty/ystuty-viewer-frontend/compare/v0.1.8...v0.1.9) (2022-09-02)
 
 
