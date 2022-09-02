@@ -8,7 +8,7 @@ import TextField from '@mui/material/TextField';
 import Popper, { PopperProps } from '@mui/material/Popper';
 import { styled } from '@mui/material/styles';
 
-import scheduleSlice, { DEFAULT_TEACHER, STORE_TEACHER_NAME_KEY } from '../store/reducer/schedule/schedule.slice';
+import scheduleSlice, { getDefaultTeacher, STORE_TEACHER_NAME_KEY } from '../store/reducer/schedule/schedule.slice';
 import alertSlice from '../store/reducer/alert/alert.slice';
 import { apiPath } from '../utils';
 import { ITeacherData } from '../interfaces/ystuty.types';
@@ -43,12 +43,13 @@ export const SelectTeacherComponent = (props: {
     const [isCached, setIsCached] = React.useState(false);
 
     const defaultValues: number[] = React.useMemo(() => {
+        const teacherId = getDefaultTeacher();
         const defaultHash = ((e) =>
             e
                 ?.split(',')
                 .map<number>((e) => Number(e))
                 .filter((e) => e /* .id */ > 0) || [])(decodeURI(hash.slice(1)));
-        const values = defaultHash.length > 0 ? defaultHash : DEFAULT_TEACHER ? [DEFAULT_TEACHER] : [];
+        const values = defaultHash.length > 0 ? defaultHash : teacherId ? [teacherId] : [];
         // store2.set(STORE_TEACHER_NAME_KEY, values[0]);
         return values;
     }, [hash, teachers]);
@@ -116,14 +117,17 @@ export const SelectTeacherComponent = (props: {
     const onChangeValues = React.useCallback(
         (value: number | number[] | null) => {
             value = !value ? [] : Array.isArray(value) ? value : [value];
-            let values: number[] = value.length > 0 ? value : DEFAULT_TEACHER ? [DEFAULT_TEACHER] : [];
+            const teacherId = getDefaultTeacher();
+            let values: number[] = value.length > 0 ? value : teacherId ? [teacherId] : [];
             const maxCount = 4 - 1;
             values = values.length > maxCount ? [values[0], ...values.slice(-maxCount)] : values;
 
             if (values.length !== selected.length || values.some((e, i) => selected[i] !== e)) {
                 dispatch(scheduleSlice.actions.setSelectedTeachers(values));
                 setHash(values.map((e) => e /* .id */).join(','));
-                store2.set(STORE_TEACHER_NAME_KEY, values[0]);
+                if (values[0]) {
+                    store2.set(STORE_TEACHER_NAME_KEY, values[0]);
+                }
             }
         },
         [dispatch, setHash, selected]
@@ -139,7 +143,9 @@ export const SelectTeacherComponent = (props: {
                     .filter(Boolean) as number[];
                 // value = value.filter((w, i) => value.indexOf(w) === i);
             }
-            onChangeValues(value);
+            if (value) {
+                onChangeValues(value);
+            }
         },
         [teachers, selected, onChangeValues]
     );

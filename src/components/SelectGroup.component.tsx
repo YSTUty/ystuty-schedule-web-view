@@ -8,13 +8,11 @@ import TextField from '@mui/material/TextField';
 import Popper, { PopperProps } from '@mui/material/Popper';
 import { styled } from '@mui/material/styles';
 
-import scheduleSlice, { STORE_GROUP_NAME_KEY } from '../store/reducer/schedule/schedule.slice';
+import scheduleSlice, { getDefaultGroup, STORE_GROUP_NAME_KEY } from '../store/reducer/schedule/schedule.slice';
 import alertSlice from '../store/reducer/alert/alert.slice';
 import { apiPath } from '../utils';
 
 const STORE_CACHED_INSTITUTES_KEY = 'CACHED_INSTITUTES';
-
-const DEFAULT_GROUP: string = store2.get(STORE_GROUP_NAME_KEY, 'ЭИС-46');
 
 const StyledPopper = styled(Popper)({
     [`& .${autocompleteClasses.listbox}`]: {
@@ -39,7 +37,8 @@ export const SelectGroupComponent = (props: {
     const { online, previous: previousOnline, since } = useNetworkState();
     const [hash, setHash] = useHash();
     const defaultValues = React.useMemo(() => {
-        const defaultHash = decodeURI(hash.slice(1)) || DEFAULT_GROUP;
+        const groupName = getDefaultGroup();
+        const defaultHash = decodeURI(hash.slice(1)) || groupName;
         const values = defaultHash.split(',');
         store2.set(STORE_GROUP_NAME_KEY, values[0]);
         return values;
@@ -115,8 +114,9 @@ export const SelectGroupComponent = (props: {
 
     const onChangeValues = React.useCallback(
         (value: string | string[] | null) => {
-            value = typeof value === 'string' ? value.split(',') : value || [DEFAULT_GROUP];
-            let values: string[] = value.length > 0 ? value : [DEFAULT_GROUP];
+            const groupName = getDefaultGroup();
+            value = typeof value === 'string' ? value.split(',') : value || [groupName];
+            let values: string[] = value.length > 0 ? value : [groupName];
             const maxGroups = 4 - 1;
             values = values.length > maxGroups ? [values[0], ...values.slice(-maxGroups)] : values;
 

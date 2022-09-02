@@ -7,8 +7,11 @@ export const STORE_TEACHER_NAME_KEY = 'lastTeacherName';
 export const STORE_ALLOW_MULTIPLE_GROUP_KEY = 'allowMultipleGroup';
 export const STORE_ALLOW_MULTIPLE_TEACHERS_KEY = 'allowMultipleTeachers';
 
-export const DEFAULT_GROUP: string = store2.get(STORE_GROUP_NAME_KEY, 'ЭИС-46');
-export const DEFAULT_TEACHER: number = store2.get(STORE_TEACHER_NAME_KEY, null);
+export const getDefaultGroup = () => store2.get(STORE_GROUP_NAME_KEY, 'ЭИС-46') as string;
+export const getDefaultTeacher = () => store2.get(STORE_TEACHER_NAME_KEY, null) as number;
+
+export const DEFAULT_GROUP = getDefaultGroup();
+export const DEFAULT_TEACHER = getDefaultTeacher();
 export const DEFAULT_ALLOW_MULTIPLE_GROUP: boolean = !!store2.get(STORE_ALLOW_MULTIPLE_GROUP_KEY, false);
 export const DEFAULT_ALLOW_MULTIPLE_TEACHERS: boolean = !!store2.get(STORE_ALLOW_MULTIPLE_TEACHERS_KEY, false);
 
