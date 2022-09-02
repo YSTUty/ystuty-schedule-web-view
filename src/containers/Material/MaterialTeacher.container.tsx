@@ -70,15 +70,39 @@ const AppointmentContent = ({
 }: Appointments.AppointmentContentProps & {
     data: Appointments.AppointmentContentProps['data'] & TeacherLessonData & { teacherId?: number };
 }) => {
+    let title = `#${data.number}`;
+    if (data.teacherId) {
+        title += ` [${teachers?.find((e) => e.id === data.teacherId)?.name || data.teacherId}]`;
+    }
+    title += ` "${data.title}"\n`;
+    title += `🕑 Время: ${data.timeRange}\n`;
+    if (data.type !== 0) {
+        title += `• Вид занятий: ${lessonsUtils.getLessonTypeStrArr(data.lessonType).join(', ')}\n`;
+    }
+    if (data.auditoryName) {
+        title += `• Аудитория: ${data.auditoryName}\n`;
+    }
+    if (data.groups) {
+        title += `• Группы: ${data.groups.join(', ')}`;
+    }
+
     return (
-        <StyledAppointmentsAppointmentContent {...restProps} data={data}>
+        <StyledAppointmentsAppointmentContent {...restProps} data={data} title={title}>
             <div className={dxClasses.container}>
                 {/* Дисциплина */}
                 <div className={dxClasses.text}>
                     #{data.number}
                     {data.teacherId && (
-                        // TODO: find teacher name by teacherId
-                        <span style={{ fontSize: 10, fontWeight: 700, color: green['900'] }}> [{data.teacherId}]</span>
+                        <span style={{ fontSize: 10, fontWeight: 700, color: green['900'] }}>
+                            {' ['}
+                            {((e?: string) =>
+                                e
+                                    ?.split(' ')
+                                    .map((e, i) => /* i === 0 ? e.slice(0, 5) : */ e[0])
+                                    .join('.')
+                                    .trim())(teachers?.find((e) => e.id === data.teacherId)?.name) || data.teacherId}
+                            {']'}
+                        </span>
                     )}{' '}
                     {data.title}
                 </div>

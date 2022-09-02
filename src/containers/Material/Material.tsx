@@ -74,8 +74,30 @@ const AppointmentContent = ({
 }: Appointments.AppointmentContentProps & {
     data: Appointments.AppointmentContentProps['data'] & LessonData & { group?: string };
 }) => {
+    let title = `#${data.number}`;
+    if (data.group) {
+        title += ` [${data.group}]`;
+    }
+    title += ` "${data.title}"\n`;
+    title += `🕑 Время: ${data.time}\n`;
+    if (data.type !== 0) {
+        title += `• Вид занятий: ${lessonsUtils.getLessonTypeStrArr(data.type).join(', ')}\n`;
+    }
+    if (data.auditoryName) {
+        title += `• Аудитория: ${data.auditoryName}\n`;
+    }
+    if (data.teacherName) {
+        title += `• Преподаватель: ${data.teacherName}\n`;
+    }
+    if (data.isDivision) {
+        title += `• По П/Г\n`;
+    }
+    if (data.isStream) {
+        title += `• В потоке`;
+    }
+
     return (
-        <StyledAppointmentsAppointmentContent {...restProps} data={data}>
+        <StyledAppointmentsAppointmentContent {...restProps} data={data} title={title}>
             <div className={dxClasses.container}>
                 {/* Дисциплина */}
                 <div className={dxClasses.text}>
