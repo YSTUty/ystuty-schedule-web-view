@@ -33,6 +33,7 @@ import InfoIcon from '@mui/icons-material/Info';
 import LessonFilter from '../../components/LessonFilter.component';
 import LessonTypeSelector from '../../components/LessonTypeSelector.component';
 import GroupGroupingControl from '../../components/GroupGroupingControl.component';
+import { getTeachers } from '../../components/SelectTeacher.component';
 
 import { TeacherLessonData, LessonFlags } from '../../interfaces/ystuty.types';
 import scheduleSlice from '../../store/reducer/schedule/schedule.slice';
@@ -195,11 +196,22 @@ const FlexibleSpace = ({ ...props }: Toolbar.FlexibleSpaceProps) => (
     </StyledToolbarFlexibleSpace>
 );
 
-const getResources = (selectedGroups: string[] = []) => [
+const teachers = getTeachers();
+const getResources = (selectedTeachers: number[] = []) => [
     {
         fieldName: 'teacherId',
         title: 'Преподаватель',
-        instances: selectedGroups.map((e, i) => ({ id: e, text: e, color: [green, blue, yellow, teal, red][i] })),
+        instances: selectedTeachers.map((id, i) => ({
+            id,
+            text:
+                ((e?: string) =>
+                    e
+                        ?.split(' ')
+                        .map((e, i) => /* i === 0 ? e.slice(0, 5) : */ e[0])
+                        .join('.')
+                        .trim())(teachers?.find((e) => e.id === id)?.name) || `#${id}`,
+            color: [green, blue, yellow, teal, red][i],
+        })),
     },
     {
         fieldName: 'typeArr',
@@ -226,7 +238,7 @@ const MaterialTeacherContainer = () => {
     const {
         lessonTypes,
         lessonFilter = '',
-        selectedGroups,
+        selectedTeachers,
         groupsSplitColor,
         groupingGroups,
         isGroupByDate,
@@ -277,8 +289,8 @@ const MaterialTeacherContainer = () => {
         [data, lessonTypes, lowerCaseFilter]
     );
 
-    const mainResourceName = selectedGroups.length > 1 && groupsSplitColor ? 'teacherId' : 'typeArr';
-    const hasGroupingGroups = selectedGroups.length > 1 && groupingGroups;
+    const mainResourceName = selectedTeachers.length > 1 && groupsSplitColor ? 'teacherId' : 'typeArr';
+    const hasGroupingGroups = selectedTeachers.length > 1 && groupingGroups;
 
     return (
         <Paper style={{ height: '100vh' }}>
@@ -307,7 +319,7 @@ const MaterialTeacherContainer = () => {
                 />
                 <AppointmentTooltip contentComponent={AppointmentTooltipContent as any} />
                 <AppointmentForm readOnly />
-                <Resources data={getResources(selectedGroups)} mainResourceName={mainResourceName} />
+                <Resources data={getResources(selectedTeachers)} mainResourceName={mainResourceName} />
 
                 <CurrentTimeIndicator shadePreviousCells shadePreviousAppointments updateInterval={60e3} />
                 <Toolbar

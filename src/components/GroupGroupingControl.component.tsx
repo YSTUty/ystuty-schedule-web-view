@@ -13,7 +13,9 @@ const StyledToggleButtonGroup = styled(ToggleButtonGroup)(() => ({
 }));
 
 const GroupGroupingControl = () => {
-    const { groupsSplitColor, groupingGroups, isGroupByDate, selectedGroups } = useSelector((state) => state.schedule);
+    const { groupsSplitColor, groupingGroups, isGroupByDate, selectedGroups, selectedTeachers } = useSelector(
+        (state) => state.schedule
+    );
     const dispatch = useDispatch();
 
     const handleChange = (event: React.MouseEvent<HTMLElement>, val: string) => {
@@ -31,9 +33,12 @@ const GroupGroupingControl = () => {
                 break;
         }
     };
+    const show = window.location.pathname.startsWith('/teacher')
+        ? selectedTeachers.length > 1
+        : selectedGroups.length > 1;
 
     return (
-        <Collapse sx={{ px: 1 }} in={selectedGroups.length > 1}>
+        <Collapse sx={{ px: 1 }} in={show}>
             <StyledToggleButtonGroup exclusive onChange={handleChange}>
                 <ToggleButton
                     value="groupingGroups"

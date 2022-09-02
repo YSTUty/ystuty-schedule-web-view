@@ -14,6 +14,7 @@ import { apiPath } from '../utils';
 import { ITeacherData } from '../interfaces/ystuty.types';
 
 const STORE_CACHED_TEACHERS_KEY = 'cachedTeachers';
+export const getTeachers = () => store2.get(STORE_CACHED_TEACHERS_KEY, null) as ITeacherData[] | null;
 
 const StyledPopper = styled(Popper)({
     [`& .${autocompleteClasses.listbox}`]: {
