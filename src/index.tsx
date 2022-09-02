@@ -27,7 +27,7 @@ ReactDOM.render(
                         <ServiceWorkerProvider>
                             <LoadingUpdatesComponent>
                                 <Switch>
-                                    <Route strict path="/(|pwa|teacher)" component={App} />
+                                    <Route strict path="/(|pwa|g|group|t|teacher)" component={App} />
                                     <Route path="/" component={() => <b>not found</b>} />
                                 </Switch>
                             </LoadingUpdatesComponent>

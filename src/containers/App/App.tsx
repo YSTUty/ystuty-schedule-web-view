@@ -7,6 +7,7 @@ import LazyLoadComponent from '../../components/LazyLoad.component';
 import { AlertMe } from '../../components/AlertMe.component';
 import TopPanelComponent from '../../components/TopPanel.component';
 
+import { history } from '../../store';
 import * as appConstants from '../../constants/app.constants';
 import * as pwaUtils from '../../utils/pwa.utils';
 import WithVersionCheckerConnect from '../../shared/WithVersionChecker.util';
@@ -35,6 +36,10 @@ const App = () => {
         } else {
             window.location.href = `https://${appConstants.pwaHostname}`;
         }
+    } else if (pathname === '/' || pathname === '/g') {
+        history.push(`/group${window.location.hash}`);
+    } else if (pathname === '/t') {
+        history.push(`/teacher${window.location.hash}`);
     }
 
     const isTeacherPage = pathname.startsWith('/teacher');
@@ -46,7 +51,7 @@ const App = () => {
             <TopPanelComponent forTeacher={isTeacherPage} />
 
             <hr />
-            {isTeacherPage ? <TeacherScheduleView /> : <ScheduleView />}
+            {isTeacherPage ? <TeacherScheduleView /> : /* isGroup ? */ <ScheduleView />}
         </>
     );
 };
