@@ -15,6 +15,7 @@ export const classes = {
     parityOddAppointment: `${PREFIX}-parityOddAppointment`,
     parityEvenAppointment: `${PREFIX}-parityEvenAppointment`,
     distantAppointment: `${PREFIX}-distantAppointment`,
+    streamAppointment: `${PREFIX}-streamAppointment`,
     text: `${PREFIX}-text`,
     content: `${PREFIX}-content`,
     container: `${PREFIX}-container`,
@@ -56,6 +57,9 @@ export const StyledAppointmentsAppointment = styled(Appointments.Appointment)(()
     },
     [`&.${classes.parityEvenAppointment}`]: {
         borderLeft: `4px solid ${red[400]}`,
+    },
+    [`&.${classes.streamAppointment}`]: {
+        borderRight: `2px dashed ${yellow[700]}`,
     },
     [`&.${classes.distantAppointment}`]: {
         borderBottom: `2px dashed ${red[700]}`,

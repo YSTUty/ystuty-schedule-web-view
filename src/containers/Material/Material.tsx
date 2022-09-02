@@ -27,6 +27,7 @@ import RoomIcon from '@mui/icons-material/Room';
 import TimeIcon from '@mui/icons-material/MoreTime';
 import TeacherIcon from '@mui/icons-material/PermIdentity';
 import LessonIcon from '@mui/icons-material/BookRounded';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import DivisionGroupsIcon from '@mui/icons-material/PeopleOutlined';
 import StreamGroupsIcon from '@mui/icons-material/Groups';
 import OnlinePredictionIcon from '@mui/icons-material/OnlinePrediction';
@@ -36,7 +37,7 @@ import LessonFilter from '../../components/LessonFilter.component';
 import LessonTypeSelector from '../../components/LessonTypeSelector.component';
 import GroupGroupingControl from '../../components/GroupGroupingControl.component';
 
-import { LessonData, LessonFlags } from '../../interfaces/ystuty.types';
+import { LessonData, LessonFlags, WeekParityType } from '../../interfaces/ystuty.types';
 import scheduleSlice from '../../store/reducer/schedule/schedule.slice';
 import * as lessonsUtils from '../../utils/lessons.utils';
 
@@ -60,13 +61,19 @@ const Appointment = ({ data, ...restProps }: Appointments.AppointmentProps) => (
             [dxClasses.parityOddAppointment]: data.parity === 1,
             [dxClasses.parityEvenAppointment]: data.parity === 2,
             [dxClasses.distantAppointment]: data.isDistant,
+            [dxClasses.streamAppointment]: data.isStream,
             [dxClasses.appointment]: true,
         })}
         data={data}
     />
 );
 
-const AppointmentContent = ({ data, ...restProps }: Appointments.AppointmentContentProps) => {
+const AppointmentContent = ({
+    data,
+    ...restProps
+}: Appointments.AppointmentContentProps & {
+    data: Appointments.AppointmentContentProps['data'] & LessonData & { group?: string };
+}) => {
     return (
         <StyledAppointmentsAppointmentContent {...restProps} data={data}>
             <div className={dxClasses.container}>
@@ -101,9 +108,15 @@ const AppointmentContent = ({ data, ...restProps }: Appointments.AppointmentCont
     );
 };
 
-const AppointmentTooltipContent = ({ children, appointmentData, ...restProps }: AppointmentTooltip.ContentProps) => (
+const AppointmentTooltipContent = ({
+    children,
+    appointmentData,
+    ...restProps
+}: AppointmentTooltip.ContentProps & {
+    appointmentData: AppointmentTooltip.ContentProps['appointmentData'] & LessonData & { group?: string };
+}) => (
     <AppointmentTooltip.Content {...restProps} appointmentData={appointmentData}>
-        {appointmentData!.isDistant && (
+        {appointmentData.isDistant && (
             <Grid container alignItems="center" color={red[800]}>
                 <StyledGrid item xs={2} className={dxClasses.textCenter}>
                     <OnlinePredictionIcon />
@@ -113,7 +126,7 @@ const AppointmentTooltipContent = ({ children, appointmentData, ...restProps }: 
                 </Grid>
             </Grid>
         )}
-        {appointmentData!.auditoryName && (
+        {appointmentData.auditoryName && (
             <Grid container alignItems="center">
                 <StyledGrid item xs={2} className={dxClasses.textCenter}>
                     <StyledIcon className={dxClasses.icon}>
@@ -122,12 +135,12 @@ const AppointmentTooltipContent = ({ children, appointmentData, ...restProps }: 
                 </StyledGrid>
                 <Grid item xs={10}>
                     <span>
-                        <b>{appointmentData!.auditoryName}</b>
+                        <b>{appointmentData.auditoryName}</b>
                     </span>
                 </Grid>
             </Grid>
         )}
-        {appointmentData!.duration > 2 && (
+        {appointmentData.duration > 2 && (
             <Grid container alignItems="center">
                 <StyledGrid item xs={2} className={dxClasses.textCenter}>
                     <StyledIcon className={dxClasses.icon}>
@@ -136,12 +149,12 @@ const AppointmentTooltipContent = ({ children, appointmentData, ...restProps }: 
                 </StyledGrid>
                 <Grid item xs={10}>
                     <span>
-                        Продолжительность: <b>{appointmentData!.duration} ч</b>
+                        Продолжительность: <b>{appointmentData.duration} ч</b>
                     </span>
                 </Grid>
             </Grid>
         )}
-        {appointmentData!.type !== 0 && (
+        {appointmentData.type !== 0 && (
             <Grid container alignItems="center">
                 <StyledGrid item xs={2} className={dxClasses.textCenter}>
                     <StyledIcon className={dxClasses.icon}>
@@ -149,11 +162,11 @@ const AppointmentTooltipContent = ({ children, appointmentData, ...restProps }: 
                     </StyledIcon>
                 </StyledGrid>
                 <Grid item xs={10}>
-                    Вид занятий: <b>{lessonsUtils.getLessonTypeStrArr(appointmentData!.type).join(', ')}</b>
+                    Вид занятий: <b>{lessonsUtils.getLessonTypeStrArr(appointmentData.type).join(', ')}</b>
                 </Grid>
             </Grid>
         )}
-        {appointmentData!.isStream && (
+        {appointmentData.isStream && (
             <Grid container alignItems="center">
                 <StyledGrid item xs={2} className={dxClasses.textCenter}>
                     <StyledIcon className={dxClasses.icon}>
@@ -165,7 +178,7 @@ const AppointmentTooltipContent = ({ children, appointmentData, ...restProps }: 
                 </Grid>
             </Grid>
         )}
-        {appointmentData!.isDivision && (
+        {appointmentData.isDivision && (
             <Grid container alignItems="center">
                 <StyledGrid item xs={2} className={dxClasses.textCenter}>
                     <StyledIcon className={dxClasses.icon}>
@@ -177,7 +190,7 @@ const AppointmentTooltipContent = ({ children, appointmentData, ...restProps }: 
                 </Grid>
             </Grid>
         )}
-        {appointmentData!.teacherName && (
+        {appointmentData.teacherName && (
             <Grid container alignItems="center">
                 <StyledGrid item xs={2} className={dxClasses.textCenter}>
                     <StyledIcon className={dxClasses.icon}>
@@ -185,11 +198,11 @@ const AppointmentTooltipContent = ({ children, appointmentData, ...restProps }: 
                     </StyledIcon>
                 </StyledGrid>
                 <Grid item xs={10}>
-                    <span>{appointmentData!.teacherName}</span>
+                    <span>{appointmentData.teacherName}</span>
                 </Grid>
             </Grid>
         )}
-        {appointmentData!.subInfo && (
+        {appointmentData.subInfo && (
             <Grid container alignItems="center">
                 <StyledGrid item xs={2} className={dxClasses.textCenter}>
                     <StyledIcon className={dxClasses.icon}>
@@ -199,9 +212,21 @@ const AppointmentTooltipContent = ({ children, appointmentData, ...restProps }: 
                 <Grid item xs={10}>
                     <span>
                         <i>
-                            <b>{appointmentData!.subInfo}</b>
+                            <b>{appointmentData.subInfo}</b>
                         </i>
                     </span>
+                </Grid>
+            </Grid>
+        )}
+        {appointmentData.parity !== WeekParityType.CUSTOM && (
+            <Grid container alignItems="center">
+                <StyledGrid item xs={2} className={dxClasses.textCenter}>
+                    <StyledIcon className={dxClasses.icon}>
+                        <CalendarTodayIcon />
+                    </StyledIcon>
+                </StyledGrid>
+                <Grid item xs={10}>
+                    Только на <b>{appointmentData.parity === WeekParityType.EVEN ? '' : 'не'}четной</b> неделе
                 </Grid>
             </Grid>
         )}
@@ -333,8 +358,11 @@ const MaterialContainer = () => {
                 {/* <DayView displayName="Days" startDayHour={6} endDayHour={23} intervalCount={3} /> */}
                 <DayView startDayHour={6} endDayHour={23} />
 
-                <Appointments appointmentComponent={Appointment} appointmentContentComponent={AppointmentContent} />
-                <AppointmentTooltip contentComponent={AppointmentTooltipContent} />
+                <Appointments
+                    appointmentComponent={Appointment}
+                    appointmentContentComponent={AppointmentContent as any}
+                />
+                <AppointmentTooltip contentComponent={AppointmentTooltipContent as any} />
                 <AppointmentForm readOnly />
                 <Resources data={getResources(selectedGroups)} mainResourceName={mainResourceName} />
 
