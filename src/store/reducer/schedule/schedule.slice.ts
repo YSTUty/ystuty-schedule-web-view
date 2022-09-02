@@ -7,17 +7,22 @@ export const STORE_TEACHER_NAME_KEY = 'lastTeacherName';
 export const STORE_ALLOW_MULTIPLE_GROUP_KEY = 'allowMultipleGroup';
 export const STORE_ALLOW_MULTIPLE_TEACHERS_KEY = 'allowMultipleTeachers';
 
-export const getDefaultGroup = () => store2.get(STORE_GROUP_NAME_KEY, 'ЭИС-46') as string;
-export const getDefaultTeacher = () => store2.get(STORE_TEACHER_NAME_KEY, null) as number;
+// TODO: change to normal before release
+export const getLastGroups = (e?: string[]) => (
+    (e = store2.get(STORE_GROUP_NAME_KEY, ['ЭИС-46'])), (Array.isArray(e) ? e : [e]) as string[]
+);
+export const getLastTeachers = (e?: number[]) => (
+    (e = store2.get(STORE_TEACHER_NAME_KEY, [])), (Array.isArray(e) ? e : [e]) as number[]
+);
 
-export const DEFAULT_GROUP = getDefaultGroup();
-export const DEFAULT_TEACHER = getDefaultTeacher();
+export const LAST_GROUPS = getLastGroups();
+export const LAST_TEACHER_IDS = getLastTeachers();
 export const DEFAULT_ALLOW_MULTIPLE_GROUP: boolean = !!store2.get(STORE_ALLOW_MULTIPLE_GROUP_KEY, false);
 export const DEFAULT_ALLOW_MULTIPLE_TEACHERS: boolean = !!store2.get(STORE_ALLOW_MULTIPLE_TEACHERS_KEY, false);
 
 const initialState = {
-    selectedGroups: [DEFAULT_GROUP] as string[],
-    selectedTeachers: (DEFAULT_TEACHER ? [DEFAULT_TEACHER] : []) as number[],
+    selectedGroups: LAST_GROUPS,
+    selectedTeachers: LAST_TEACHER_IDS,
     lessonTypes: [
         LessonFlags.Lecture,
         LessonFlags.Labaratory,

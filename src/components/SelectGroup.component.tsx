@@ -8,7 +8,7 @@ import TextField from '@mui/material/TextField';
 import Popper, { PopperProps } from '@mui/material/Popper';
 import { styled } from '@mui/material/styles';
 
-import scheduleSlice, { getDefaultGroup, STORE_GROUP_NAME_KEY } from '../store/reducer/schedule/schedule.slice';
+import scheduleSlice, { getLastGroups, STORE_GROUP_NAME_KEY } from '../store/reducer/schedule/schedule.slice';
 import alertSlice from '../store/reducer/alert/alert.slice';
 import { apiPath } from '../utils';
 
@@ -37,14 +37,15 @@ export const SelectGroupComponent = (props: {
     const { online, previous: previousOnline, since } = useNetworkState();
     const [hash, setHash] = useHash();
     const defaultValues = React.useMemo(() => {
-        const groupName = getDefaultGroup();
-        const defaultHash = decodeURI(hash.slice(1)) || groupName;
-        const values = defaultHash.split(',');
-        store2.set(STORE_GROUP_NAME_KEY, values[0]);
+        const groupNames = getLastGroups();
+        const defaultHash = decodeURI(hash.slice(1));
+        let values = defaultHash.split(',');
+        values = values.length > 0 ? values : groupNames;
+        // store2.set(STORE_GROUP_NAME_KEY, values[0]);
         return values;
     }, [hash]);
     const [institutes, setInstitutes] = React.useState<{ name: string; groups: string[] }[]>([
-        { name: 'Default', groups: defaultValues },
+        // { name: 'Default', groups: defaultValues },
     ]);
     const [fetching, setFetching] = React.useState(false);
     const [isCached, setIsCached] = React.useState(false);
@@ -73,7 +74,6 @@ export const SelectGroupComponent = (props: {
             return;
         }
 
-        // setInstitutes([]);
         setFetching(true);
 
         fetch(`${apiPath}/ystu/schedule/institutes?extramural=true`)
@@ -114,35 +114,41 @@ export const SelectGroupComponent = (props: {
 
     const onChangeValues = React.useCallback(
         (value: string | string[] | null) => {
-            const groupName = getDefaultGroup();
-            value = typeof value === 'string' ? value.split(',') : value || [groupName];
-            let values: string[] = value.length > 0 ? value : [groupName];
+            value = !value ? [] : typeof value !== 'string' ? value : value.split(',');
+            value = value.filter(Boolean);
+            // value = !value ? [] : Array.isArray(value) ? value : [value];
+            // const groupNames = getLastGroups();
+            let values: string[] = value; /* value.length > 0 ? value : groupNames; */
             const maxGroups = 4 - 1;
             values = values.length > maxGroups ? [values[0], ...values.slice(-maxGroups)] : values;
 
             if (values.some((e, i) => selected[i] !== e) || values.length !== selected.length) {
                 dispatch(scheduleSlice.actions.setSelectedGroups(values));
                 setHash(values.join(','));
-                store2.set(STORE_GROUP_NAME_KEY, values[0]);
+                if (values.length > 0) {
+                    store2.set(STORE_GROUP_NAME_KEY, values);
+                }
             }
         },
         [dispatch, setHash, selected]
     );
 
     const fixSelected = React.useCallback(
-        (_selected: string[] = selected) => {
-            let value = _selected;
+        (newSelected: string[] = selected) => {
+            let value = newSelected;
             const groups = institutes.flatMap((e) => e.groups.map((e) => e));
             if (groups.length > 1) {
                 const lowerGroups = groups.map((e) => e.toLowerCase());
-                const lowerSelected = _selected.map((e) => e.toLowerCase());
+                const lowerSelected = newSelected.map((e) => e.toLowerCase());
                 value = lowerSelected
                     .map((e) => lowerGroups.findIndex((g) => g === e))
                     .filter((e) => e > -1)
                     .map((e) => groups[e]);
                 value = value.filter((w, i) => value.indexOf(w) === i);
             }
-            onChangeValues(value);
+            if (value.length > 1) {
+                onChangeValues(value);
+            }
         },
         [institutes, selected, onChangeValues]
     );
@@ -151,8 +157,10 @@ export const SelectGroupComponent = (props: {
         (state = true) => {
             dispatch(scheduleSlice.actions.setAllowedMultipleGroup(state));
             if (!state) {
-                const value = selected[0];
+                const [value] = selected;
                 onChangeValues(value);
+            } else {
+                onChangeValues(selected);
             }
         },
         [onChangeValues, selected]
@@ -167,7 +175,10 @@ export const SelectGroupComponent = (props: {
 
     // On location hash changed
     React.useEffect(() => {
-        if (defaultValues.some((e, i) => selected[i] !== e) || defaultValues.length !== selected.length) {
+        if (
+            (defaultValues.some((e, i) => selected[i] !== e) || defaultValues.length !== selected.length) &&
+            selected.length !== 0
+        ) {
             fixSelected(defaultValues);
         }
     }, [defaultValues]);
@@ -213,7 +224,9 @@ export const SelectGroupComponent = (props: {
                 <TextField
                     {...params}
                     label={`Групп${isMultiple ? 'ы' : 'а'}`}
-                    placeholder={((e) => e[Math.floor(Math.random() * e.length)])(Object.keys(options))}
+                    placeholder={((e) => (e.length > 0 && e[Math.floor(Math.random() * e.length)]) || '...')(
+                        Object.keys(options)
+                    )}
                 />
             )}
             PopperComponent={MyPopper}
