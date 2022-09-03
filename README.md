@@ -7,9 +7,10 @@
   <img src="https://img.shields.io/badge/dynamic/json?color=ced&style=flat-square&logo=GraphQL&label=Доступно&suffix= групп&query=$.groups&url=https://parser.ystu.site/api/ystu/schedule/count" alt="Number of available groups"/>
   <img src="https://img.shields.io/badge/dynamic/json?color=ced&style=flat-square&logo=GraphQL&label=Доступно&suffix= преподавателей&query=$.teachers&url=https://parser.ystu.site/api/ystu/schedule/count" alt="Number of available teachers"/>
   <br/>
-  <a href="https://view.ystuty.ru"><img src="https://img.shields.io/badge/Viwe%20schedule-YSTUty-9cf?style=flat-square&logo=Internet%20Explorer" alt="view.ystuty.ru"/></a>
-  <a href="https://vk.com/ss_ystu"><img src="https://img.shields.io/badge/Bot-Use now-9cf?style=flat-square&logo=vk" alt="vk.com/ss_ystu"/></a>
-  <a href="https://t.me/ss_ystu_bot"><img src="https://img.shields.io/badge/Bot-Use now-229ED9?style=flat-square&logo=telegram" alt="t.me/ss_ystu_bot"/></a>
+  <a href="https://view.ystuty.ru"><img src="https://img.shields.io/badge/Viwe%20schedule-YSTUty-9cf?style=flat-square&logo=Internet%20Explorer" alt="Viwe schedule"/></a>
+  <a href="https://ics.ystuty.ru"><img src="https://img.shields.io/badge/Import%20Calendar%20Schedule-YSTUty-9cf?style=flat-square&logo=Internet%20Explorer" alt="Import Calendar Schedule"/></a>
+  <a href="https://vk.com/ss_ystu"><img src="https://img.shields.io/badge/Bot-Use now-9cf?style=flat-square&logo=vk" alt="Use VK bot now"/></a>
+  <a href="https://t.me/ss_ystu_bot"><img src="https://img.shields.io/badge/Bot-Use now-229ED9?style=flat-square&logo=telegram" alt="Use Telegram bot now"/></a>
 </p>
 
 # [YSTUty] Viewer
