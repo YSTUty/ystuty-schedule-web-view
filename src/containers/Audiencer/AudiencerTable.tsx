@@ -22,6 +22,7 @@ import TableRow from '@mui/material/TableRow';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 
+import { FilterContext } from './Filter.provider';
 import { AccumulativeSchedule } from '../../interfaces/ystuty.types';
 import * as lessonsUtils from '../../utils/lessons.utils';
 
@@ -113,9 +114,7 @@ const RowAccumulative = (props: { row: AccumulativeSchedule }) => {
 };
 
 const AudiencerTable = (props: {
-    filter: {
-        filterAudience: string;
-        filterLesson: string;
+    filterDateTime: {
         date1: Dayjs | null;
         date2: Dayjs | null;
         time1: Dayjs | null;
@@ -123,19 +122,20 @@ const AudiencerTable = (props: {
     };
 }) => {
     const {
-        filter: { filterAudience, filterLesson, date1, date2, time1, time2 },
+        filterDateTime: { date1, date2, time1, time2 },
     } = props;
 
     const { audiences, accumulatives } = useSelector((state) => state.audiencer);
+    const { filters } = React.useContext(FilterContext);
 
     const showAudiences = !true;
 
     const filteredAcc = React.useMemo(() => {
-        const filterAudienceArr = filterAudience
+        const filterAudienceArr = filters.audience.value
             .toLowerCase()
             .split(',')
             .map((item) => item.trim());
-        const filterLessonArr = filterLesson
+        const filterLessonArr = filters.lesson.value
             .toLowerCase()
             .split(',')
             .map((item) => item.trim());
@@ -194,7 +194,7 @@ const AudiencerTable = (props: {
                           ),
             }))
             .filter((audience) => audience.items.length > 0);
-    }, [accumulatives, filterAudience, filterLesson, date1, date2, time1, time2]);
+    }, [accumulatives, filters, date1, date2, time1, time2]);
 
     if (accumulatives.length === 0) {
         return (
