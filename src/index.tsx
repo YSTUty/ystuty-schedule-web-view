@@ -9,6 +9,7 @@ import store, { history } from './store';
 import './index.css';
 
 import App from './containers/App/App';
+import Audiencer from './containers/Audiencer/Audiencer';
 import { ThemeModeProvider } from './components/ThemeMode.component';
 import { YandexMetrika } from './components/YandexMetrika.component';
 import LocalizerComponent from './components/Localizer.component';
@@ -28,6 +29,7 @@ ReactDOM.render(
                             <LoadingUpdatesComponent>
                                 <Switch>
                                     <Route strict path="/(|pwa|g|group|t|teacher)" component={App} />
+                                    <Route path="/audience" component={Audiencer} />
                                     <Route path="/" component={() => <b>not found</b>} />
                                 </Switch>
                             </LoadingUpdatesComponent>
