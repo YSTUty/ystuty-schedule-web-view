@@ -1,3 +1,5 @@
+import React from 'react';
+import store2 from 'store2';
 import { Route, useLocation } from 'react-router';
 
 import Box from '@mui/material/Box';
@@ -19,6 +21,8 @@ import { SelectAudiencesComponent } from './SelectAudiences.component';
 import { ThemeModeButton } from '../../components/ThemeMode.component';
 import NavLinkComponent from '../../components/NavLink.component';
 
+const BETA_CONFIRM_KEY = 'betaConfirm-audience';
+
 const Audiencer = () => {
     useAudienceLoader();
     const location = useLocation();
@@ -27,6 +31,16 @@ const Audiencer = () => {
     const [TimePickerComponent, [time1, time2]] = useTimePickerComponent();
 
     const isAudienceCombined = location.pathname.startsWith('/audience/combined');
+
+    React.useEffect(() => {
+        const isConfirmed = store2.get(BETA_CONFIRM_KEY, false);
+        if (!isConfirmed) {
+            const confirm = window.confirm(
+                'Раздел находится в Beta версии!\n\nДанные могут быть некорректны...\nПродолжить?',
+            );
+            store2.set(BETA_CONFIRM_KEY, confirm);
+        }
+    }, []);
 
     return (
         <>
