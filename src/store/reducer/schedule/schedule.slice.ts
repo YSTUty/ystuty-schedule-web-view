@@ -7,7 +7,7 @@ export const STORE_TEACHER_NAME_KEY = 'lastTeacherName';
 export const STORE_ALLOW_MULTIPLE_GROUP_KEY = 'allowMultipleGroup';
 export const STORE_ALLOW_MULTIPLE_TEACHERS_KEY = 'allowMultipleTeachers';
 
-export const getLastGroups = () => store2.get(STORE_GROUP_NAME_KEY, ['ЭИС-46']) as string[];
+export const getLastGroups = () => store2.get(STORE_GROUP_NAME_KEY, []) as string[];
 export const getLastTeachers = () => store2.get(STORE_TEACHER_NAME_KEY, []) as number[];
 
 export const LAST_GROUPS = getLastGroups();
