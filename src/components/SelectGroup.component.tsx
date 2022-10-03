@@ -39,9 +39,8 @@ export const SelectGroupComponent = (props: {
     const defaultValues = React.useMemo(() => {
         const groupNames = getLastGroups();
         const defaultHash = decodeURI(hash.slice(1));
-        let values = defaultHash.split(',');
+        let values = defaultHash.split(',').filter((e) => e.length > 0);
         values = values.length > 0 ? values : groupNames;
-        // store2.set(STORE_GROUP_NAME_KEY, values[0]);
         return values;
     }, [hash]);
     const [institutes, setInstitutes] = React.useState<{ name: string; groups: string[] }[]>([
@@ -116,16 +115,13 @@ export const SelectGroupComponent = (props: {
         (value: string | string[] | null) => {
             value = !value ? [] : typeof value !== 'string' ? value : value.split(',');
             value = value.filter(Boolean);
-            // value = !value ? [] : Array.isArray(value) ? value : [value];
-            // const groupNames = getLastGroups();
-            let values: string[] = value; /* value.length > 0 ? value : groupNames; */
             const maxGroups = 4 - 1;
-            values = values.length > maxGroups ? [values[0], ...values.slice(-maxGroups)] : values;
+            const values = value.length > maxGroups ? [value[0], ...value.slice(-maxGroups)] : value;
 
-            if (values.some((e, i) => selected[i] !== e) || values.length !== selected.length) {
+            if (values.length !== selected.length || values.some((e, i) => selected[i] !== e)) {
                 dispatch(scheduleSlice.actions.setSelectedGroups(values));
-                setHash(values.join(','));
                 if (values.length > 0) {
+                    setHash(values.join(','));
                     store2.set(STORE_GROUP_NAME_KEY, values);
                 }
             }
@@ -146,7 +142,7 @@ export const SelectGroupComponent = (props: {
                     .map((e) => groups[e]);
                 value = value.filter((w, i) => value.indexOf(w) === i);
             }
-            if (value.length > 1) {
+            if (value.length > 0) {
                 onChangeValues(value);
             }
         },
@@ -175,22 +171,18 @@ export const SelectGroupComponent = (props: {
 
     // On location hash changed
     React.useEffect(() => {
-        if (
-            (defaultValues.some((e, i) => selected[i] !== e) || defaultValues.length !== selected.length) &&
-            selected.length !== 0
-        ) {
+        if (defaultValues.some((e, i) => selected[i] !== e) || defaultValues.length !== selected.length) {
             fixSelected(defaultValues);
         }
     }, [defaultValues]);
 
     React.useEffect(() => {
-        if (online && (online !== previousOnline || (since && Date.now() - since.getTime() > 2 * 60e3))) {
+        if (online !== previousOnline || (since && Date.now() - since.getTime() > 2 * 60e3)) {
             loadGroupsList();
         }
     }, [online, previousOnline, since]);
 
-    React.useEffect(() => {
-        loadGroupsList();
+    React.useEffect(() => { 
         fixSelected(defaultValues);
 
         if (window.location.search.includes('allow_multiple')) {
@@ -223,7 +215,7 @@ export const SelectGroupComponent = (props: {
             renderInput={(params) => (
                 <TextField
                     {...params}
-                    label={`Групп${isMultiple ? 'ы' : 'а'}`}
+                    label={`Групп${isMultiple ? 'ы' : 'а'}${isCached ? '*' : ''}`}
                     placeholder={((e) => (e.length > 0 && e[Math.floor(Math.random() * e.length)]) || '...')(
                         Object.keys(options)
                     )}

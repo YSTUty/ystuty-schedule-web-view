@@ -51,7 +51,6 @@ export const SelectTeacherComponent = (props: {
                 .map<number>((e) => Number(e))
                 .filter((e) => e /* .id */ > 0) || [])(decodeURI(hash.slice(1)));
         values = values.length > 0 ? values : teacherIds;
-        // store2.set(STORE_TEACHER_NAME_KEY, values[0]);
         return values;
     }, [hash]);
 
@@ -118,15 +117,14 @@ export const SelectTeacherComponent = (props: {
     const onChangeValues = React.useCallback(
         (value: number | number[] | null) => {
             value = !value ? [] : Array.isArray(value) ? value : [value];
-            // const teacherIds = getLastTeachers();
-            let values: number[] = value; /* value.length > 0 ? value : teacherIds */
+            value = value.filter(Boolean);
             const maxCount = 4 - 1;
-            values = values.length > maxCount ? [values[0], ...values.slice(-maxCount)] : values;
+            const values = value.length > maxCount ? [value[0], ...value.slice(-maxCount)] : value;
 
             if (values.length !== selected.length || values.some((e, i) => selected[i] !== e)) {
                 dispatch(scheduleSlice.actions.setSelectedTeachers(values));
-                setHash(values.map((e) => e /* .id */).join(','));
                 if (values.length > 0) {
+                    setHash(values.join(','));
                     store2.set(STORE_TEACHER_NAME_KEY, values);
                 }
             }
@@ -140,11 +138,9 @@ export const SelectTeacherComponent = (props: {
             if (teachers.length > 1) {
                 value = teachers
                     .map((teacher) => newSelected.find((selected) => teacher.id === selected))
-                    // .map((selected) => teachers.find((teacher) => teacher.id === selected.id))
                     .filter(Boolean) as number[];
-                // value = value.filter((w, i) => value.indexOf(w) === i);
             }
-            if (value.length > 1) {
+            if (value.length > 0) {
                 onChangeValues(value);
             }
         },
@@ -173,22 +169,18 @@ export const SelectTeacherComponent = (props: {
 
     // On location hash changed
     React.useEffect(() => {
-        if (
-            (defaultValues.some((e, i) => selected[i] !== e) || defaultValues.length !== selected.length) &&
-            selected.length !== 0
-        ) {
+        if (defaultValues.some((e, i) => selected[i] !== e) || defaultValues.length !== selected.length) {
             fixSelected(defaultValues);
         }
     }, [defaultValues]);
 
     React.useEffect(() => {
-        if (online && (online !== previousOnline || (since && Date.now() - since.getTime() > 2 * 60e3))) {
+        if (online !== previousOnline || (since && Date.now() - since.getTime() > 2 * 60e3)) {
             loadTeachersList();
         }
     }, [online, previousOnline, since]);
 
     React.useEffect(() => {
-        loadTeachersList();
         fixSelected(defaultValues);
 
         if (window.location.search.includes('allow_multiple')) {
@@ -212,7 +204,7 @@ export const SelectTeacherComponent = (props: {
             renderInput={(params) => (
                 <TextField
                     {...params}
-                    label={`Преподавател${isMultiple ? 'и' : 'ь'}`}
+                    label={`Преподавател${isMultiple ? 'и' : 'ь'}${isCached ? '*' : ''}`}
                     placeholder={((e) => (e.length > 0 && e[Math.floor(Math.random() * e.length)].name) || '...')(
                         teachers
                     )}
