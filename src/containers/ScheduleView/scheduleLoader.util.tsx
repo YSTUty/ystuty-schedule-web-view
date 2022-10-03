@@ -6,7 +6,7 @@ import store2 from 'store2';
 import { LessonData, LessonFlags, OneWeek } from '../../interfaces/ystuty.types';
 import alertSlice from '../../store/reducer/alert/alert.slice';
 import scheduleSlice from '../../store/reducer/schedule/schedule.slice';
-import { apiPath, createEvent } from '../../utils';
+import { apiPath } from '../../utils';
 
 // TODO: add removing old cache
 const STORE_CACHED_GROUP_KEY = 'CACHED_GROUP::';
@@ -38,25 +38,23 @@ export const useScheduleLoader = () => {
                 (prev, week) => [
                     ...prev,
                     ...week.days.flatMap((day) =>
-                        day.lessons.map((lesson) =>
-                            createEvent<LessonData>({
-                                ...lesson,
-                                start: lesson.startAt!,
-                                end: lesson.endAt!,
-                                title: lesson.lessonName!,
-                                typeArr: (Object.values(LessonFlags) as LessonFlags[]).filter(
-                                    (e) => (lesson.type & e) === e && e !== LessonFlags.None
-                                ),
-                            })
-                        )
+                        day.lessons.map((lesson) => ({
+                            ...lesson,
+                            start: lesson.startAt!,
+                            end: lesson.endAt!,
+                            title: lesson.lessonName!,
+                            typeArr: (Object.values(LessonFlags) as LessonFlags[]).filter(
+                                (e) => (lesson.type & e) === e && e !== LessonFlags.None,
+                            ),
+                        })),
                     ),
                 ],
-                [] as LessonData[]
+                [] as LessonData[],
             );
 
             setSchedulesData((state) => ({ ...state, [name]: { time: Date.now(), sources } }));
         },
-        [setSchedulesData, setIsCached]
+        [setSchedulesData, setIsCached],
     );
 
     const loadSchedule = React.useCallback(
@@ -75,19 +73,21 @@ export const useScheduleLoader = () => {
                 .then((response) => response.json())
                 .then(
                     (
-                        response: { isCache: boolean; items: OneWeek[] } | { error: { error: string; message: string } }
+                        response:
+                            | { isCache: boolean; items: OneWeek[] }
+                            | { error: { error: string; message: string } },
                     ) => {
                         if ('error' in response) {
                             dispatch(
                                 alertSlice.actions.add({
                                     message: `Error: ${response.error.message}`,
                                     severity: 'error',
-                                })
+                                }),
                             );
                             return;
                         }
                         formatData(name, response!.items);
-                    }
+                    },
                 )
                 .catch((e) => {
                     console.log(e);
@@ -101,7 +101,7 @@ export const useScheduleLoader = () => {
                     setFetchings((s) => ({ ...s, [name]: false }));
                 });
         },
-        [schedulesData, fetchings, setFetchings, formatData /* online */]
+        [schedulesData, fetchings, setFetchings, formatData /* online */],
     );
 
     React.useEffect(() => {
@@ -112,7 +112,7 @@ export const useScheduleLoader = () => {
 
     const scheduleData = React.useMemo(
         () => selectedGroups.map((name) => ({ name, data: schedulesData?.[name]?.sources! })).filter((e) => !!e.data),
-        [selectedGroups, schedulesData]
+        [selectedGroups, schedulesData],
     );
 
     const isFetching = React.useMemo(() => Object.values(fetchings).some((e) => e), [fetchings]);

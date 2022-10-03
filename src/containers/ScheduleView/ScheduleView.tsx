@@ -7,7 +7,6 @@ const ScheduleView = () => {
     return (
         <>
             <MaterialContainer />
-            {/* <FullcalendarContainer scheduleData={scheduleData} /> */}
         </>
     );
 };

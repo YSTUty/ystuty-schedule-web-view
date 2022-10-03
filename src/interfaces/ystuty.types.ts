@@ -1,5 +1,3 @@
-import { EventInput } from '@fullcalendar/react';
-
 /**
  * Данные об институте
  */
@@ -171,7 +169,7 @@ export interface Lesson {
     subInfo?: string;
 }
 
-export type LessonData = (EventInput & Lesson) & {
+export type LessonData = Lesson & {
     start: string | Date;
     end: string | Date;
     title: string;
@@ -234,7 +232,7 @@ export type TeacherDayType = {
     groups: string[];
 };
 
-export type TeacherLessonData = (EventInput & TeacherDayType) & {
+export type TeacherLessonData = TeacherDayType & {
     start: string | Date;
     end: string | Date;
     title: string;

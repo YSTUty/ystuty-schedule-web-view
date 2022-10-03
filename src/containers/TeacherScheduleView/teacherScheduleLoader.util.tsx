@@ -5,7 +5,7 @@ import store2 from 'store2';
 import { TeacherLessonData, LessonFlags, TeacherDayType } from '../../interfaces/ystuty.types';
 import alertSlice from '../../store/reducer/alert/alert.slice';
 import scheduleSlice from '../../store/reducer/schedule/schedule.slice';
-import { apiPath, createEvent } from '../../utils';
+import { apiPath } from '../../utils';
 
 // TODO: add removing old cache
 const STORE_CACHED_TEACHER_KEY = 'CACHED_TEACHER_LESSONS::';
@@ -33,17 +33,15 @@ export const useTeacherScheduleLoader = () => {
                 setIsCached(false);
             }
 
-            const sources = items.map((lesson) =>
-                createEvent<TeacherLessonData>({
-                    ...lesson,
-                    start: lesson.startAt!,
-                    end: lesson.endAt!,
-                    title: lesson.lessonName!,
-                    typeArr: (Object.values(LessonFlags) as LessonFlags[]).filter(
-                        (e) => (lesson.lessonType & e) === e && e !== LessonFlags.None
-                    ),
-                })
-            );
+            const sources = items.map((lesson) => ({
+                ...lesson,
+                start: lesson.startAt!,
+                end: lesson.endAt!,
+                title: lesson.lessonName!,
+                typeArr: (Object.values(LessonFlags) as LessonFlags[]).filter(
+                    (e) => (lesson.lessonType & e) === e && e !== LessonFlags.None,
+                ),
+            }));
 
             setSchedulesData((state) => ({ ...state, [teacherId]: { time: Date.now(), sources } }));
         },
