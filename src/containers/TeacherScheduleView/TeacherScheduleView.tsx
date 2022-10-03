@@ -7,7 +7,7 @@ import { useTeacherScheduleLoader } from './teacherScheduleLoader.util';
 const BETA_CONFIRM_KEY = 'betaConfirm-teacher';
 
 const TeacherScheduleView = () => {
-    const [] = useTeacherScheduleLoader();
+    useTeacherScheduleLoader();
 
     React.useEffect(() => {
         const isConfirmed = store2.get(BETA_CONFIRM_KEY, false);

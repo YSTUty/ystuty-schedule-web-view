@@ -56,7 +56,12 @@ export const FiltersList = (props: { except?: FilterKeys[] }) => {
                 .map((key) => (
                     <FilterComponent
                         key={key}
-                        updateValue={(val) => updateFilters((e) => ((e[key].value = val), { ...e }))}
+                        updateValue={(val) =>
+                            updateFilters((e) => {
+                                e[key].value = val;
+                                return { ...e };
+                            })
+                        }
                         {...filters[key]}
                     />
                 ))}

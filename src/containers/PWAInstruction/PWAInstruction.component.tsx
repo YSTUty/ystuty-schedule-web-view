@@ -34,7 +34,7 @@ const PWAInstructionComponent = () => {
         return () => {
             window.removeEventListener('beforeinstallprompt', onInstallPrompt);
         };
-    }, []);
+    });
 
     const onClickCallback = React.useCallback(() => {
         window.location.href = `https://${process.env.REACT_APP_MAIN_HOST}`;

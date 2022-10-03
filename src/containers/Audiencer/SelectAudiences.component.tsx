@@ -43,7 +43,7 @@ export const SelectAudiencesComponent = (props: { withDebounce?: boolean }) => {
                 setValues(values);
             }
         },
-        [dispatch, selected]
+        [selected]
     );
 
     const options = React.useMemo(

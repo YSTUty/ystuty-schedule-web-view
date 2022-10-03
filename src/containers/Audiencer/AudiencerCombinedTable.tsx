@@ -63,10 +63,6 @@ const AudiencerCombinedTable = (props: {
     const isDark = theme.palette.mode === 'dark';
 
     const schedule = React.useMemo(() => {
-        const filterAudienceArr = filters.audience.value
-            .toLowerCase()
-            .split(',')
-            .map((item) => item.trim());
         const filterLessonArr = filters.lesson.value
             .toLowerCase()
             .split(',')
@@ -74,10 +70,7 @@ const AudiencerCombinedTable = (props: {
         const selectedAudiencesArr = selectedAudiences.map((e) => e.toLowerCase());
 
         return accumulatives
-            .filter((audience) =>
-                // filterAudienceArr.some((e) => audience.name.toLowerCase().includes(e)) &&
-                selectedAudiencesArr.some((e) => audience.name.toLowerCase().includes(e))
-            )
+            .filter((audience) => selectedAudiencesArr.some((e) => audience.name.toLowerCase().includes(e)))
             .map((audience) => {
                 let { name, items } = audience;
                 if (name === 'Актовый зал') {

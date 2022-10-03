@@ -1,7 +1,5 @@
-import * as React from 'react';
 import Box from '@mui/material/Box';
 import Alert from '@mui/material/Alert';
-import Button from '@mui/material/Button';
 import ToggleButton from '@mui/material/ToggleButton';
 import List from '@mui/material/List';
 import Collapse from '@mui/material/Collapse';
@@ -36,14 +34,6 @@ export const AlertMe = () => {
                     </TransitionGroup>
                 </List>
             </Collapse>
-            {/* <Button
-                variant="outlined"
-                onClick={() => {
-                    dispatch(alertSlice.actions.add({ message: `Alert! ${Math.random()}`, severity: 'info' }));
-                }}
-            >
-                Add
-            </Button> */}
         </Box>
     );
 };

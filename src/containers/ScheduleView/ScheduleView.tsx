@@ -7,9 +7,7 @@ import { useScheduleLoader } from './scheduleLoader.util';
 const BETA_CONFIRM_KEY = 'betaConfirm';
 
 const ScheduleView = () => {
-    const [
-        /* scheduleData */
-    ] = useScheduleLoader();
+    useScheduleLoader();
 
     React.useEffect(() => {
         const isConfirmed = store2.get(BETA_CONFIRM_KEY, false);

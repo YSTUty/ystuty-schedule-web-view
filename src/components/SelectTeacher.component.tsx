@@ -53,7 +53,7 @@ export const SelectTeacherComponent = (props: {
         values = values.length > 0 ? values : teacherIds;
         // store2.set(STORE_TEACHER_NAME_KEY, values[0]);
         return values;
-    }, [hash, teachers]);
+    }, [hash]);
 
     const applyTeachers = React.useCallback(
         (items: ITeacherData[] | null) => {
