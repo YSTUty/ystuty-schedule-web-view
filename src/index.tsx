@@ -1,15 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
-import { Route, Router, Switch } from 'react-router';
+import { Router } from 'react-router';
 
 import './utils/hawk.util';
 import store, { history } from './store';
 
 import './index.css';
 
-import App from './containers/App/App';
-import Audiencer from './containers/Audiencer/Audiencer';
+import Routes from './containers/Routes/Routes';
 import { ThemeModeProvider } from './components/ThemeMode.component';
 import { YandexMetrika } from './components/YandexMetrika.component';
 import LocalizerComponent from './components/Localizer.component';
@@ -27,11 +26,7 @@ ReactDOM.render(
                     <Router history={history}>
                         <ServiceWorkerProvider>
                             <LoadingUpdatesComponent>
-                                <Switch>
-                                    <Route strict path="/(|pwa|g|group|t|teacher)" component={App} />
-                                    <Route path="/audience" component={Audiencer} />
-                                    <Route path="/" component={() => <b>not found</b>} />
-                                </Switch>
+                                <Routes />
                             </LoadingUpdatesComponent>
                         </ServiceWorkerProvider>
                     </Router>
@@ -40,7 +35,7 @@ ReactDOM.render(
             </LocalizerComponent>
         </Provider>
     </React.StrictMode>,
-    document.getElementById('root')
+    document.getElementById('root'),
 );
 
 // If you want your app to work offline and load faster, you can change

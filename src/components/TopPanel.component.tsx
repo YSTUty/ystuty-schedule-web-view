@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLocation } from 'react-router';
 import { useSelector } from 'react-redux';
 
 import FormControl from '@mui/material/FormControl';
@@ -18,11 +19,13 @@ import NavLinkComponent from './NavLink.component';
 
 import * as appConstants from '../constants/app.constants';
 
-const TopPanel = (props: { forTeacher?: boolean }) => {
-    const { forTeacher } = props;
+const TopPanel = ( ) => {
+    const { pathname } = useLocation();
+    const { allowedMultipleGroups, allowedMultipleTeachers } = useSelector((state) => state.schedule);
     const allowMultipleGroupsRef = React.useRef<(state?: any) => void>(() => {});
     const allowMultipleTeachersRef = React.useRef<(state?: any) => void>(() => {});
-    const { allowedMultipleGroups, allowedMultipleTeachers } = useSelector((state) => state.schedule);
+
+    const forTeacher = pathname.startsWith('/teacher');
 
     return (
         <Box
@@ -72,7 +75,7 @@ const TopPanel = (props: { forTeacher?: boolean }) => {
                 )}
                 <IconButton
                     component={NavLinkComponent}
-                    href={forTeacher ? '/' : '/teacher'}
+                    href={forTeacher ? '/group' : '/teacher'}
                     color="inherit"
                     title={forTeacher ? 'Расписание для группы' : 'Расписание для преподавателя'}
                     sx={{
