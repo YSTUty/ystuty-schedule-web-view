@@ -1,7 +1,8 @@
 import * as React from 'react';
+import { useDebounce } from 'react-use';
+import { useSelector } from 'react-redux';
 import dayjs, { Dayjs } from 'dayjs';
 import 'dayjs/locale/ru';
-import { useDebounce } from 'react-use';
 
 import TextField from '@mui/material/TextField';
 
@@ -16,6 +17,8 @@ export const useDatePickerComponent = () => {
     const [value1, setValue1] = React.useState<Dayjs | null>(date1);
     const [value2, setValue2] = React.useState<Dayjs | null>(date2);
 
+    const { accumulatives } = useSelector((state) => state.audiencer);
+
     // Correct formation of the date interval "from and to"
     React.useEffect(() => {
         if (value1 && value2 && value1.isAfter(value2)) {
@@ -26,15 +29,32 @@ export const useDatePickerComponent = () => {
     useDebounce(() => setDate1(value1), 1500, [value1]);
     useDebounce(() => setDate2(value2), 1500, [value2]);
 
-    // TODO: calculate minDate and maxDate
+    const [minDate, maxDate] = React.useMemo(() => {
+        const now = dayjs();
+        let minDate = now.subtract(1, 'days');
+        let maxDate = now.add(1, 'days');
+        for (const audience of accumulatives) {
+            for (const item of audience.items) {
+                const startAt = dayjs(item.startAt);
+                const endAt = dayjs(item.endAt);
+                if (!minDate || startAt.isBefore(minDate)) {
+                    minDate = startAt;
+                }
+                if (!maxDate || endAt.isAfter(maxDate)) {
+                    maxDate = endAt;
+                }
+            }
+        }
+        return [minDate, maxDate];
+    }, [accumulatives]);
 
     const component = () => {
         return (
             <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={'ru'}>
                 <DatePicker
                     views={['day']}
-                    // minDate={dayjs('2022-08-01')}
-                    // maxDate={dayjs('2023-06-01')}
+                    minDate={minDate}
+                    maxDate={maxDate}
                     inputFormat="DD.MM.YYYY"
                     label="От"
                     value={value1}
@@ -43,8 +63,8 @@ export const useDatePickerComponent = () => {
                 />
                 <DatePicker
                     views={['day']}
-                    // minDate={dayjs('2022-08-01')}
-                    // maxDate={dayjs('2023-06-01')}
+                    minDate={minDate}
+                    maxDate={maxDate}
                     inputFormat="DD.MM.YYYY"
                     label="До"
                     value={value2}
@@ -78,9 +98,6 @@ export const useTimePickerComponent = () => {
         return (
             <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={'ru'}>
                 <TimePicker
-                    ampm={false}
-                    openTo="hours"
-                    views={['hours', 'minutes']}
                     minTime={dayjs('07:00', 'HH:mm')}
                     maxTime={dayjs('22:00', 'HH:mm')}
                     inputFormat="HH:mm"
@@ -91,9 +108,6 @@ export const useTimePickerComponent = () => {
                     renderInput={(params) => <TextField {...params} />}
                 />
                 <TimePicker
-                    ampm={false}
-                    openTo="hours"
-                    views={['hours', 'minutes']}
                     minTime={dayjs('07:00', 'HH:mm')}
                     maxTime={dayjs('22:00', 'HH:mm')}
                     inputFormat="HH:mm"
