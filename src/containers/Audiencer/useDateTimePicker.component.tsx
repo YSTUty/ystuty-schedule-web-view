@@ -16,6 +16,13 @@ export const useDatePickerComponent = () => {
     const [value1, setValue1] = React.useState<Dayjs | null>(date1);
     const [value2, setValue2] = React.useState<Dayjs | null>(date2);
 
+    // Correct formation of the date interval "from and to"
+    React.useEffect(() => {
+        if (value1 && value2 && value1.isAfter(value2)) {
+            setValue1(value2);
+            setValue2(value1);
+        }
+    }, [value1, value2]);
     useDebounce(() => setDate1(value1), 1500, [value1]);
     useDebounce(() => setDate2(value2), 1500, [value2]);
 
@@ -57,6 +64,13 @@ export const useTimePickerComponent = () => {
     const [value1, setValue1] = React.useState<Dayjs | null>(time1);
     const [value2, setValue2] = React.useState<Dayjs | null>(time2);
 
+    // Correct formation of the date interval "from and to"
+    React.useEffect(() => {
+        if (value1 && value2 && value1.isAfter(value2)) {
+            setValue1(value2);
+            setValue2(value1);
+        }
+    }, [value1, value2]);
     useDebounce(() => setTime1(value1), 1500, [value1]);
     useDebounce(() => setTime2(value2), 1500, [value2]);
 
