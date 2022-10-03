@@ -2,6 +2,38 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.2.0](https://github.com/YSTUty/ystuty-viewer-frontend/compare/v0.1.10...v0.2.0) (2022-10-03)
+
+
+### 🐛 Bug Fixes
+
+* **components:** fixed selection of groups and teachers ([d0f5a0e](https://github.com/YSTUty/ystuty-viewer-frontend/commit/d0f5a0e3c7e3b4bfe9bd4ff41a521614dabfe49e))
+* **components:** fixed selection of groups and teachers empty value ([789bb74](https://github.com/YSTUty/ystuty-viewer-frontend/commit/789bb746090180e44122a0dea5888478f20f9652))
+
+
+### 🚀 Features
+
+* added `prettier` and `editorconfig` ([2334237](https://github.com/YSTUty/ystuty-viewer-frontend/commit/23342378d2b50e15984de441b81f8f4ec20d0e9a))
+* added copyright to all pages ([417ba62](https://github.com/YSTUty/ystuty-viewer-frontend/commit/417ba6226d1a9d9702677139ccf1f4ef79b13eb5))
+* **app:** added welcome page ([239cc0e](https://github.com/YSTUty/ystuty-viewer-frontend/commit/239cc0e1b0861058bac03ff186873d617a34b97e))
+* **audience:** added combined schedule table ([7d3197d](https://github.com/YSTUty/ystuty-viewer-frontend/commit/7d3197dd4a4cb1cc7272eaa1e182f3468e37196a))
+* **audience:** added displaying all audiences ([683680b](https://github.com/YSTUty/ystuty-viewer-frontend/commit/683680b83c32dbf6cc8d28840612ad552aa097bf))
+* **audience:** split filter code to filter provider ([73daa4f](https://github.com/YSTUty/ystuty-viewer-frontend/commit/73daa4f594a5633f2f2d0fef843d7e3f4da7324c))
+* updated readme ([f98d7ca](https://github.com/YSTUty/ystuty-viewer-frontend/commit/f98d7cab207c46f42ac9721f9988bb70542eafd4))
+
+
+### 🧹 Chore
+
+* **beta:** moved `beta` status from `teacher` to `audiencer` ([7d8064d](https://github.com/YSTUty/ystuty-viewer-frontend/commit/7d8064d01efb15bb197a24e8f2b30d99fd024ef5))
+* **datetimepicker:** correct `min` and `max` value ([21f5d08](https://github.com/YSTUty/ystuty-viewer-frontend/commit/21f5d08dfa389ab46d95d66ad4775e518cd7419e))
+* **eslint:** clean code ([40c7329](https://github.com/YSTUty/ystuty-viewer-frontend/commit/40c73294fcd5f7abff66c4dbfa1bff6c790ade2d))
+* **filter:** correct formation of date interval ([6f74c2f](https://github.com/YSTUty/ystuty-viewer-frontend/commit/6f74c2f25b201cf379bea1f1340ffce6ce68b95e))
+* **filter:** updated component value and label ([b05916e](https://github.com/YSTUty/ystuty-viewer-frontend/commit/b05916ed82e086a8d3c9cccde19e9098914e217f))
+* removed `fullcalendar` module and component ([1cdd253](https://github.com/YSTUty/ystuty-viewer-frontend/commit/1cdd2538c5d5fc22535ee7bfac1201c17661106d))
+* removed old script ([76a238d](https://github.com/YSTUty/ystuty-viewer-frontend/commit/76a238d6e2435365cc39684caf497b46beb053e5))
+* **schedule:** removed default group value ([8369eb5](https://github.com/YSTUty/ystuty-viewer-frontend/commit/8369eb5d664736bde8b9914e5d6ce4f840747ca9))
+* **schedule:** updated size ([9e6d47f](https://github.com/YSTUty/ystuty-viewer-frontend/commit/9e6d47f3d900fb2e4266a01776aa7d19fd3e0940))
+
 ### [0.1.10](https://github.com/YSTUty/ystuty-viewer-frontend/compare/v0.1.9...v0.1.10) (2022-09-02)
 
 
