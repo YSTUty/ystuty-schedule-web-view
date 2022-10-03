@@ -11,37 +11,11 @@ import Box from '@mui/material/Box';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import Button from '@mui/material/Button';
 
-import GitHubIcon from '@mui/icons-material/GitHub';
 import ImportExportIcon from '@mui/icons-material/ImportExportSharp';
 
 import { ThemeModeButton } from '../../components/ThemeMode.component';
-import VersionComponent from '../../components/Version.component';
 import NavLinkComponent from '../../components/NavLink.component';
 import * as envUtils from '../../utils/env.utils';
-
-const Copyright = () => {
-    return (
-        <Typography component="div" variant="body2" color="text.secondary" align="center" sx={{ pt: 3 }}>
-            {'Copyright © '}
-            2018-{new Date().getFullYear()}{' '}
-            {envUtils.linkYSTUty ? (
-                <Link href={envUtils.linkYSTUty} color="inherit">
-                    YSTUty
-                </Link>
-            ) : (
-                'YSTUty'
-            )}
-            {'.'}
-            {envUtils.linkToGitHub && (
-                <Link href={envUtils.linkToGitHub} target="_blank" color="inherit" sx={{ ml: 1 }}>
-                    <GitHubIcon fontSize="small" />
-                </Link>
-            )}
-            <br />
-            <VersionComponent />
-        </Typography>
-    );
-};
 
 const App = () => {
     return (
@@ -80,7 +54,7 @@ const App = () => {
                 </Toolbar>
             </AppBar>
 
-            <Container component="main" maxWidth="md" sx={{ mb: 4 }}>
+            <Container component="main" maxWidth="md" sx={{ mb: 0 }}>
                 <Paper sx={{ my: { xs: 3 }, p: { xs: 2, md: 3 } }}>
                     <Typography component="h1" variant="h4" align="center">
                         Просмотр расписания в браузере
@@ -124,7 +98,6 @@ const App = () => {
                         </ButtonGroup>
                     </Box>
                 </Paper>
-                <Copyright />
             </Container>
         </>
     );

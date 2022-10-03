@@ -5,6 +5,7 @@ import store2 from 'store2';
 
 import LazyLoadComponent from '../../components/LazyLoad.component';
 import { AlertMe } from '../../components/AlertMe.component';
+import Copyright from '../../components/Copyright.component';
 
 import { history } from '../../store';
 import * as appConstants from '../../constants/app.constants';
@@ -53,6 +54,7 @@ const Routes = () => {
                 <Route path="/audience" component={Audiencer} />
                 <Route component={() => <b>not found</b>} />
             </Switch>
+            <Copyright />
         </>
     );
 };
