@@ -1,3 +1,5 @@
+import { Route, useLocation } from 'react-router';
+
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
@@ -11,14 +13,20 @@ import Divider from '@mui/material/Divider';
 import { FiltersProvider, FiltersList } from './Filter.provider';
 import useAudienceLoader from './useAudienceLoader';
 import AudiencerTable from './AudiencerTable';
-import { ThemeModeButton } from '../../components/ThemeMode.component';
+import AudiencerCombinedTable from './AudiencerCombinedTable';
 import { useDatePickerComponent, useTimePickerComponent } from './useDateTimePicker.component';
+import { SelectAudiencesComponent } from './SelectAudiences.component';
+import { ThemeModeButton } from '../../components/ThemeMode.component';
+import NavLinkComponent from '../../components/NavLink.component';
 
 const Audiencer = () => {
     useAudienceLoader();
+    const location = useLocation();
 
     const [DatePickerComponent, [date1, date2]] = useDatePickerComponent();
     const [TimePickerComponent, [time1, time2]] = useTimePickerComponent();
+
+    const isAudienceCombined = location.pathname.startsWith('/audience/combined');
 
     return (
         <>
@@ -36,8 +44,19 @@ const Audiencer = () => {
                         Audiencer <small>beta</small>
                     </Typography>
                     <Typography sx={{ flex: 1 }}></Typography>
+
                     <Divider orientation="vertical" flexItem />
-                    <FormControl sx={{ ml: 2 }}>
+                    <FormControl sx={{ mx: 1 }}>
+                        <NavLinkComponent
+                            to={isAudienceCombined ? '/audience' : '/audience/combined'}
+                            style={{ color: 'inherit' }}
+                        >
+                            {isAudienceCombined ? 'Combined' : 'Divided'}
+                        </NavLinkComponent>
+                    </FormControl>
+
+                    <Divider orientation="vertical" flexItem />
+                    <FormControl sx={{ mx: 1 }}>
                         <ThemeModeButton />
                     </FormControl>
                 </Toolbar>
@@ -52,7 +71,8 @@ const Audiencer = () => {
                             </Typography>
 
                             <Stack spacing={2}>
-                                <FiltersList />
+                                {isAudienceCombined && <SelectAudiencesComponent withDebounce />}
+                                <FiltersList except={isAudienceCombined ? ['audience'] : []} />
                                 <Stack spacing={3} direction="row">
                                     <DatePickerComponent />
                                 </Stack>
@@ -63,7 +83,12 @@ const Audiencer = () => {
                         </Paper>
                     </Container>
 
-                    <AudiencerTable filterDateTime={{ date1, date2, time1, time2 }} />
+                    <Route exact path="/audience">
+                        <AudiencerTable filterDateTime={{ date1, date2, time1, time2 }} />
+                    </Route>
+                    <Route exact path="/audience/combined">
+                        <AudiencerCombinedTable filterDateTime={{ date1, date2, time1, time2 }} />
+                    </Route>
                 </Box>
             </FiltersProvider>
         </>

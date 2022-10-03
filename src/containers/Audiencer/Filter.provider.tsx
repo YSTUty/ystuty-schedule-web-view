@@ -18,7 +18,12 @@ export const FilterContext = React.createContext({
     updateFilters: (() => {}) as React.Dispatch<React.SetStateAction<FiltersListType>>,
 });
 
-export const FilterComponent = (props: { label: string; placeholder: string; value: string; updateValue: (e: string) => void }) => {
+export const FilterComponent = (props: {
+    label: string;
+    placeholder: string;
+    value: string;
+    updateValue: (e: string) => void;
+}) => {
     const { label, placeholder, value, updateValue } = props;
     const [val, setVal] = React.useState(value);
 
@@ -40,18 +45,21 @@ export const FilterComponent = (props: { label: string; placeholder: string; val
     );
 };
 
-export const FiltersList = () => {
+export const FiltersList = (props: { except?: FilterKeys[] }) => {
+    const { except = [] } = props;
     const { filters, updateFilters } = React.useContext(FilterContext);
 
     return (
         <>
-            {(Object.keys(filters) as (keyof FiltersListType)[]).map((key) => (
-                <FilterComponent
-                    key={key}
-                    updateValue={(val) => updateFilters((e) => ((e[key].value = val), { ...e }))}
-                    {...filters[key]}
-                />
-            ))}
+            {(Object.keys(filters) as (keyof FiltersListType)[])
+                .filter((e) => !except.includes(e))
+                .map((key) => (
+                    <FilterComponent
+                        key={key}
+                        updateValue={(val) => updateFilters((e) => ((e[key].value = val), { ...e }))}
+                        {...filters[key]}
+                    />
+                ))}
         </>
     );
 };

@@ -4,6 +4,7 @@ import { AccumulativeSchedule, IAudienceData } from '../../../interfaces/ystuty.
 const initialState = {
     audiences: [] as IAudienceData[],
     accumulatives: [] as AccumulativeSchedule[],
+    selectedAudiences: [] as string[],
 };
 
 export const audiencerSlice = createSlice({
@@ -16,9 +17,13 @@ export const audiencerSlice = createSlice({
         setAccumulative: (state, action: PayloadAction<AccumulativeSchedule[]>) => {
             state.accumulatives = action.payload;
         },
+        setSelectedGroups: (state, action: PayloadAction<string[]>) => {
+            state.selectedAudiences = action.payload;
+        },
         clear: (state) => {
             state.audiences = [];
             state.accumulatives = [];
+            state.selectedAudiences = [];
         },
     },
 });

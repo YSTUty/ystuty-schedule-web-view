@@ -282,7 +282,7 @@ export interface AudienceLesson {
     /**
      * Название предмета пары
      */
-    lessonName: string;
+    lessonName?: string;
     /**
      * Флаг типа пары
      */
