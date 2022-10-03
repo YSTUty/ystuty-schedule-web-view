@@ -18,9 +18,9 @@ export const FilterContext = React.createContext({
     updateFilters: (() => {}) as React.Dispatch<React.SetStateAction<FiltersListType>>,
 });
 
-export const FilterComponent = (props: { label: string; placeholder: string; updateValue: (e: string) => void }) => {
-    const { label, placeholder, updateValue } = props;
-    const [val, setVal] = React.useState('');
+export const FilterComponent = (props: { label: string; placeholder: string; value: string; updateValue: (e: string) => void }) => {
+    const { label, placeholder, value, updateValue } = props;
+    const [val, setVal] = React.useState(value);
 
     useDebounce(() => updateValue(val), 1200, [val]);
 
@@ -48,9 +48,8 @@ export const FiltersList = () => {
             {(Object.keys(filters) as (keyof FiltersListType)[]).map((key) => (
                 <FilterComponent
                     key={key}
-                    label={filters[key].label}
-                    placeholder={filters[key].placeholder}
                     updateValue={(val) => updateFilters((e) => ((e[key].value = val), { ...e }))}
+                    {...filters[key]}
                 />
             ))}
         </>
@@ -60,13 +59,13 @@ export const FiltersList = () => {
 export const FiltersProvider = (props: { children: any }) => {
     const [filters, updateFilters] = React.useState<FiltersListType>({
         audience: {
-            value: '',
-            label: 'Аудитории',
+            value: 'г-5',
+            label: 'Аудитории (через запятую)',
             placeholder: 'Г-501,г-62,А-31',
         },
         lesson: {
             value: '',
-            label: 'Предметы, группы',
+            label: 'Предметы, группы и преподаватели',
             placeholder: 'эис-46,овр-',
         },
     });
