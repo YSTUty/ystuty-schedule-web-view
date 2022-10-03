@@ -65,7 +65,7 @@ export const SelectGroupComponent = (props: {
             // items.sort();
             setInstitutes(items);
         },
-        [setInstitutes, setIsCached]
+        [setInstitutes, setIsCached],
     );
 
     const loadGroupsList = React.useCallback(() => {
@@ -81,19 +81,19 @@ export const SelectGroupComponent = (props: {
                 (
                     response:
                         | { items: { name: string; groups: string[] }[] }
-                        | { error: { error: string; message: string } }
+                        | { error: { error: string; message: string } },
                 ) => {
                     if ('error' in response) {
                         dispatch(
                             alertSlice.actions.add({
                                 message: `Error: ${response.error.message}`,
                                 severity: 'warning',
-                            })
+                            }),
                         );
                         return;
                     }
                     applyInstitutes(response!.items);
-                }
+                },
             )
             .catch((e) => {
                 applyInstitutes(null);
@@ -102,7 +102,7 @@ export const SelectGroupComponent = (props: {
                         alertSlice.actions.add({
                             message: `Error: ${e.message}`,
                             severity: 'error',
-                        })
+                        }),
                     );
                 }
             })
@@ -126,7 +126,7 @@ export const SelectGroupComponent = (props: {
                 }
             }
         },
-        [dispatch, setHash, selected]
+        [dispatch, setHash, selected],
     );
 
     const fixSelected = React.useCallback(
@@ -146,7 +146,7 @@ export const SelectGroupComponent = (props: {
                 onChangeValues(value);
             }
         },
-        [institutes, selected, onChangeValues]
+        [institutes, selected, onChangeValues],
     );
 
     const allowMultiple = React.useCallback(
@@ -159,7 +159,7 @@ export const SelectGroupComponent = (props: {
                 onChangeValues(selected);
             }
         },
-        [onChangeValues, selected]
+        [onChangeValues, selected],
     );
 
     // Check correct names after institutes loading
@@ -182,7 +182,7 @@ export const SelectGroupComponent = (props: {
         }
     }, [online, previousOnline, since]);
 
-    React.useEffect(() => { 
+    React.useEffect(() => {
         fixSelected(defaultValues);
 
         if (window.location.search.includes('allow_multiple')) {
@@ -197,10 +197,12 @@ export const SelectGroupComponent = (props: {
         () =>
             institutes.reduce(
                 (prev, cur) => ({ ...prev, ...Object.fromEntries(cur.groups.map((g) => [g, cur.name])) }),
-                {} as Record<string, string>
+                {} as Record<string, string>,
             ),
-        [institutes]
+        [institutes],
     );
+
+    const value = isMultiple ? (institutes.length > 0 ? selected : []) : institutes.length > 0 ? selected[0] : '';
 
     return (
         <Autocomplete
@@ -217,12 +219,12 @@ export const SelectGroupComponent = (props: {
                     {...params}
                     label={`Групп${isMultiple ? 'ы' : 'а'}${isCached ? '*' : ''}`}
                     placeholder={((e) => (e.length > 0 && e[Math.floor(Math.random() * e.length)]) || '...')(
-                        Object.keys(options)
+                        Object.keys(options),
                     )}
                 />
             )}
             PopperComponent={MyPopper}
-            value={!isMultiple && Array.isArray(selected) ? selected[0] : selected}
+            value={value}
             onChange={(event, newValue, reason) => {
                 if (
                     event.type === 'keydown' &&

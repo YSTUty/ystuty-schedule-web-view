@@ -190,6 +190,7 @@ export const SelectTeacherComponent = (props: {
     }, []);
 
     const isMultiple = allowedMultiple || selected.length > 1;
+    const value = isMultiple ? (teachers.length > 0 ? selected : []) : teachers.length > 0 ? selected[0] : null;
 
     return (
         <Autocomplete
@@ -206,12 +207,12 @@ export const SelectTeacherComponent = (props: {
                     {...params}
                     label={`Преподавател${isMultiple ? 'и' : 'ь'}${isCached ? '*' : ''}`}
                     placeholder={((e) => (e.length > 0 && e[Math.floor(Math.random() * e.length)].name) || '...')(
-                        teachers
+                        teachers,
                     )}
                 />
             )}
             PopperComponent={MyPopper}
-            value={!isMultiple && Array.isArray(selected) ? selected[0] : selected}
+            value={value}
             onChange={(event, newValue, reason) => {
                 if (
                     event.type === 'keydown' &&
