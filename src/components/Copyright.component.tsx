@@ -5,7 +5,6 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 import TelegramIcon from '@mui/icons-material/Telegram';
 
 import VersionComponent from './Version.component';
-import * as appConstants from '../constants/app.constants';
 import * as envUtils from '../utils/env.utils';
 
 const Copyright = () => {
@@ -26,10 +25,10 @@ const Copyright = () => {
                     <GitHubIcon fontSize="small" />
                 </Link>
             )}
-            {envUtils.linkToGitHub && appConstants.telegramBotName && ' '}
-            {appConstants.telegramBotName && (
+            {envUtils.linkToGitHub && envUtils.telegramBotName && ' '}
+            {envUtils.telegramBotName && (
                 <Link
-                    href={`https://${appConstants.telegramBotName}.t.me?start=viewer`}
+                    href={`https://${envUtils.telegramBotName}.t.me?start=viewer`}
                     target="_blank"
                     color="inherit"
                     sx={{ ml: 1 }}

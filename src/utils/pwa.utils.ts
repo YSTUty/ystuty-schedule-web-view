@@ -3,7 +3,7 @@ import AddToHomeScreenIcon from '@mui/icons-material/AddToHomeScreen';
 import MenuIcon from '@mui/icons-material/Menu';
 
 import { history } from '../store/index';
-import * as appConstants from '../constants/app.constants';
+import * as envUtils from './env.utils';
 import * as deviceUtils from './device.utils';
 
 export const getDescriptionByOS = (os: 'ios' | 'android') =>
@@ -55,8 +55,8 @@ export const checkPWA = () => {
     }
 
     if (
-        ((window.location.hostname === appConstants.pwaHostname && !deviceUtils.isPWA()) ||
-            window.location.hostname === appConstants.pwaHostnameOld) &&
+        ((window.location.hostname === envUtils.pwaHostname && !deviceUtils.isPWA()) ||
+            window.location.hostname === envUtils.pwaHostnameOld) &&
         window.location.pathname !== '/pwa'
     ) {
         history.push('/pwa');

@@ -8,7 +8,7 @@ import { AlertMe } from '../../components/AlertMe.component';
 import Copyright from '../../components/Copyright.component';
 
 import { history } from '../../store';
-import * as appConstants from '../../constants/app.constants';
+import * as envUtils from '../../utils/env.utils';
 import * as pwaUtils from '../../utils/pwa.utils';
 import WithVersionCheckerConnect from '../../shared/WithVersionChecker.util';
 import appVersion from '../../utils/app-version';
@@ -30,10 +30,10 @@ const Routes = () => {
     }, []);
 
     if (pathname === '/pwa') {
-        if (window.location.hostname === appConstants.pwaHostname) {
+        if (window.location.hostname === envUtils.pwaHostname) {
             return <PWAInstructionComponent />;
         } else {
-            window.location.href = `https://${appConstants.pwaHostname}`;
+            window.location.href = `https://${envUtils.pwaHostname}`;
         }
     }
     // * Short paths
