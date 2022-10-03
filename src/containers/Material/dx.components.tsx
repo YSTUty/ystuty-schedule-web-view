@@ -114,11 +114,11 @@ const StyledMonthViewDayScaleCell = styled(MonthView.DayScaleCell)(({ theme: { p
 const StyledMonthViewTimeTableCell = styled(MonthView.TimeTableCell)(({ theme: { palette } }) => ({
     [`&.${classes.weekCellFullSize}1`]: {
         minHeight: '100px',
-        height: 'calc((100vh / 6) - ((56px + 28px) / 6) - 2px)',
+        height: 'calc((100vh / 6) - ((56px + 56px + 28px) / 6) - 2px)',
     },
     [`&.${classes.weekCellFullSize}2`]: {
         minHeight: '100px',
-        height: 'calc((100vh / 6) - ((56px + 28px + 75px) / 6) - 2px)',
+        height: 'calc((100vh / 6) - ((56px + 56px + 28px + 75px) / 6) - 2px)',
     },
     [`&.${classes.weekEndCell}`]: {
         backgroundColor: alpha(palette.action.disabledBackground, 0.04),

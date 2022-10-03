@@ -208,7 +208,7 @@ export const SelectGroupComponent = (props: {
         <Autocomplete
             multiple={isMultiple}
             sx={{ minWidth: 200, maxWidth: 400 }}
-            id="grouped-native-select"
+            size="small"
             options={Object.keys(options)}
             disableCloseOnSelect
             disableListWrap

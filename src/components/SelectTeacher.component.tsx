@@ -196,7 +196,7 @@ export const SelectTeacherComponent = (props: {
         <Autocomplete
             multiple={isMultiple}
             sx={{ minWidth: 200, maxWidth: 400 }}
-            id="teachers-native-select"
+            size="small"
             options={teachers.map((e) => e.id)}
             disableCloseOnSelect={isMultiple}
             disableListWrap

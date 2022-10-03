@@ -360,7 +360,7 @@ const MaterialContainer = () => {
     const hasGroupingGroups = selectedGroups.length > 1 && groupingGroups;
 
     return (
-        <Paper style={{ height: '100vh' }}>
+        <Paper style={{ height: 'calc(100vh - 56px)' }}>
             <Scheduler locale="ru" data={dataMemo} firstDayOfWeek={1}>
                 <ViewState />
                 {hasGroupingGroups && (
