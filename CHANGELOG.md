@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.1](https://github.com/YSTUty/ystuty-viewer-frontend/compare/v0.2.0...v0.2.1) (2022-10-28)
+
+
+### 🐛 Bug Fixes
+
+* **components:** added a missing lesson flag in array ([bdd6e99](https://github.com/YSTUty/ystuty-viewer-frontend/commit/bdd6e991c3cda3c370c1a59112b90103382b1e27))
+
+
+### 🚀 Features
+
+* added `teacher-lessons` ([91351be](https://github.com/YSTUty/ystuty-viewer-frontend/commit/91351be70ec658b4b4de9d1be8a9ff46cf871995))
+* **app:** updated main page buttons style ([084e80a](https://github.com/YSTUty/ystuty-viewer-frontend/commit/084e80ac3ec13be4a0a1c15c18aa5cab863431b6))
+
+
+### 🧹 Chore
+
+* moved `constants` to `envUtils` ([227fbf7](https://github.com/YSTUty/ystuty-viewer-frontend/commit/227fbf71d8d37876e109e7702db985997e84df14))
+* **teacher-lessons:** added color by lesson type ([fabeb93](https://github.com/YSTUty/ystuty-viewer-frontend/commit/fabeb9388007a35940aef99cf5f297b51582ebf5))
+
 ## [0.2.0](https://github.com/YSTUty/ystuty-viewer-frontend/compare/v0.1.10...v0.2.0) (2022-10-03)
 
 
