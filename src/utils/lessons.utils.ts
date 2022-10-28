@@ -1,3 +1,4 @@
+import { red, green, teal, blue, yellow } from '@mui/material/colors';
 import { LessonFlags } from '../interfaces/ystuty.types';
 
 export const getLessonTypeStrArr = (type: LessonFlags) => {
@@ -14,4 +15,33 @@ export const getLessonTypeStrArr = (type: LessonFlags) => {
     if (type & LessonFlags.ResearchWork) types.push('НИР');
     if (type & LessonFlags.None) types.push('???');
     return types;
+};
+
+export const getLessonColor = (type: LessonFlags) => {
+    switch (type) {
+        case type & LessonFlags.Lecture:
+            return green;
+        case type & LessonFlags.Practical:
+            return yellow;
+        case type & LessonFlags.Labaratory:
+            return blue;
+        case type & LessonFlags.CourseProject:
+            return red;
+        case type & LessonFlags.Consultation:
+            return green;
+        case type & LessonFlags.Test:
+            return teal;
+        case type & LessonFlags.DifferentiatedTest:
+            return red;
+        case type & LessonFlags.Exam:
+            return red;
+        case type & LessonFlags.Library:
+            return teal;
+        case type & LessonFlags.ResearchWork:
+            return yellow;
+        case type & LessonFlags.None:
+            return red;
+        default:
+            return yellow;
+    }
 };

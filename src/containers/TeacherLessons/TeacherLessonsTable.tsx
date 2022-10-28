@@ -73,7 +73,7 @@ const RowAccumulative = (props: { row: TeacherLessonType }) => {
             </StyledTableRow>
 
             <TableRow>
-                <TableCell sx={{ pb: 0, pt: 0 }} colSpan={3}>
+                <TableCell sx={{ pb: 0, pt: 0 }} colSpan={2}>
                     <Collapse in={open} timeout="auto" unmountOnExit>
                         <Box sx={{ margin: 1 }}>
                             <Typography variant="h6" gutterBottom component="div">
@@ -83,24 +83,32 @@ const RowAccumulative = (props: { row: TeacherLessonType }) => {
                                 <TableHead>
                                     <TableRow>
                                         <StyledTableCell>Группа</StyledTableCell>
-                                        <StyledTableCell>Количество пар</StyledTableCell>
+                                        <StyledTableCell align="right">Количество пар</StyledTableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
                                     {Object.entries(row.groups).map(([group, counter]) => (
                                         <StyledTableRow key={group}>
                                             <StyledTableCell>{group}</StyledTableCell>
-                                            <StyledTableCell>
+                                            <StyledTableCell align="right">
                                                 {Object.entries(counter)
                                                     .map(([lessonType, count]) => (
                                                         <>
-                                                            <b>
+                                                            <Typography
+                                                                style={{
+                                                                    color: lessonsUtils.getLessonColor(
+                                                                        Number(lessonType),
+                                                                    )[500],
+                                                                }}
+                                                                component="b"
+                                                                variant="inherit"
+                                                            >
                                                                 [
                                                                 {lessonsUtils
                                                                     .getLessonTypeStrArr(Number(lessonType))
                                                                     .join(', ')}
                                                                 ]
-                                                            </b>
+                                                            </Typography>
                                                             : {count}
                                                         </>
                                                     ))
