@@ -19,6 +19,7 @@ const PWAInstructionComponent = LazyLoadComponent(
 );
 const Schedule = LazyLoadComponent(React.lazy(() => import('../Schedule/Schedule')));
 const Audiencer = LazyLoadComponent(React.lazy(() => import('../Audiencer/Audiencer')));
+const TeacherLessons = LazyLoadComponent(React.lazy(() => import('../TeacherLessons/TeacherLessons')));
 
 const Routes = () => {
     const { pathname, hash } = useLocation();
@@ -52,6 +53,7 @@ const Routes = () => {
                 <Route exact path="/" component={App} />
                 <Route strict path="/(group|teacher)" component={Schedule} />
                 <Route path="/audience" component={Audiencer} />
+                <Route path="/teacher-lessons" component={TeacherLessons} />
                 <Route component={() => <b>not found</b>} />
             </Switch>
             <Copyright />

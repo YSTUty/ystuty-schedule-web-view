@@ -112,6 +112,12 @@ const App = () => {
                             </Button>
                         </ButtonGroup>
                     </Box>
+
+                    <Typography sx={{ mt: 2, fontSize: 10 }}>
+                        <NavLinkComponent to="/teacher-lessons" style={{ color: 'grey' }}>
+                            Список предметов по преподавателям
+                        </NavLinkComponent>
+                    </Typography>
                 </Paper>
             </Container>
         </>
