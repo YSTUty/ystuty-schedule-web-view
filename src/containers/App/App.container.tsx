@@ -12,6 +12,8 @@ import ButtonGroup from '@mui/material/ButtonGroup';
 import Button from '@mui/material/Button';
 
 import ImportExportIcon from '@mui/icons-material/ImportExportSharp';
+import SchoolIcon from '@mui/icons-material/School';
+import AudienceIcon from '@mui/icons-material/DoorSliding';
 
 import { ThemeModeButton } from '../../components/ThemeMode.component';
 import NavLinkComponent from '../../components/NavLink.component';
@@ -85,18 +87,37 @@ const App = () => {
                             '& > *': { m: 1 },
                         }}
                     >
-                        <ButtonGroup size="large">
-                            <Button to={'/group'} component={NavLinkComponent}>
-                                По группам
+                        <ButtonGroup size="large" orientation="vertical">
+                            <Button
+                                to={'/group'}
+                                component={NavLinkComponent}
+                                color="secondary"
+                                variant="contained"
+                                endIcon={<SchoolIcon />}
+                                title="Расписание по группам"
+                            >
+                                Для студентов
                             </Button>
-                            <Button to={'/teacher'} component={NavLinkComponent}>
-                                По преподавателям
+                            <Button to={'/teacher'} component={NavLinkComponent} title="Расписание по преподавателям">
+                                Для преподавателей
                             </Button>
-                            <Button to={'/audience'} component={NavLinkComponent}>
-                                По аудиториям
+                            <Button
+                                to={'/audience'}
+                                component={NavLinkComponent}
+                                endIcon={<AudienceIcon />}
+                                title="Расписание по аудиториям"
+                                size="medium"
+                            >
+                                Аудитории
                             </Button>
                         </ButtonGroup>
                     </Box>
+
+                    <Typography sx={{ mt: 2, fontSize: 10 }}>
+                        <NavLinkComponent to="/teacher-lessons" style={{ color: 'grey' }}>
+                            Список предметов по преподавателям
+                        </NavLinkComponent>
+                    </Typography>
                 </Paper>
             </Container>
         </>

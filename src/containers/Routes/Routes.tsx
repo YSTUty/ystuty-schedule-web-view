@@ -8,7 +8,7 @@ import { AlertMe } from '../../components/AlertMe.component';
 import Copyright from '../../components/Copyright.component';
 
 import { history } from '../../store';
-import * as appConstants from '../../constants/app.constants';
+import * as envUtils from '../../utils/env.utils';
 import * as pwaUtils from '../../utils/pwa.utils';
 import WithVersionCheckerConnect from '../../shared/WithVersionChecker.util';
 import appVersion from '../../utils/app-version';
@@ -19,6 +19,7 @@ const PWAInstructionComponent = LazyLoadComponent(
 );
 const Schedule = LazyLoadComponent(React.lazy(() => import('../Schedule/Schedule')));
 const Audiencer = LazyLoadComponent(React.lazy(() => import('../Audiencer/Audiencer')));
+const TeacherLessons = LazyLoadComponent(React.lazy(() => import('../TeacherLessons/TeacherLessons')));
 
 const Routes = () => {
     const { pathname, hash } = useLocation();
@@ -30,10 +31,10 @@ const Routes = () => {
     }, []);
 
     if (pathname === '/pwa') {
-        if (window.location.hostname === appConstants.pwaHostname) {
+        if (window.location.hostname === envUtils.pwaHostname) {
             return <PWAInstructionComponent />;
         } else {
-            window.location.href = `https://${appConstants.pwaHostname}`;
+            window.location.href = `https://${envUtils.pwaHostname}`;
         }
     }
     // * Short paths
@@ -52,6 +53,7 @@ const Routes = () => {
                 <Route exact path="/" component={App} />
                 <Route strict path="/(group|teacher)" component={Schedule} />
                 <Route path="/audience" component={Audiencer} />
+                <Route path="/teacher-lessons" component={TeacherLessons} />
                 <Route component={() => <b>not found</b>} />
             </Switch>
             <Copyright />
