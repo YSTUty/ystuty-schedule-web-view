@@ -74,6 +74,7 @@ const LESSON_TYPES = [
     LessonFlags.DifferentiatedTest,
     LessonFlags.Exam,
     LessonFlags.Library,
+    LessonFlags.ResearchWork,
 ];
 const LESSON_TYPE_SHORT_NAMES = ['Лек', 'ЛР', 'ПР', 'КП', 'КОН', 'ЗАЧ', 'ДИФ', 'ЭКЗ', 'БИБЛ', 'НИР'];
 const LESSON_TYPE_NAMES = [
