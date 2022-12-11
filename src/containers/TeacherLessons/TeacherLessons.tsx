@@ -1,7 +1,7 @@
 import React from 'react';
+import { useIntl } from 'react-intl';
 
 import Box from '@mui/material/Box';
-import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
 import Container from '@mui/material/Container';
@@ -9,6 +9,8 @@ import Toolbar from '@mui/material/Toolbar';
 import FormControl from '@mui/material/FormControl';
 import AppBar from '@mui/material/AppBar';
 import Divider from '@mui/material/Divider';
+
+import HomeIcon from '@mui/icons-material/Home';
 
 import { ThemeModeButton } from '../../components/ThemeMode.component';
 import NavLinkComponent from '../../components/NavLink.component';
@@ -19,6 +21,7 @@ import TeacherLessonsTable from './TeacherLessonsTable';
 const TeacherLessons = () => {
     useTeacherScheduleLoader();
     const allowMultipleTeachersRef = React.useRef<(state?: any) => void>(() => {});
+    const { formatMessage } = useIntl();
 
     return (
         <>
@@ -32,17 +35,17 @@ const TeacherLessons = () => {
                 }}
             >
                 <Toolbar>
-                    <Typography variant="h6" color="inherit" noWrap>
+                    <Typography variant="h6" color="inherit" noWrap sx={{ mr: 2 }}>
                         Teacher Lessons
                     </Typography>
-                    <Typography sx={{ flex: 1 }}></Typography>
 
                     <Divider orientation="vertical" flexItem />
                     <FormControl sx={{ mx: 1 }}>
-                        <NavLinkComponent to="/" style={{ color: 'inherit' }}>
-                            ← Back
+                        <NavLinkComponent to="/" style={{ color: 'inherit' }} title={formatMessage({ id: 'to_home' })}>
+                            <HomeIcon />
                         </NavLinkComponent>
                     </FormControl>
+                    <Typography sx={{ flex: 1 }}></Typography>
 
                     <Divider orientation="vertical" flexItem />
                     <FormControl sx={{ mx: 1 }}>

@@ -1,6 +1,7 @@
 import React from 'react';
 import store2 from 'store2';
 import { Route, useLocation } from 'react-router';
+import { useIntl } from 'react-intl';
 
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
@@ -11,6 +12,8 @@ import Toolbar from '@mui/material/Toolbar';
 import FormControl from '@mui/material/FormControl';
 import AppBar from '@mui/material/AppBar';
 import Divider from '@mui/material/Divider';
+
+import HomeIcon from '@mui/icons-material/Home';
 
 import { FiltersProvider, FiltersList } from './Filter.provider';
 import useAudienceLoader from './useAudienceLoader';
@@ -26,6 +29,7 @@ const BETA_CONFIRM_KEY = 'betaConfirm-audience';
 const Audiencer = () => {
     useAudienceLoader();
     const location = useLocation();
+    const { formatMessage } = useIntl();
 
     const [DatePickerComponent, [date1, date2]] = useDatePickerComponent();
     const [TimePickerComponent, [time1, time2]] = useTimePickerComponent();
@@ -54,9 +58,16 @@ const Audiencer = () => {
                 }}
             >
                 <Toolbar>
-                    <Typography variant="h6" color="inherit" noWrap>
+                    <Typography variant="h6" color="inherit" noWrap sx={{ mr: 2 }}>
                         Audiencer <small>beta</small>
                     </Typography>
+
+                    <Divider orientation="vertical" flexItem />
+                    <FormControl sx={{ mx: 1 }}>
+                        <NavLinkComponent to="/" style={{ color: 'inherit' }} title={formatMessage({ id: 'to_home' })}>
+                            <HomeIcon />
+                        </NavLinkComponent>
+                    </FormControl>
                     <Typography sx={{ flex: 1 }}></Typography>
 
                     <Divider orientation="vertical" flexItem />
@@ -64,8 +75,11 @@ const Audiencer = () => {
                         <NavLinkComponent
                             to={isAudienceCombined ? '/audience' : '/audience/combined'}
                             style={{ color: 'inherit' }}
+                            title={formatMessage({ id: 'audiencer.display_mode.type' })}
                         >
-                            {isAudienceCombined ? 'Combined' : 'Divided'}
+                            {formatMessage({
+                                id: `audiencer.display_mode.${isAudienceCombined ? 'combined' : 'divided'}`,
+                            })}
                         </NavLinkComponent>
                     </FormControl>
 

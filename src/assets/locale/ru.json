@@ -1,6 +1,10 @@
 {
     "badges.loading": "Загрузка...",
     "badges.loading.update": "Выполняется обновление! \n Страница перезагрузится автоматически",
+    "to_home": "На главную",
+    "audiencer.display_mode.type": "Режим отображения",
+    "audiencer.display_mode.combined": "Объединенный",
+    "audiencer.display_mode.divided": "Разделенный",
     "pwa.h1": "YSTUty Schedule {version} для {device}",
     "pwa.openBrowser": "Если вы находитесь в каком либо другом браузере, откройте данную страницу в браузере {browser}",
     "pwa.ios.step1.title": "Откройте браузер Safari",
