@@ -1,4 +1,5 @@
 import { red, green, teal, blue, yellow } from '@mui/material/colors';
+import ColorHash from 'color-hash';
 import { LessonFlags } from '../interfaces/ystuty.types';
 
 export const getLessonTypeStrArr = (type: LessonFlags) => {
@@ -45,3 +46,19 @@ export const getLessonColor = (type: LessonFlags) => {
             return yellow;
     }
 };
+
+export const hashColorDate = (isDark = false) =>
+    new ColorHash({
+        hue: { min: 90, max: 270 },
+        lightness: isDark ? [0.35, 0.4, 0.5] : [0.4, 0.5, 0.65],
+    });
+export const hashColorTime = (isDark = false) =>
+    new ColorHash({
+        hue: { min: 90, max: 180 },
+        lightness: isDark ? [0.35, 0.4, 0.5] : [0.4, 0.5, 0.65],
+    });
+export const hashColorAudience = (isDark = false) =>
+    new ColorHash({
+        lightness: isDark ? [0.35, 0.4, 0.5] : [0.4, 0.5, 0.65],
+        saturation: isDark ? 0.5 : 0.8,
+    });

@@ -3,7 +3,6 @@ import { useSelector } from 'react-redux';
 import dayjs, { Dayjs } from 'dayjs';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
-import ColorHash from 'color-hash';
 
 import { styled, useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
@@ -21,6 +20,7 @@ import TableRow from '@mui/material/TableRow';
 import { FilterContext } from './Filter.provider';
 import { AudienceLesson } from '../../interfaces/ystuty.types';
 import * as lessonsUtils from '../../utils/lessons.utils';
+import * as audiencerUtils from '../../utils/audiencer.utils';
 
 dayjs.extend(isSameOrBefore);
 dayjs.extend(isSameOrAfter);
@@ -52,10 +52,9 @@ const AudiencerCombinedTable = (props: {
         time1: Dayjs | null;
         time2: Dayjs | null;
     };
+    isColoring: boolean;
 }) => {
-    const {
-        filterDateTime: { date1, date2, time1, time2 },
-    } = props;
+    const { filterDateTime, isColoring } = props;
 
     const { accumulatives, selectedAudiences } = useSelector((state) => state.audiencer);
     const { filters } = React.useContext(FilterContext);
@@ -63,64 +62,13 @@ const AudiencerCombinedTable = (props: {
     const isDark = theme.palette.mode === 'dark';
 
     const schedule = React.useMemo(() => {
-        const filterLessonArr = filters.lesson.value
-            .toLowerCase()
-            .split(',')
-            .map((item) => item.trim());
         const selectedAudiencesArr = selectedAudiences.map((e) => e.toLowerCase());
 
         return accumulatives
+            .map(audiencerUtils.fixAudienceName)
             .filter((audience) => selectedAudiencesArr.some((e) => audience.name.toLowerCase().includes(e)))
-            .map((audience) => {
-                let { name, items } = audience;
-                if (name === 'Актовый зал') {
-                    name = 'А-АктовыйЗал';
-                } else if (name === 'В-корпус_библиотека') {
-                    name = 'В-Библиотека';
-                }
-
-                if (date1 || date2 || time1 || time2) {
-                    items = items.filter((l) => {
-                        let ok = true;
-                        const startAt = dayjs(l.startAt);
-                        const endAt = dayjs(l.endAt);
-                        const startDate = startAt.startOf('day');
-                        const startTime = dayjs(startAt.get('hour') + ':' + startAt.get('m'), 'HH:mm');
-                        const endTime = dayjs(endAt.get('hour') + ':' + endAt.get('m'), 'HH:mm');
-
-                        if (date1 && !startDate.isSameOrAfter(date1)) {
-                            ok = false;
-                        }
-                        if (date2 && !startDate.isSameOrBefore(date2)) {
-                            ok = false;
-                        }
-                        if (time1 && !startTime.isSameOrAfter(time1)) {
-                            ok = false;
-                        }
-                        if (time2 && !endTime.isSameOrBefore(time2)) {
-                            ok = false;
-                        }
-                        return ok;
-                    });
-                }
-
-                return { ...audience, name, items };
-            })
-            .map((e) => ({
-                ...e,
-                items:
-                    filterLessonArr.length === 0
-                        ? e.items
-                        : e.items.filter((item) =>
-                              filterLessonArr.some(
-                                  (e) =>
-                                      // item.lessonName?.toLowerCase().includes(e)
-                                      item.lessonName?.toLowerCase()?.includes(e) ||
-                                      item.teacherName?.toLowerCase()?.includes(e) ||
-                                      item.groups?.join(', ')?.toLowerCase()?.includes(e),
-                              ),
-                          ),
-            }))
+            .map(audiencerUtils.filterByDateTime(filterDateTime))
+            .map(audiencerUtils.filterByLessonArray(filters.lesson.value))
             .filter((audience) => audience.items.length > 0)
             .reduce((acc, audience) => {
                 const { name, items } = audience;
@@ -128,20 +76,11 @@ const AudiencerCombinedTable = (props: {
                 return acc;
             }, [] as (AudienceLesson & { audienceName: string })[])
             .sort((a, b) => (dayjs(a.startAt).isAfter(b.startAt) ? 1 : -1));
-    }, [accumulatives, filters, date1, date2, time1, time2, selectedAudiences]);
+    }, [accumulatives, filters, filterDateTime, selectedAudiences]);
 
-    const colorDate = new ColorHash({
-        hue: { min: 90, max: 270 },
-        lightness: isDark ? [0.35, 0.4, 0.5] : [0.4, 0.5, 0.65],
-    });
-    const colorTime = new ColorHash({
-        hue: { min: 90, max: 180 },
-        lightness: isDark ? [0.35, 0.4, 0.5] : [0.4, 0.5, 0.65],
-    });
-    const colorAudience = new ColorHash({
-        lightness: isDark ? [0.35, 0.4, 0.5] : [0.4, 0.5, 0.65],
-        saturation: isDark ? 0.5 : 0.8,
-    });
+    const colorDate = lessonsUtils.hashColorTime(isDark);
+    const colorTime = lessonsUtils.hashColorAudience(isDark);
+    const colorAudience = lessonsUtils.hashColorAudience(isDark);
 
     if (accumulatives.length === 0) {
         return (
@@ -188,7 +127,7 @@ const AudiencerCombinedTable = (props: {
                                             scope="row"
                                             sx={{
                                                 minWidth: 90,
-                                                backgroundColor: colorDate.hex(fDate),
+                                                backgroundColor: (isColoring && colorDate.hex(fDate)) || null,
                                             }}
                                         >
                                             {fDate}
@@ -196,14 +135,18 @@ const AudiencerCombinedTable = (props: {
                                         <StyledTableCell
                                             sx={{
                                                 minWidth: 110,
-                                                backgroundColor: colorTime.hex(fTime1),
+                                                backgroundColor: (isColoring && colorTime.hex(fTime1)) || null,
                                             }}
                                         >
                                             {fTime1}-{fTime2}
                                         </StyledTableCell>
                                         <StyledTableCell>{lesson.groups.join(', ')}</StyledTableCell>
                                         <StyledTableCell
-                                            sx={{ backgroundColor: colorAudience.hex(lesson.lessonName || 'none') }}
+                                            sx={{
+                                                backgroundColor:
+                                                    (isColoring && colorAudience.hex(lesson.lessonName || 'none')) ||
+                                                    null,
+                                            }}
                                         >
                                             {lesson.lessonName}
                                         </StyledTableCell>
@@ -213,7 +156,10 @@ const AudiencerCombinedTable = (props: {
                                         <StyledTableCell>{lesson.teacherName}</StyledTableCell>
                                         <StyledTableCell
                                             align="right"
-                                            sx={{ backgroundColor: colorAudience.hex(lesson.audienceName) }}
+                                            sx={{
+                                                backgroundColor:
+                                                    (isColoring && colorAudience.hex(lesson.audienceName)) || null,
+                                            }}
                                         >
                                             {lesson.audienceName}
                                         </StyledTableCell>

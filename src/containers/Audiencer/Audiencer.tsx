@@ -3,6 +3,7 @@ import store2 from 'store2';
 import { Route, useLocation } from 'react-router';
 import { useIntl } from 'react-intl';
 
+import { styled } from '@mui/material';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
@@ -12,8 +13,11 @@ import Toolbar from '@mui/material/Toolbar';
 import FormControl from '@mui/material/FormControl';
 import AppBar from '@mui/material/AppBar';
 import Divider from '@mui/material/Divider';
+import ToggleButton from '@mui/material/ToggleButton';
+import Grid from '@mui/material/Unstable_Grid2';
 
 import HomeIcon from '@mui/icons-material/Home';
+import ColoringIcon from '@mui/icons-material/ColorLensSharp';
 
 import { FiltersProvider, FiltersList } from './Filter.provider';
 import useAudienceLoader from './useAudienceLoader';
@@ -37,6 +41,7 @@ const Audiencer = () => {
 
     const [DatePickerComponent, [date1, date2]] = useDatePickerComponent();
     const [TimePickerComponent, [time1, time2]] = useTimePickerComponent();
+    const [isColoring, setColoring] = React.useState(true);
 
     const isAudienceCombined = location.pathname.startsWith('/audience/combined');
 
@@ -114,30 +119,75 @@ const Audiencer = () => {
 
             <FiltersProvider>
                 <Box component="main" sx={{ mt: 4, mb: 4 }}>
-                    <Container component="main" /* maxWidth="md" */ sx={{ mb: 4 }}>
+                    <Container component="main" /* maxWidth="md" */ sx={{ mb: 2 }}>
                         <Paper sx={{ my: { xs: 3, md: 6 }, p: { xs: 2, md: 3 } }}>
                             <Typography component="h1" variant="h6" align="center">
                                 Фильтрация
                             </Typography>
 
-                            <Stack spacing={2}>
-                                {isAudienceCombined && <SelectAudiencesComponent withDebounce />}
-                                <FiltersList except={isAudienceCombined ? ['audience'] : []} />
-                                <Stack spacing={3} direction="row">
-                                    <DatePickerComponent />
-                                </Stack>
-                                <Stack spacing={3} direction="row">
-                                    <TimePickerComponent />
-                                </Stack>
-                            </Stack>
+                            <Grid container spacing={2} sx={{ mt: 1 }}>
+                                <Grid xs={12}>
+                                    <Paper elevation={3} sx={{ p: 1 }}>
+                                        <Grid container spacing={2}>
+                                            <Grid xs={12} spacing={3}>
+                                                {isAudienceCombined && <SelectAudiencesComponent withDebounce />}
+                                            </Grid>
+                                            <Grid xs={12} spacing={3}>
+                                                <Stack spacing={2}>
+                                                    <FiltersList except={isAudienceCombined ? ['audience'] : []} />
+                                                </Stack>
+                                            </Grid>
+                                        </Grid>
+                                    </Paper>
+                                </Grid>
+
+                                <Grid xs={12} md={8}>
+                                    <Grid container spacing={2}>
+                                        <Grid xs={12} spacing={3}>
+                                            <Paper elevation={3} sx={{ p: 1 }}>
+                                                <Stack spacing={3} direction="row">
+                                                    <DatePickerComponent />
+                                                </Stack>
+                                            </Paper>
+                                        </Grid>
+                                        <Grid xs={12} spacing={3}>
+                                            <Paper elevation={3} sx={{ p: 1 }}>
+                                                <Stack spacing={3} direction="row">
+                                                    <TimePickerComponent />
+                                                </Stack>
+                                            </Paper>
+                                        </Grid>
+                                    </Grid>
+                                </Grid>
+                                <Grid xs={12} md={4}>
+                                    <Grid container spacing={2}>
+                                        <Grid xs={12} spacing={3}>
+                                            <Stack spacing={2}>
+                                                <ToggleButton
+                                                    value="check"
+                                                    selected={isColoring}
+                                                    onChange={() => {
+                                                        setColoring((e) => !e);
+                                                    }}
+                                                >
+                                                    <ColoringIcon /> {formatMessage({ id: 'audiencer.coloring' })}
+                                                </ToggleButton>
+                                            </Stack>
+                                        </Grid>
+                                    </Grid>
+                                </Grid>
+                            </Grid>
                         </Paper>
                     </Container>
 
                     <Route exact path="/audience">
-                        <AudiencerTable filterDateTime={{ date1, date2, time1, time2 }} />
+                        <AudiencerTable filterDateTime={{ date1, date2, time1, time2 }} isColoring={isColoring} />
                     </Route>
                     <Route exact path="/audience/combined">
-                        <AudiencerCombinedTable filterDateTime={{ date1, date2, time1, time2 }} />
+                        <AudiencerCombinedTable
+                            filterDateTime={{ date1, date2, time1, time2 }}
+                            isColoring={isColoring}
+                        />
                     </Route>
                 </Box>
             </FiltersProvider>

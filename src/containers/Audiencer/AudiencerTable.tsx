@@ -4,7 +4,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 
-import { styled } from '@mui/material/styles';
+import { styled, useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import Paper from '@mui/material/Paper';
@@ -25,6 +25,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { FilterContext } from './Filter.provider';
 import { AccumulativeSchedule } from '../../interfaces/ystuty.types';
 import * as lessonsUtils from '../../utils/lessons.utils';
+import * as audiencerUtils from '../../utils/audiencer.utils';
 
 dayjs.extend(isSameOrBefore);
 dayjs.extend(isSameOrAfter);
@@ -49,9 +50,16 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
     },
 }));
 
-const RowAccumulative = (props: { row: AccumulativeSchedule }) => {
-    const { row } = props;
+const RowAccumulative = (props: { row: AccumulativeSchedule; isColoring: boolean }) => {
+    const { row, isColoring } = props;
     const [open, setOpen] = React.useState(false);
+
+    const theme = useTheme();
+    const isDark = theme.palette.mode === 'dark';
+
+    const colorDate = lessonsUtils.hashColorTime(isDark);
+    const colorTime = lessonsUtils.hashColorAudience(isDark);
+    const colorAudience = lessonsUtils.hashColorAudience(isDark);
 
     return (
         <>
@@ -86,23 +94,59 @@ const RowAccumulative = (props: { row: AccumulativeSchedule }) => {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {row.items.map((lesson) => (
-                                        <StyledTableRow key={new Date(lesson.startAt).toString()}>
-                                            <StyledTableCell component="th" scope="row" sx={{ minWidth: 90 }}>
-                                                {dayjs(lesson.startAt).locale('ru').format('DD.MM dd')}
-                                            </StyledTableCell>
-                                            <StyledTableCell sx={{ minWidth: 110 }}>
-                                                {dayjs(lesson.startAt).format('HH:mm')}-
-                                                {dayjs(lesson.endAt).format('HH:mm')}
-                                            </StyledTableCell>
-                                            <StyledTableCell>{lesson.groups.join(', ')}</StyledTableCell>
-                                            <StyledTableCell>{lesson.lessonName}</StyledTableCell>
-                                            <StyledTableCell>
-                                                {lessonsUtils.getLessonTypeStrArr(lesson.lessonType).join(', ')}
-                                            </StyledTableCell>
-                                            <StyledTableCell>{lesson.teacherName}</StyledTableCell>
-                                        </StyledTableRow>
-                                    ))}
+                                    {row.items.map((lesson) => {
+                                        const fDate = dayjs(lesson.startAt).locale('ru').format('DD.MM dd');
+                                        const fTime1 = dayjs(lesson.startAt).format('HH:mm');
+                                        const fTime2 = dayjs(lesson.endAt).format('HH:mm');
+
+                                        return (
+                                            <StyledTableRow key={new Date(lesson.startAt).toString()}>
+                                                <StyledTableCell
+                                                    component="th"
+                                                    scope="row"
+                                                    sx={{
+                                                        minWidth: 90,
+                                                        backgroundColor: (isColoring && colorDate.hex(fDate)) || null,
+                                                    }}
+                                                >
+                                                    {fDate}
+                                                </StyledTableCell>
+                                                <StyledTableCell
+                                                    sx={{
+                                                        minWidth: 110,
+                                                        backgroundColor: (isColoring && colorTime.hex(fTime1)) || null,
+                                                    }}
+                                                >
+                                                    {fTime1}-{fTime2}
+                                                </StyledTableCell>
+                                                <StyledTableCell>{lesson.groups.join(', ')}</StyledTableCell>
+                                                <StyledTableCell
+                                                    sx={{
+                                                        backgroundColor:
+                                                            (isColoring &&
+                                                                colorAudience.hex(lesson.lessonName || 'none')) ||
+                                                            null,
+                                                    }}
+                                                >
+                                                    {lesson.lessonName}
+                                                </StyledTableCell>
+                                                <StyledTableCell>
+                                                    {lessonsUtils.getLessonTypeStrArr(lesson.lessonType).join(', ')}
+                                                </StyledTableCell>
+                                                <StyledTableCell
+                                                    align="right"
+                                                    sx={{
+                                                        backgroundColor:
+                                                            (isColoring &&
+                                                                colorAudience.hex(lesson.teacherName || 'none')) ||
+                                                            null,
+                                                    }}
+                                                >
+                                                    {lesson.teacherName}
+                                                </StyledTableCell>
+                                            </StyledTableRow>
+                                        );
+                                    })}
                                 </TableBody>
                             </Table>
                         </Box>
@@ -120,10 +164,9 @@ const AudiencerTable = (props: {
         time1: Dayjs | null;
         time2: Dayjs | null;
     };
+    isColoring: boolean;
 }) => {
-    const {
-        filterDateTime: { date1, date2, time1, time2 },
-    } = props;
+    const { filterDateTime } = props;
 
     const { audiences, accumulatives } = useSelector((state) => state.audiencer);
     const { filters } = React.useContext(FilterContext);
@@ -135,66 +178,14 @@ const AudiencerTable = (props: {
             .toLowerCase()
             .split(',')
             .map((item) => item.trim());
-        const filterLessonArr = filters.lesson.value
-            .toLowerCase()
-            .split(',')
-            .map((item) => item.trim());
 
         return accumulatives
+            .map(audiencerUtils.fixAudienceName)
             .filter((audience) => filterAudienceArr.some((e) => audience.name.toLowerCase().includes(e)))
-            .map((audience) => {
-                let { name, items } = audience;
-                if (name === 'Актовый зал') {
-                    name = 'А-АктовыйЗал';
-                }
-                if (name === 'В-корпус_библиотека') {
-                    name = 'В-Библиотека';
-                }
-
-                if (date1 || date2 || time1 || time2) {
-                    items = items.filter((l) => {
-                        let ok = true;
-                        const startAt = dayjs(l.startAt);
-                        const endAt = dayjs(l.endAt);
-                        const startDate = startAt.startOf('day');
-                        const startTime = dayjs(startAt.get('hour') + ':' + startAt.get('m'), 'HH:mm');
-                        const endTime = dayjs(endAt.get('hour') + ':' + endAt.get('m'), 'HH:mm');
-
-                        if (date1 && !startDate.isSameOrAfter(date1)) {
-                            ok = false;
-                        }
-                        if (date2 && !startDate.isSameOrBefore(date2)) {
-                            ok = false;
-                        }
-                        if (time1 && !startTime.isSameOrAfter(time1)) {
-                            ok = false;
-                        }
-                        if (time2 && !endTime.isSameOrBefore(time2)) {
-                            ok = false;
-                        }
-                        return ok;
-                    });
-                }
-
-                return { ...audience, name, items };
-            })
-            .map((e) => ({
-                ...e,
-                items:
-                    filterLessonArr.length === 0
-                        ? e.items
-                        : e.items.filter((item) =>
-                              filterLessonArr.some(
-                                  (e) =>
-                                      // item.lessonName?.toLowerCase().includes(e)
-                                      item.lessonName?.toLowerCase()?.includes(e) ||
-                                      item.teacherName?.toLowerCase()?.includes(e) ||
-                                      item.groups?.join(', ')?.toLowerCase()?.includes(e)
-                              )
-                          ),
-            }))
+            .map(audiencerUtils.filterByDateTime(filterDateTime))
+            .map(audiencerUtils.filterByLessonArray(filters.lesson.value))
             .filter((audience) => audience.items.length > 0);
-    }, [accumulatives, filters, date1, date2, time1, time2]);
+    }, [accumulatives, filters, filterDateTime]);
 
     if (accumulatives.length === 0) {
         return (
@@ -226,7 +217,7 @@ const AudiencerTable = (props: {
                         </TableHead>
                         <TableBody>
                             {filteredAcc.map((row) => (
-                                <RowAccumulative key={row.id} row={row} />
+                                <RowAccumulative key={row.id} row={row} isColoring={props.isColoring} />
                             ))}
                         </TableBody>
                     </Table>
