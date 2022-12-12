@@ -1,13 +1,15 @@
 import React from 'react';
 import { useHash, useNetworkState } from 'react-use';
 import { useDispatch, useSelector } from 'react-redux';
+import classNames from 'clsx';
 import store2 from 'store2';
 
-import Autocomplete, { autocompleteClasses } from '@mui/material/Autocomplete';
+import { autocompleteClasses } from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import Popper, { PopperProps } from '@mui/material/Popper';
 import { styled } from '@mui/material/styles';
 
+import { StyledAutocomplete } from './StylePulseAnimation.component';
 import scheduleSlice, { getLastGroups, STORE_GROUP_NAME_KEY } from '../store/reducer/schedule/schedule.slice';
 import alertSlice from '../store/reducer/alert/alert.slice';
 import { apiPath } from '../utils';
@@ -205,15 +207,18 @@ export const SelectGroupComponent = (props: {
     const value = isMultiple ? (institutes.length > 0 ? selected : []) : institutes.length > 0 ? selected[0] : '';
 
     return (
-        <Autocomplete
+        <StyledAutocomplete
+            className={classNames({
+                ['pulsation']: !value,
+            })}
             multiple={isMultiple}
             sx={{ minWidth: 200, maxWidth: 400 }}
             size="small"
             options={Object.keys(options)}
             disableCloseOnSelect
             disableListWrap
-            getOptionLabel={(option) => option}
-            groupBy={(option) => options[option]}
+            getOptionLabel={(option) => option as string}
+            groupBy={(option) => options[option as string]}
             renderInput={(params) => (
                 <TextField
                     {...params}
@@ -233,7 +238,7 @@ export const SelectGroupComponent = (props: {
                 ) {
                     return;
                 }
-                onChangeValues(newValue);
+                onChangeValues(newValue as string[]);
             }}
             disabled={!!fetchingSchedule}
         />

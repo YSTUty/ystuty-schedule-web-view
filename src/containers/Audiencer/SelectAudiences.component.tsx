@@ -1,12 +1,14 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useDebounce } from 'react-use';
+import classNames from 'clsx';
 
-import Autocomplete, { autocompleteClasses } from '@mui/material/Autocomplete';
+import { autocompleteClasses } from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import Popper, { PopperProps } from '@mui/material/Popper';
 import { styled } from '@mui/material/styles';
 
+import { StyledAutocomplete } from '../../components/StylePulseAnimation.component';
 import audiencerSlice from '../../store/reducer/audiencer/audiencer.slice';
 
 const StyledPopper = styled(Popper)({
@@ -31,7 +33,7 @@ export const SelectAudiencesComponent = (props: { withDebounce?: boolean }) => {
             dispatch(audiencerSlice.actions.setSelectedGroups(selected));
         },
         withDebounce ? 2e3 : 0,
-        [selected]
+        [selected],
     );
 
     const onChangeValues = React.useCallback(
@@ -43,7 +45,7 @@ export const SelectAudiencesComponent = (props: { withDebounce?: boolean }) => {
                 setValues(values);
             }
         },
-        [selected]
+        [selected],
     );
 
     const options = React.useMemo(
@@ -59,11 +61,14 @@ export const SelectAudiencesComponent = (props: { withDebounce?: boolean }) => {
                 prev[name] = corpName;
                 return prev;
             }, {} as Record<string, string>),
-        [audiences]
+        [audiences],
     );
 
     return (
-        <Autocomplete
+        <StyledAutocomplete
+            className={classNames({
+                ['pulsation']: !selected,
+            })}
             multiple
             size="small"
             sx={{ minWidth: 200 }}
@@ -71,14 +76,14 @@ export const SelectAudiencesComponent = (props: { withDebounce?: boolean }) => {
             options={Object.keys(options)}
             disableCloseOnSelect
             disableListWrap
-            getOptionLabel={(option) => option}
-            groupBy={(option) => options[option]}
+            getOptionLabel={(option) => option as string}
+            groupBy={(option) => options[option as string]}
             renderInput={(params) => (
                 <TextField
                     {...params}
                     label="Аудитории"
                     placeholder={((e) => (e.length > 0 && e[Math.floor(Math.random() * e.length)]) || '...')(
-                        Object.keys(options)
+                        Object.keys(options),
                     )}
                 />
             )}
@@ -92,7 +97,7 @@ export const SelectAudiencesComponent = (props: { withDebounce?: boolean }) => {
                 ) {
                     return;
                 }
-                onChangeValues(newValue);
+                onChangeValues(newValue as string[]);
             }}
             disabled={audiences.length === 0}
         />

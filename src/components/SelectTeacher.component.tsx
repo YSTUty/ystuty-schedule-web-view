@@ -1,13 +1,15 @@
 import React from 'react';
 import { useHash, useNetworkState } from 'react-use';
 import { useDispatch, useSelector } from 'react-redux';
+import classNames from 'clsx';
 import store2 from 'store2';
 
-import Autocomplete, { autocompleteClasses } from '@mui/material/Autocomplete';
+import { autocompleteClasses } from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import Popper, { PopperProps } from '@mui/material/Popper';
 import { styled } from '@mui/material/styles';
 
+import { StyledAutocomplete } from './StylePulseAnimation.component';
 import scheduleSlice, { getLastTeachers, STORE_TEACHER_NAME_KEY } from '../store/reducer/schedule/schedule.slice';
 import alertSlice from '../store/reducer/alert/alert.slice';
 import { apiPath } from '../utils';
@@ -70,7 +72,7 @@ export const SelectTeacherComponent = (props: {
             // items.sort();
             setTeachers(items);
         },
-        [setTeachers, setIsCached]
+        [setTeachers, setIsCached],
     );
 
     const loadTeachersList = React.useCallback(() => {
@@ -84,19 +86,19 @@ export const SelectTeacherComponent = (props: {
             .then((response) => response.json())
             .then(
                 (
-                    response: { items: { name: string; id: number }[] } | { error: { error: string; message: string } }
+                    response: { items: { name: string; id: number }[] } | { error: { error: string; message: string } },
                 ) => {
                     if ('error' in response) {
                         dispatch(
                             alertSlice.actions.add({
                                 message: `Error: ${response.error.message}`,
                                 severity: 'warning',
-                            })
+                            }),
                         );
                         return;
                     }
                     applyTeachers(response!.items);
-                }
+                },
             )
             .catch((e) => {
                 applyTeachers(null);
@@ -105,7 +107,7 @@ export const SelectTeacherComponent = (props: {
                         alertSlice.actions.add({
                             message: `Error: ${e.message}`,
                             severity: 'error',
-                        })
+                        }),
                     );
                 }
             })
@@ -129,7 +131,7 @@ export const SelectTeacherComponent = (props: {
                 }
             }
         },
-        [dispatch, setHash, selected]
+        [dispatch, setHash, selected],
     );
 
     const fixSelected = React.useCallback(
@@ -144,7 +146,7 @@ export const SelectTeacherComponent = (props: {
                 onChangeValues(value);
             }
         },
-        [teachers, selected, onChangeValues]
+        [teachers, selected, onChangeValues],
     );
 
     const allowMultiple = React.useCallback(
@@ -157,7 +159,7 @@ export const SelectTeacherComponent = (props: {
                 onChangeValues(selected);
             }
         },
-        [onChangeValues, selected]
+        [onChangeValues, selected],
     );
 
     // Check correct names after teachers loading
@@ -193,7 +195,10 @@ export const SelectTeacherComponent = (props: {
     const value = isMultiple ? (teachers.length > 0 ? selected : []) : teachers.length > 0 ? selected[0] : null;
 
     return (
-        <Autocomplete
+        <StyledAutocomplete
+            className={classNames({
+                ['pulsation']: !value,
+            })}
             multiple={isMultiple}
             sx={{ minWidth: 200, maxWidth: 400 }}
             size="small"
@@ -221,7 +226,7 @@ export const SelectTeacherComponent = (props: {
                 ) {
                     return;
                 }
-                onChangeValues(newValue);
+                onChangeValues(newValue as number[]);
             }}
             disabled={!!fetchingSchedule}
         />
