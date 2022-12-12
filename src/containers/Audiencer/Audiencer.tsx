@@ -19,10 +19,14 @@ import { FiltersProvider, FiltersList } from './Filter.provider';
 import useAudienceLoader from './useAudienceLoader';
 import AudiencerTable from './AudiencerTable';
 import AudiencerCombinedTable from './AudiencerCombinedTable';
-import { useDatePickerComponent, useTimePickerComponent } from './useDateTimePicker.component';
-import { SelectAudiencesComponent } from './SelectAudiences.component';
+
+import VK, { Like } from '../../components/VK';
 import { ThemeModeButton } from '../../components/ThemeMode.component';
 import NavLinkComponent from '../../components/NavLink.component';
+import { useDatePickerComponent, useTimePickerComponent } from './useDateTimePicker.component';
+import { SelectAudiencesComponent } from './SelectAudiences.component';
+
+import * as envUtils from '../../utils/env.utils';
 
 const BETA_CONFIRM_KEY = 'betaConfirm-audience';
 
@@ -61,6 +65,24 @@ const Audiencer = () => {
                     <Typography variant="h6" color="inherit" noWrap sx={{ mr: 2 }}>
                         Audiencer <small>beta</small>
                     </Typography>
+                    {envUtils.vkWidgetsApiId && (
+                        <>
+                            <Divider orientation="vertical" flexItem />
+                            <FormControl sx={{ ml: 2 }}>
+                                <VK apiId={envUtils.vkWidgetsApiId} options={{ version: 168, onlyWidgets: true }}>
+                                    <Like
+                                        elementId="vk_like"
+                                        options={{ type: 'mini', height: 24, width: 1000, verb: 0 }}
+                                        pageId={'viewer-audiencer'}
+                                        onLike={(num) => {}}
+                                        onUnlike={(num) => {}}
+                                        onShare={(num) => {}}
+                                        onUnshare={(num) => {}}
+                                    />
+                                </VK>
+                            </FormControl>
+                        </>
+                    )}
 
                     <Divider orientation="vertical" flexItem />
                     <FormControl sx={{ mx: 1 }}>

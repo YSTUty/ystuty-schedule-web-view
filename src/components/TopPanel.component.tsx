@@ -15,11 +15,14 @@ import LocalPizzaIcon from '@mui/icons-material/LocalPizza';
 import SchoolIcon from '@mui/icons-material/School';
 import HomeIcon from '@mui/icons-material/Home';
 
+import VK, { Like } from './VK';
 import { ThemeModeButton } from './ThemeMode.component';
 import { AlertMeToggler } from './AlertMe.component';
 import { SelectGroupComponent } from './SelectGroup.component';
 import { SelectTeacherComponent } from './SelectTeacher.component';
 import NavLinkComponent from './NavLink.component';
+
+import * as envUtils from '../utils/env.utils';
 
 const TopPanel = () => {
     const { pathname } = useLocation();
@@ -103,6 +106,25 @@ const TopPanel = () => {
                         </IconButton>
                         <AlertMeToggler />
                     </FormControl>
+
+                    {!isSmall && envUtils.vkWidgetsApiId && (
+                        <>
+                            <Divider orientation="vertical" flexItem />
+                            <FormControl sx={{ ml: 2 }}>
+                                <VK apiId={envUtils.vkWidgetsApiId} options={{ version: 168, onlyWidgets: true }}>
+                                    <Like
+                                        elementId="vk_like"
+                                        options={{ type: 'mini', height: 24, width: 1000, verb: 0 }}
+                                        pageId={'viewer-schedule'}
+                                        onLike={(num) => {}}
+                                        onUnlike={(num) => {}}
+                                        onShare={(num) => {}}
+                                        onUnshare={(num) => {}}
+                                    />
+                                </VK>
+                            </FormControl>
+                        </>
+                    )}
 
                     <Typography sx={{ flex: 1 }}></Typography>
 

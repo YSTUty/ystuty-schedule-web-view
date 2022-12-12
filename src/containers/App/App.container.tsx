@@ -15,6 +15,7 @@ import ImportExportIcon from '@mui/icons-material/ImportExportSharp';
 import SchoolIcon from '@mui/icons-material/School';
 import AudienceIcon from '@mui/icons-material/DoorSliding';
 
+import VK, { Like } from '../../components/VK';
 import { ThemeModeButton } from '../../components/ThemeMode.component';
 import NavLinkComponent from '../../components/NavLink.component';
 import * as envUtils from '../../utils/env.utils';
@@ -32,9 +33,27 @@ const App = () => {
                 }}
             >
                 <Toolbar>
-                    <Typography variant="h6" color="inherit" noWrap>
+                    <Typography variant="h6" color="inherit" noWrap sx={{ mr: 2 }}>
                         [YSTUty] <b>View</b>er
                     </Typography>
+                    {envUtils.vkWidgetsApiId && (
+                        <>
+                            <Divider orientation="vertical" flexItem />
+                            <FormControl sx={{ ml: 2 }}>
+                                <VK apiId={envUtils.vkWidgetsApiId} options={{ version: 168, onlyWidgets: true }}>
+                                    <Like
+                                        elementId="vk_like"
+                                        options={{ type: 'mini', height: 24, width: 1000, verb: 0 }}
+                                        pageId={'viewer-app'}
+                                        onLike={(num) => {}}
+                                        onUnlike={(num) => {}}
+                                        onShare={(num) => {}}
+                                        onUnshare={(num) => {}}
+                                    />
+                                </VK>
+                            </FormControl>
+                        </>
+                    )}
                     <Typography sx={{ flex: 1 }}></Typography>
                     <Divider orientation="vertical" flexItem />
                     <FormControl>
