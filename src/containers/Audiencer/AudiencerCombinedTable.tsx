@@ -117,8 +117,8 @@ const AudiencerCombinedTable = (props: {
                                       // item.lessonName?.toLowerCase().includes(e)
                                       item.lessonName?.toLowerCase()?.includes(e) ||
                                       item.teacherName?.toLowerCase()?.includes(e) ||
-                                      item.groups?.join(', ')?.toLowerCase()?.includes(e)
-                              )
+                                      item.groups?.join(', ')?.toLowerCase()?.includes(e),
+                              ),
                           ),
             }))
             .filter((audience) => audience.items.length > 0)
@@ -160,7 +160,7 @@ const AudiencerCombinedTable = (props: {
                 Displayed: [schedule: {schedule.length};]
             </Typography>
 
-            <Box component="main" /* maxWidth="xl" */ sx={{ pb: 2, px: 10, width: '100%', overflow: 'hidden' }}>
+            <Box component="main" sx={{ pb: 2, px: { xs: 1, md: 4, lg: 10 }, width: '100%', overflow: 'hidden' }}>
                 <TableContainer component={Paper} /* sx={{ maxHeight: 'calc(100vh - 45px)' }} */>
                     <Table stickyHeader size="small">
                         <TableHead>

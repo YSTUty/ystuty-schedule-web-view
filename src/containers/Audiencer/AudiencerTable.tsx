@@ -214,7 +214,7 @@ const AudiencerTable = (props: {
                 {filteredAcc.reduce((p, c) => p + c.items.length, 0)}]
             </Typography>
 
-            <Box component="main" /* maxWidth="xl" */ sx={{ pb: 2, px: 10, width: '100%', overflow: 'hidden' }}>
+            <Box component="main" sx={{ pb: 2, px: { xs: 1, md: 4, lg: 10 }, width: '100%', overflow: 'hidden' }}>
                 <TableContainer component={Paper} /* sx={{ maxHeight: 'calc(100vh - 45px)' }} */>
                     <Table stickyHeader size="small">
                         <TableHead>
