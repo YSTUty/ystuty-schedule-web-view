@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.2](https://github.com/YSTUty/ystuty-viewer-frontend/compare/v0.2.1...v0.2.2) (2022-12-12)
+
+
+### 🚀 Features
+
+* added pulsation animation for input component ([ce1b4e9](https://github.com/YSTUty/ystuty-viewer-frontend/commit/ce1b4e9b7bbdab57e6f5f27577a43a1971b4bf33))
+* **app:** added `vk like` widget ([e411fee](https://github.com/YSTUty/ystuty-viewer-frontend/commit/e411fee5075c259b0dc17f4595c170089540a995))
+* updated app bar (toolbar) ([9101b7c](https://github.com/YSTUty/ystuty-viewer-frontend/commit/9101b7c5f228bf1e1ef6177686a34780a85aee29))
+
 ### [0.2.1](https://github.com/YSTUty/ystuty-viewer-frontend/compare/v0.2.0...v0.2.1) (2022-10-28)
 
 
