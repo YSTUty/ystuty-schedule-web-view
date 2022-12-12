@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.3](https://github.com/YSTUty/ystuty-viewer-frontend/compare/v0.2.2...v0.2.3) (2022-12-12)
+
+
+### 🧹 Chore
+
+* **audiencer:** updated table padding by breakpoints ([0a3b4d0](https://github.com/YSTUty/ystuty-viewer-frontend/commit/0a3b4d03f65939e5e65b1aa4cd1f93316aca5ad1))
+
+
+### 🚀 Features
+
+* **audiencer:** updated filter displaying & moved to utils ([4c346ec](https://github.com/YSTUty/ystuty-viewer-frontend/commit/4c346ec9c04213797ea1fe97a5ce3a3cb0e9ef98))
+
 ### [0.2.2](https://github.com/YSTUty/ystuty-viewer-frontend/compare/v0.2.1...v0.2.2) (2022-12-12)
 
 
