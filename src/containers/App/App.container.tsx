@@ -43,8 +43,8 @@ const App = () => {
                                 <VK apiId={envUtils.vkWidgetsApiId} options={{ version: 168, onlyWidgets: true }}>
                                     <Like
                                         elementId="vk_like"
-                                        options={{ type: 'mini', height: 24, width: 1000, verb: 0 }}
-                                        pageId={'viewer-app'}
+                                        options={{ type: 'mini', height: 24, verb: 0 }}
+                                        pageId="app"
                                         onLike={(num) => {}}
                                         onUnlike={(num) => {}}
                                         onShare={(num) => {}}
