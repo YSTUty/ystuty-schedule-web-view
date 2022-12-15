@@ -50,7 +50,7 @@ const TopPanel = () => {
                 <Toolbar>
                     {!isSmall && (
                         <Typography variant="h6" color="inherit" noWrap sx={{ mr: 2 }}>
-                            View
+                            {formatMessage({ id: 'schedule.viewer' })}
                         </Typography>
                     )}
                     {!isSmall && <Divider orientation="vertical" flexItem />}
@@ -78,6 +78,11 @@ const TopPanel = () => {
                                 forTeacher
                                     ? allowMultipleTeachersRef.current(!allowedMultipleTeachers)
                                     : allowMultipleGroupsRef.current(!allowedMultipleGroups)
+                            }
+                            title={
+                                forTeacher
+                                    ? 'Разрешить выбор нескольких преподавателей'
+                                    : 'Разрешить выбор нескольких групп'
                             }
                             color="inherit"
                             sx={{

@@ -39,7 +39,7 @@ const TeacherLessons = () => {
             >
                 <Toolbar>
                     <Typography variant="h6" color="inherit" noWrap sx={{ mr: 2 }}>
-                        Teacher Lessons
+                        {formatMessage({ id: 'schedule.teacher' })}
                     </Typography>
                     {envUtils.vkWidgetsApiId && (
                         <>

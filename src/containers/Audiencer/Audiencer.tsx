@@ -68,7 +68,7 @@ const Audiencer = () => {
             >
                 <Toolbar>
                     <Typography variant="h6" color="inherit" noWrap sx={{ mr: 2 }}>
-                        Audiencer <small>beta</small>
+                        {formatMessage({ id: 'schedule.audiencer' })} <small>beta</small>
                     </Typography>
                     {envUtils.vkWidgetsApiId && (
                         <>
