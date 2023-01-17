@@ -1,6 +1,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import classNames from 'clsx';
+import dayjs from 'dayjs';
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
 import { red, green, teal, blue, yellow } from '@mui/material/colors';
@@ -20,6 +21,7 @@ import {
     CurrentTimeIndicator,
     Resources,
     GroupingPanel,
+    AllDayPanel,
 } from '@devexpress/dx-react-scheduler-material-ui';
 import { GroupingState, IntegratedGrouping, ViewState } from '@devexpress/dx-react-scheduler';
 
@@ -70,12 +72,17 @@ const AppointmentContent = ({
 }: Appointments.AppointmentContentProps & {
     data: Appointments.AppointmentContentProps['data'] & TeacherLessonData & { teacherId?: number };
 }) => {
-    let title = `#${data.number}`;
+    let title = '';
+    if (data.number) {
+        title += `#${data.number}`;
+    }
     if (data.teacherId) {
         title += ` [${teachers?.find((e) => e.id === data.teacherId)?.name || data.teacherId}]`;
     }
     title += ` "${data.title}"\n`;
-    title += `🕑 Время: ${data.timeRange}\n`;
+    if (data.timeRange) {
+        title += `🕑 Время: ${data.timeRange}\n`;
+    }
     if (data.type !== 0) {
         title += `• Вид занятий: ${lessonsUtils.getLessonTypeStrArr(data.lessonType).join(', ')}\n`;
     }
@@ -91,7 +98,7 @@ const AppointmentContent = ({
             <div className={dxClasses.container}>
                 {/* Дисциплина */}
                 <div className={dxClasses.text}>
-                    #{data.number}
+                    {data.number && <>#{data.number}</>}
                     {data.teacherId && (
                         <span style={{ fontSize: 10, fontWeight: 700, color: green['900'] }}>
                             {' ['}
@@ -106,7 +113,7 @@ const AppointmentContent = ({
                     )}{' '}
                     {data.title}
                 </div>
-                <div className={dxClasses.text}>🕑 {data.timeRange}</div>
+                {data.timeRange && <div className={dxClasses.text}>🕑 {data.timeRange}</div>}
                 {data.type !== 0 && (
                     <div className={classNames(dxClasses.text, dxClasses.content)}>
                         • Вид занятий: {lessonsUtils.getLessonTypeStrArr(data.lessonType).join(', ')}
@@ -212,6 +219,8 @@ const AppointmentTooltipContent = ({
     </AppointmentTooltip.Content>
 );
 
+const TitleCellComponent = () => <AllDayPanel.TitleCell getMessage={(e) => (e === 'allDay' ? 'Весь день' : e)} />;
+
 const FlexibleSpace = ({ ...props }: Toolbar.FlexibleSpaceProps) => (
     <StyledToolbarFlexibleSpace {...props} className={dxClasses.flexibleSpace}>
         <LessonFilter />
@@ -270,7 +279,7 @@ const MaterialTeacherContainer = () => {
         teacherScheduleData: scheduleData,
     } = useSelector((state) => state.schedule);
     const [data, setData] = React.useState<
-        (TeacherLessonData & { startDate: Date; endDate: Date; teacherId?: number })[]
+        (TeacherLessonData & { startDate: Date; endDate: Date; teacherId?: number; allDay?: boolean })[]
     >([]);
 
     React.useEffect(() => {
@@ -282,19 +291,23 @@ const MaterialTeacherContainer = () => {
                     for (const type of e.typeArr) {
                         allowedLessonTypes[type] = true;
                     }
+                    const startDate = dayjs(e.start);
+                    const endDate = dayjs(e.end);
+                    const durationDays = endDate.diff(startDate, 'days');
                     return {
                         ...e,
-                        startDate: new Date(e.start),
-                        endDate: new Date(e.end),
+                        startDate: startDate.toDate(),
+                        endDate: endDate.toDate(),
+                        ...(durationDays > 0 && { allDay: true }),
                         ...(isComparing && { teacherId: data.teacherId }),
                     };
-                })
+                }),
             ),
         ];
         dispatch(
             scheduleSlice.actions.setAllowedLessonTypes(
-                Object.keys(allowedLessonTypes).map((e) => Number(e)) as LessonFlags[]
-            )
+                Object.keys(allowedLessonTypes).map((e) => Number(e)) as LessonFlags[],
+            ),
         );
         setData(data);
     }, [setData, scheduleData]);
@@ -308,9 +321,9 @@ const MaterialTeacherContainer = () => {
                     (dataItem) =>
                         dataItem.title?.toLowerCase()?.includes(lowerCaseFilter) ||
                         dataItem.auditoryName?.toLowerCase()?.includes(lowerCaseFilter) ||
-                        dataItem.groups?.join(', ')?.toLowerCase()?.includes(lowerCaseFilter)
+                        dataItem.groups?.join(', ')?.toLowerCase()?.includes(lowerCaseFilter),
                 ),
-        [data, lessonTypes, lowerCaseFilter]
+        [data, lessonTypes, lowerCaseFilter],
     );
 
     const mainResourceName = selectedTeachers.length > 1 && groupsSplitColor ? 'teacherId' : 'typeArr';
@@ -336,6 +349,7 @@ const MaterialTeacherContainer = () => {
                 <WeekView startDayHour={6} endDayHour={23} excludedDays={[0]} />
                 {/* <DayView displayName="Days" startDayHour={6} endDayHour={23} intervalCount={3} /> */}
                 <DayView startDayHour={6} endDayHour={23} />
+                <AllDayPanel titleCellComponent={TitleCellComponent} />
 
                 <Appointments
                     appointmentComponent={Appointment}
