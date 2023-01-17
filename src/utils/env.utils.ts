@@ -1,4 +1,4 @@
-export const apiPath = process.env.REACT_APP_API_URL || `//${window.location.host}/api`;
+export const apiPath = getApiPath();
 
 export const linkYSTUty = process.env.REACT_APP_LINK_YSTUTY;
 export const linkToGitHub = process.env.REACT_APP_LINK_2GH;
@@ -13,3 +13,21 @@ export const vkWidgetsApiId =
     process.env.REACT_APP_VK_WIDGETS_API_ID && !isNaN(+process.env.REACT_APP_VK_WIDGETS_API_ID)
         ? +process.env.REACT_APP_VK_WIDGETS_API_ID
         : undefined;
+
+function getApiPath() {
+    const apiPathFromUrl = new URLSearchParams(window.location.search).get('apiPath');
+    const apiPathFromStorage = localStorage.getItem('apiPath');
+    const apiPathFromEnv = process.env.REACT_APP_API_URL;
+    const apiPathFromWindow = `//${window.location.host}/api`;
+
+    const apiPath = apiPathFromUrl || apiPathFromStorage || apiPathFromEnv || apiPathFromWindow;
+    localStorage.setItem('apiPath', apiPath);
+
+    if (apiPathFromUrl) {
+        const s = new URLSearchParams(window.location.search);
+        s.delete('apiPath');
+        window.location.search = s.toString();
+    }
+
+    return apiPath;
+}
