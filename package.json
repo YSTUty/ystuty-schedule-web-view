@@ -40,6 +40,8 @@
     "color-hash": "^2.0.1",
     "date-fns": "^2.29.2",
     "dayjs": "^1.11.5",
+    "devextreme": "^22.2.3",
+    "devextreme-react": "^22.2.3",
     "history": "4.10.1",
     "node-sass": "^7.0.1",
     "preval.macro": "^5.0.0",

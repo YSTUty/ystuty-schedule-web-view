@@ -66,6 +66,25 @@ export const StyledAppointmentsAppointment = styled(Appointments.Appointment)(()
     },
 }));
 
+export const StyledAppointmentsAppointmentContent_NEW = styled('div')(
+    ({ theme: { palette } }) => ({
+        [`& .${classes.text}`]: {
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            color: 'black',
+        },
+        [`& .${classes.content}`]: {
+            opacity: 0.8,
+        },
+        [`& .${classes.container}`]: {
+            width: '100%',
+            height: '100%',
+            lineHeight: 1.1,
+        },
+    }),
+);
+
 export const StyledAppointmentsAppointmentContent = styled(Appointments.AppointmentContent)(
     ({ theme: { palette } }) => ({
         [`& .${classes.text}`]: {
@@ -82,7 +101,7 @@ export const StyledAppointmentsAppointmentContent = styled(Appointments.Appointm
             height: '100%',
             lineHeight: 1.1,
         },
-    })
+    }),
 );
 
 export const StyledGrid = styled(Grid)(() => ({
