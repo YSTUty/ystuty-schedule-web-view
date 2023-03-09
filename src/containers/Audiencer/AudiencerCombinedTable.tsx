@@ -63,10 +63,15 @@ const AudiencerCombinedTable = (props: {
 
     const schedule = React.useMemo(() => {
         const selectedAudiencesArr = selectedAudiences.map((e) => e.toLowerCase());
+        const filterAudienceArr = filters.audience.value
+            .toLowerCase()
+            .split(',')
+            .map((item) => item.trim());
+        const filterNames = [...filterAudienceArr, ...selectedAudiencesArr];
 
         return accumulatives
             .map(audiencerUtils.fixAudienceName)
-            .filter((audience) => selectedAudiencesArr.some((e) => audience.name.toLowerCase().includes(e)))
+            .filter((audience) => filterNames.some((e) => audience.name.toLowerCase().includes(e)))
             .map(audiencerUtils.filterByDateTime(filterDateTime))
             .map(audiencerUtils.filterByLessonArray(filters.lesson.value))
             .map(audiencerUtils.filterByLessonType(lessonTypes))

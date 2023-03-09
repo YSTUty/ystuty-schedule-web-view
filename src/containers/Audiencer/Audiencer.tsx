@@ -133,24 +133,25 @@ const Audiencer = () => {
                             <Grid container spacing={2} sx={{ mt: 1 }}>
                                 <Grid xs={12}>
                                     <Paper elevation={3} sx={{ p: 1 }}>
-                                        <Grid container spacing={2}>
-                                            {/* // TODO: сделать изменяемый фильтр (либо список, либо строка) */}
-                                            {(isAudienceCombined || isAudienceMonther) && (
-                                                <Grid xs={12} spacing={3}>
-                                                    <SelectAudiencesComponent withDebounce />
-                                                </Grid>
-                                            )}
+                                        <Grid spacing={2}>
+                                            <Grid xs={12} spacing={3}>
+                                                <SelectAudiencesComponent withDebounce />
+                                            </Grid>
+                                            <Divider
+                                                orientation="horizontal"
+                                                textAlign="left"
+                                                variant="middle"
+                                                flexItem
+                                            >
+                                                Используются оба фильтра в виде списка ↑ и строки ↓
+                                            </Divider>
                                             <Grid xs={12} spacing={3}>
                                                 <Stack spacing={2}>
-                                                    <FiltersList
-                                                        except={
-                                                            isAudienceCombined || isAudienceMonther ? ['audience'] : []
-                                                        }
-                                                    />
+                                                    <FiltersList />
                                                 </Stack>
-                                                <Stack spacing={2}>
-                                                    <LessonTypeSelector isAudiencer />
-                                                </Stack>
+                                            </Grid>
+                                            <Grid xs={12} spacing={3}>
+                                                <LessonTypeSelector isAudiencer />
                                             </Grid>
                                         </Grid>
                                     </Paper>
