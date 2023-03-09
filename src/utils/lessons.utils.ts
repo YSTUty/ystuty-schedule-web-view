@@ -14,6 +14,8 @@ export const getLessonTypeStrArr = (type: LessonFlags) => {
     if (type & LessonFlags.Exam) types.push('ЭКЗ');
     if (type & LessonFlags.Library) types.push('Библиотека');
     if (type & LessonFlags.ResearchWork) types.push('НИР');
+    if (type & LessonFlags.OrganizationalMeeting) types.push('Орг. собрание');
+    if (type & LessonFlags.Unsupported) types.push('N/A');
     if (type & LessonFlags.None) types.push('???');
     return types;
 };
@@ -39,7 +41,9 @@ export const getLessonColor = (type: LessonFlags) => {
         case type & LessonFlags.Library:
             return teal;
         case type & LessonFlags.ResearchWork:
+        case type & LessonFlags.OrganizationalMeeting:
             return yellow;
+        case type & LessonFlags.Unsupported:
         case type & LessonFlags.None:
             return red;
         default:

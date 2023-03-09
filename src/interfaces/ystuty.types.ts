@@ -54,6 +54,8 @@ export enum LessonFlags {
     Exam = 1 << 8,
     Library = 1 << 9,
     ResearchWork = 1 << 10,
+    OrganizationalMeeting = 1 << 11,
+    Unsupported = 1 << 12,
 }
 
 /**
