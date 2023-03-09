@@ -2,6 +2,7 @@ import React from 'react';
 import { useDebounce } from 'react-use';
 
 import TextField from '@mui/material/TextField';
+import LinearProgress from '@mui/material/LinearProgress';
 
 type FilterKeys = 'audience' | 'lesson';
 export type FiltersListType = Record<
@@ -18,6 +19,41 @@ export const FilterContext = React.createContext({
     updateFilters: (() => {}) as React.Dispatch<React.SetStateAction<FiltersListType>>,
 });
 
+export const useProgresser = (ms: number = 2e3) => {
+    const defVal = 101;
+    const [progress, setProgress] = React.useState(defVal);
+    const [state, updateState] = React.useState(0);
+
+    React.useEffect(() => {
+        const fps = 100;
+        if (state == 0) {
+            return;
+        }
+
+        const timer = setInterval(() => {
+            setProgress((oldProgress) => {
+                if (oldProgress >= 100) {
+                    clearInterval(timer);
+                    return defVal;
+                }
+                const diff = (fps / ms) * 100;
+                return Math.min(oldProgress + diff, 100);
+            });
+        }, fps);
+
+        return () => {
+            clearInterval(timer);
+        };
+    }, [ms, state]);
+
+    const updateTimer = React.useCallback(() => {
+        setProgress(0);
+        updateState((e) => ++e);
+    }, [setProgress, updateState]);
+
+    return [updateTimer, progress] as const;
+};
+
 export const FilterComponent = (props: {
     label: string;
     placeholder: string;
@@ -27,21 +63,32 @@ export const FilterComponent = (props: {
     const { label, placeholder, value, updateValue } = props;
     const [val, setVal] = React.useState(value);
 
-    useDebounce(() => updateValue(val), 1200, [val]);
+    const ms = 2e3;
+    useDebounce(() => updateValue(val), ms, [val]);
+    const [update, progress] = useProgresser(ms);
 
     return (
-        <TextField
-            size="small"
-            label={label}
-            placeholder={placeholder}
-            value={val}
-            onChange={({ currentTarget }) => {
-                setVal(currentTarget.value);
-            }}
-            variant="outlined"
-            hiddenLabel
-            margin="dense"
-        />
+        <>
+            <TextField
+                size="small"
+                label={label}
+                placeholder={placeholder}
+                value={val}
+                onChange={({ currentTarget }) => {
+                    setVal(currentTarget.value);
+                    update();
+                }}
+                variant="outlined"
+                hiddenLabel
+                margin="dense"
+            />
+            <LinearProgress
+                variant="determinate"
+                value={progress}
+                style={{ marginTop: 0 }}
+                // sx={{ opacity: progress !== 101 ? 1 : 0 }}
+            />
+        </>
     );
 };
 
