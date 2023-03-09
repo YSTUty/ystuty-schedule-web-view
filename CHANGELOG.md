@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.4](https://github.com/YSTUty/ystuty-viewer-frontend/compare/v0.2.3...v0.2.4) (2023-03-09)
+
+
+### 🚀 Features
+
+* add audience month stat ([fd89346](https://github.com/YSTUty/ystuty-viewer-frontend/commit/fd89346ef6952cf57c366feac6db57df1b144b57))
+* add filter by lesson type to audiencer ([411fe75](https://github.com/YSTUty/ystuty-viewer-frontend/commit/411fe75a29fa878fc6818f816b24e4d08494f74e))
+* add filter debounce linear progress ([26e440e](https://github.com/YSTUty/ystuty-viewer-frontend/commit/26e440e5d417e3cba5c271f78401a620415017b7))
+* add new `LessonFlags` ([6912174](https://github.com/YSTUty/ystuty-viewer-frontend/commit/6912174a1399f50cf07084b6c178218398ae5dee))
+* **scheduler:** add support `allDay` for exam ([b35e1e6](https://github.com/YSTUty/ystuty-viewer-frontend/commit/b35e1e6b6c482875802db6f835ac5d28644f74ab))
+
+
+### 🧹 Chore
+
+* **audiencer:** add milti filter ([eaf3e7a](https://github.com/YSTUty/ystuty-viewer-frontend/commit/eaf3e7a9073ef91488b903b9569dc9a05eea7cf6))
+* **env:** add support for custom api path ([e7cf3cf](https://github.com/YSTUty/ystuty-viewer-frontend/commit/e7cf3cff757a0d5e5a17ba8f65f3e18ae863b57a))
+* unified page id for vk like ([677e0a3](https://github.com/YSTUty/ystuty-viewer-frontend/commit/677e0a387ff9e45f66a6c1d1e92053b2b14d8ae7))
+* update locale ([2e8d668](https://github.com/YSTUty/ystuty-viewer-frontend/commit/2e8d6684dd9db94fb8fa2dab12e2de1c1066fbeb))
+
 ### [0.2.3](https://github.com/YSTUty/ystuty-viewer-frontend/compare/v0.2.2...v0.2.3) (2022-12-12)
 
 
