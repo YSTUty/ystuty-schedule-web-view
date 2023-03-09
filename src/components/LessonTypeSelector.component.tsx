@@ -7,6 +7,7 @@ import ButtonGroup from '@mui/material/ButtonGroup';
 import Button from '@mui/material/Button';
 
 import scheduleSlice from '../store/reducer/schedule/schedule.slice';
+import audiencerSlice from '../store/reducer/audiencer/audiencer.slice';
 import { LessonFlags } from '../interfaces/ystuty.types';
 
 const PREFIX = 'LTS';
@@ -95,9 +96,15 @@ const LESSON_TYPE_NAMES = [
 const getButtonClass = (lessonTypes: LessonFlags[], type: LessonFlags) =>
     lessonTypes.includes(type) && classes.selectedButton;
 
-const LessonTypeSelector = () => {
-    const { lessonTypes, allowedLessonTypes } = useSelector((state) => state.schedule);
+const LessonTypeSelector = (props: { isAudiencer?: boolean }) => {
+    let { lessonTypes, allowedLessonTypes } = useSelector((state) => state.schedule);
+    const audiencerState = useSelector((state) => state.audiencer);
     const dispatch = useDispatch();
+
+    if (props.isAudiencer) {
+        allowedLessonTypes = LESSON_TYPES;
+        lessonTypes = audiencerState.lessonTypes;
+    }
 
     // TODO: add drop-down list for mobile
     return (
@@ -109,15 +116,22 @@ const LessonTypeSelector = () => {
                         <Button
                             className={classNames(
                                 classes.button,
-                                /* classes.longButtonText, */ getButtonClass(lessonTypes, type)
+                                /* classes.longButtonText, */ getButtonClass(lessonTypes, type),
                             )}
-                            onClick={() => dispatch(scheduleSlice.actions.toggleSelectedTypeLessons(type))}
+                            onClick={() =>
+                                dispatch(
+                                    (props.isAudiencer
+                                        ? audiencerSlice
+                                        : scheduleSlice
+                                    ).actions.toggleSelectedTypeLessons(type),
+                                )
+                            }
                             key={type}
                         >
                             <span className={classes.shortButtonText}>{LESSON_TYPE_SHORT_NAMES[index]}</span>
                             <span className={classes.longButtonText}>{LESSON_TYPE_NAMES[index]}</span>
                         </Button>
-                    ))
+                    )),
             )}
         </StyledButtonGroup>
     );

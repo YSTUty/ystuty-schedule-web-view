@@ -168,7 +168,7 @@ const AudiencerTable = (props: {
 }) => {
     const { filterDateTime } = props;
 
-    const { audiences, accumulatives } = useSelector((state) => state.audiencer);
+    const { audiences, accumulatives, lessonTypes } = useSelector((state) => state.audiencer);
     const { filters } = React.useContext(FilterContext);
 
     const showAudiences = !true;
@@ -184,8 +184,10 @@ const AudiencerTable = (props: {
             .filter((audience) => filterAudienceArr.some((e) => audience.name.toLowerCase().includes(e)))
             .map(audiencerUtils.filterByDateTime(filterDateTime))
             .map(audiencerUtils.filterByLessonArray(filters.lesson.value))
+            .map(audiencerUtils.filterByLessonType(lessonTypes))
+
             .filter((audience) => audience.items.length > 0);
-    }, [accumulatives, filters, filterDateTime]);
+    }, [accumulatives, filters, filterDateTime, lessonTypes]);
 
     if (accumulatives.length === 0) {
         return (

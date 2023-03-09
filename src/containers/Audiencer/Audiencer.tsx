@@ -27,6 +27,7 @@ import AudiencerCombinedTable from './AudiencerCombinedTable';
 import VK, { Like } from '../../components/VK';
 import { ThemeModeButton } from '../../components/ThemeMode.component';
 import NavLinkComponent from '../../components/NavLink.component';
+import LessonTypeSelector from '../../components/LessonTypeSelector.component';
 import { useDatePickerComponent, useTimePickerComponent } from './useDateTimePicker.component';
 import { SelectAudiencesComponent } from './SelectAudiences.component';
 
@@ -44,6 +45,7 @@ const Audiencer = () => {
     const [isColoring, setColoring] = React.useState(true);
 
     const isAudienceCombined = location.pathname.startsWith('/audience/combined');
+    const isAudienceMonther = location.pathname.startsWith('/audience/month');
 
     React.useEffect(() => {
         const isConfirmed = store2.get(BETA_CONFIRM_KEY, false);
@@ -134,7 +136,14 @@ const Audiencer = () => {
                                             </Grid>
                                             <Grid xs={12} spacing={3}>
                                                 <Stack spacing={2}>
-                                                    <FiltersList except={isAudienceCombined ? ['audience'] : []} />
+                                                    <FiltersList
+                                                        except={
+                                                            isAudienceCombined || isAudienceMonther ? ['audience'] : []
+                                                        }
+                                                    />
+                                                </Stack>
+                                                <Stack spacing={2}>
+                                                    <LessonTypeSelector isAudiencer />
                                                 </Stack>
                                             </Grid>
                                         </Grid>

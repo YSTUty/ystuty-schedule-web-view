@@ -1,4 +1,5 @@
 import dayjs, { Dayjs } from 'dayjs';
+import { LessonFlags } from '../interfaces/ystuty.types';
 
 export const fixAudienceName = <T extends { name: string }>({ name, ...e }: T) => ({
     ...e,
@@ -63,5 +64,22 @@ export const filterByLessonArray = <
                               item.groups?.join(', ')?.toLowerCase()?.includes(e),
                       ),
                   ),
+    });
+};
+
+export const filterByLessonType = <T extends { items: { lessonType: LessonFlags }[] }>(
+    lessonTypes: LessonFlags | LessonFlags[],
+) => {
+    const lessonFlagFilter = Array.isArray(lessonTypes)
+        ? lessonTypes.reduce((prev, cur) => prev | cur, 0)
+        : lessonTypes;
+
+    return (e: T) => ({
+        ...e,
+
+        items:
+            lessonFlagFilter === 0
+                ? e.items
+                : e.items.filter((item) => (lessonFlagFilter & item.lessonType) === item.lessonType),
     });
 };

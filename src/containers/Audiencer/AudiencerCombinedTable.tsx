@@ -56,7 +56,7 @@ const AudiencerCombinedTable = (props: {
 }) => {
     const { filterDateTime, isColoring } = props;
 
-    const { accumulatives, selectedAudiences } = useSelector((state) => state.audiencer);
+    const { accumulatives, selectedAudiences, lessonTypes } = useSelector((state) => state.audiencer);
     const { filters } = React.useContext(FilterContext);
     const theme = useTheme();
     const isDark = theme.palette.mode === 'dark';
@@ -69,6 +69,7 @@ const AudiencerCombinedTable = (props: {
             .filter((audience) => selectedAudiencesArr.some((e) => audience.name.toLowerCase().includes(e)))
             .map(audiencerUtils.filterByDateTime(filterDateTime))
             .map(audiencerUtils.filterByLessonArray(filters.lesson.value))
+            .map(audiencerUtils.filterByLessonType(lessonTypes))
             .filter((audience) => audience.items.length > 0)
             .reduce((acc, audience) => {
                 const { name, items } = audience;
@@ -76,7 +77,7 @@ const AudiencerCombinedTable = (props: {
                 return acc;
             }, [] as (AudienceLesson & { audienceName: string })[])
             .sort((a, b) => (dayjs(a.startAt).isAfter(b.startAt) ? 1 : -1));
-    }, [accumulatives, filters, filterDateTime, selectedAudiences]);
+    }, [accumulatives, filters, filterDateTime, selectedAudiences, lessonTypes]);
 
     const colorDate = lessonsUtils.hashColorTime(isDark);
     const colorTime = lessonsUtils.hashColorAudience(isDark);
