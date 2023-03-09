@@ -136,6 +136,10 @@ const App = () => {
                         <NavLinkComponent to="/teacher-lessons" style={{ color: 'grey' }}>
                             Список предметов по преподавателям
                         </NavLinkComponent>
+                        <Divider orientation="vertical" />
+                        <NavLinkComponent to="/audience/month" style={{ color: 'grey' }}>
+                            Статистика аудиторий по месяцам
+                        </NavLinkComponent>
                     </Typography>
                 </Paper>
             </Container>

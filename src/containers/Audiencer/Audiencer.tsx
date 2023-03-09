@@ -23,6 +23,7 @@ import { FiltersProvider, FiltersList } from './Filter.provider';
 import useAudienceLoader from './useAudienceLoader';
 import AudiencerTable from './AudiencerTable';
 import AudiencerCombinedTable from './AudiencerCombinedTable';
+import AudiencerMonther from './AudiencerMonther';
 
 import VK, { Like } from '../../components/VK';
 import { ThemeModeButton } from '../../components/ThemeMode.component';
@@ -102,12 +103,14 @@ const Audiencer = () => {
                     <Divider orientation="vertical" flexItem />
                     <FormControl sx={{ mx: 1 }}>
                         <NavLinkComponent
-                            to={isAudienceCombined ? '/audience' : '/audience/combined'}
+                            to={isAudienceCombined || isAudienceMonther ? '/audience' : '/audience/combined'}
                             style={{ color: 'inherit' }}
                             title={formatMessage({ id: 'audiencer.display_mode.type' })}
                         >
                             {formatMessage({
-                                id: `audiencer.display_mode.${isAudienceCombined ? 'combined' : 'divided'}`,
+                                id: `audiencer.display_mode.${
+                                    isAudienceCombined ? 'combined' : isAudienceMonther ? 'monther' : 'divided'
+                                }`,
                             })}
                         </NavLinkComponent>
                     </FormControl>
@@ -131,9 +134,12 @@ const Audiencer = () => {
                                 <Grid xs={12}>
                                     <Paper elevation={3} sx={{ p: 1 }}>
                                         <Grid container spacing={2}>
-                                            <Grid xs={12} spacing={3}>
-                                                {isAudienceCombined && <SelectAudiencesComponent withDebounce />}
-                                            </Grid>
+                                            {/* // TODO: сделать изменяемый фильтр (либо список, либо строка) */}
+                                            {(isAudienceCombined || isAudienceMonther) && (
+                                                <Grid xs={12} spacing={3}>
+                                                    <SelectAudiencesComponent withDebounce />
+                                                </Grid>
+                                            )}
                                             <Grid xs={12} spacing={3}>
                                                 <Stack spacing={2}>
                                                     <FiltersList
@@ -191,6 +197,9 @@ const Audiencer = () => {
 
                     <Route exact path="/audience">
                         <AudiencerTable filterDateTime={{ date1, date2, time1, time2 }} isColoring={isColoring} />
+                    </Route>
+                    <Route exact path="/audience/month">
+                        <AudiencerMonther filterDateTime={{ date1, date2, time1, time2 }} isColoring={isColoring} />
                     </Route>
                     <Route exact path="/audience/combined">
                         <AudiencerCombinedTable
