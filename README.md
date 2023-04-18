@@ -4,8 +4,8 @@
   <img src="https://img.shields.io/github/package-json/v/YSTUty/ystuty-viewer-frontend?style=flat-square" alt="GitHub package.json version"/>
   <img src="https://img.shields.io/github/last-commit/YSTUty/ystuty-viewer-frontend?style=flat-square" alt="GitHub last commit"/>
   <!-- <img src="https://img.shields.io/badge/dynamic/json?color=ced&style=flat-square&logo=telegram&label=Used by&suffix= user&query=ip&url=http://ip.jsontest.com" alt="GitHub last commit"/> -->
-  <img src="https://img.shields.io/badge/dynamic/json?color=ced&style=flat-square&logo=GraphQL&label=Доступно&suffix= групп&query=$.groups&url=https://parser.ystu.site/api/ystu/schedule/count" alt="Number of available groups"/>
-  <img src="https://img.shields.io/badge/dynamic/json?color=ced&style=flat-square&logo=GraphQL&label=Доступно&suffix= преподавателей&query=$.teachers&url=https://parser.ystu.site/api/ystu/schedule/count" alt="Number of available teachers"/>
+  <img src="https://img.shields.io/badge/dynamic/json?color=ced&style=flat-square&logo=GraphQL&label=Доступно&suffix= групп&query=$.groups&url=https://parser.ystuty.ru/api/ystu/schedule/count?extramural=true" alt="Number of available groups"/>
+  <img src="https://img.shields.io/badge/dynamic/json?color=ced&style=flat-square&logo=GraphQL&label=Доступно&suffix= преподавателей&query=$.teachers&url=https://parser.ystuty.ru/api/ystu/schedule/count" alt="Number of available teachers"/>
   <br/>
   <a href="https://view.ystuty.ru"><img src="https://img.shields.io/badge/Viwe%20schedule-YSTUty-9cf?style=flat-square&logo=Internet%20Explorer" alt="Viwe schedule"/></a>
   <a href="https://ics.ystuty.ru"><img src="https://img.shields.io/badge/Import%20Calendar%20Schedule-YSTUty-9cf?style=flat-square&logo=Internet%20Explorer" alt="Import Calendar Schedule"/></a>
