@@ -35,12 +35,18 @@ const Routes = () => {
             return <PWAInstructionComponent />;
         } else {
             window.location.href = `https://${envUtils.pwaHostname}`;
+            return;
         }
     }
+
+    // TODO: Переделать наоборот из hash в href
+    const regexpGroup = /^\/(g\/?|group\/)(?<groupName>[А-я]{2,5}-[0-9А-я()]{2,8})?$/i;
+    const groupRes = pathname.match(regexpGroup);
+
     // * Short paths
-    else if ((pathname === '/' && hash.length > 1) /* for compatibility support */ || pathname === '/g') {
-        history.push(`/group${window.location.hash}`);
-    } else if (pathname === '/t') {
+    if ((pathname === '/' && hash.length > 1) /* for compatibility support */ || groupRes) {
+        history.push(`/group${groupRes?.groups?.groupName ? `#${groupRes.groups.groupName}` : window.location.hash}`);
+    } else if (/^\/t\/?$/i.test(pathname)) {
         history.push(`/teacher${window.location.hash}`);
     }
 
