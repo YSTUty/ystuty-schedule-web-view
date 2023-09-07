@@ -1,16 +1,16 @@
 {
-  "name": "ystuty-viewer-frontend",
+  "name": "ystuty-schedule-web-view",
   "version": "0.2.4",
   "description": "",
   "author": "xTCry [Vladislav Kh] (https://github.com/xTCry/)",
   "private": true,
   "license": "MIT",
   "repository": {
-    "url": "https://github.com/YSTUty/ystuty-viewer-frontend.git",
+    "url": "https://github.com/YSTUty/ystuty-schedule-web-view.git",
     "type": "git"
   },
   "bugs": {
-    "url": "https://github.com/YSTUty/ystuty-viewer-frontend/issues"
+    "url": "https://github.com/YSTUty/ystuty-schedule-web-view/issues"
   },
   "scripts": {
     "start": "react-scripts start",

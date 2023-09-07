@@ -1,8 +1,8 @@
 <p align="center"><img src="https://ystuty.github.io/docs/assets/img/YSTUty_logo-text-without-bg-shadow.png" width="150"></p>
 
 <p align="center">
-  <img src="https://img.shields.io/github/package-json/v/YSTUty/ystuty-viewer-frontend?style=flat-square" alt="GitHub package.json version"/>
-  <img src="https://img.shields.io/github/last-commit/YSTUty/ystuty-viewer-frontend?style=flat-square" alt="GitHub last commit"/>
+  <img src="https://img.shields.io/github/package-json/v/YSTUty/ystuty-schedule-web-view?style=flat-square" alt="GitHub package.json version"/>
+  <img src="https://img.shields.io/github/last-commit/YSTUty/ystuty-schedule-web-view?style=flat-square" alt="GitHub last commit"/>
   <!-- <img src="https://img.shields.io/badge/dynamic/json?color=ced&style=flat-square&logo=telegram&label=Used by&suffix= user&query=ip&url=http://ip.jsontest.com" alt="GitHub last commit"/> -->
   <img src="https://img.shields.io/badge/dynamic/json?color=ced&style=flat-square&logo=GraphQL&label=Доступно&suffix= групп&query=$.groups&url=https://parser.ystuty.ru/api/ystu/schedule/count?extramural=true" alt="Number of available groups"/>
   <img src="https://img.shields.io/badge/dynamic/json?color=ced&style=flat-square&logo=GraphQL&label=Доступно&suffix= преподавателей&query=$.teachers&url=https://parser.ystuty.ru/api/ystu/schedule/count" alt="Number of available teachers"/>
@@ -13,7 +13,7 @@
   <a href="https://t.me/ss_ystu_bot"><img src="https://img.shields.io/badge/Bot-Use now-229ED9?style=flat-square&logo=telegram" alt="Use Telegram bot now"/></a>
 </p>
 
-# [YSTUty] Viewer
+# [YSTUty] Schedule Web view
 > Решение для визуализации данных в виде календаря, использующее данные из сервиса [YSTUty-Parser](https://github.com/YSTUty/ystuty-parser)
 
 ---
