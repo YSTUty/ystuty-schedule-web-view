@@ -12,7 +12,6 @@ const Schedule = () => {
         <>
             <TopPanelComponent />
 
-            <hr />
             <Route strict path="/group" component={ScheduleView} />
             <Route strict path="/teacher" component={TeacherScheduleView} />
         </>
