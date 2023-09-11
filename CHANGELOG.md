@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.5](https://github.com/YSTUty/ystuty-schedule-web-view/compare/v0.2.4...v0.2.5) (2023-09-11)
+
+
+### 🐛 Bug Fixes
+
+* **readme:** change server host on badges ([f59e34a](https://github.com/YSTUty/ystuty-schedule-web-view/commit/f59e34aa4186de7ff2159ae8d2f9d03b70f12a01))
+
+
+### 🚀 Features
+
+* **app:** add links to schedule bot on messengers ([26cfd10](https://github.com/YSTUty/ystuty-schedule-web-view/commit/26cfd10738c79a263ca57e50ea6ff2392c676a07))
+* **routes:** add support group name in `pathname` ([adbf72f](https://github.com/YSTUty/ystuty-schedule-web-view/commit/adbf72f0cdd00165eee9ab4519dcce9ad9fd96c3))
+
+
+### 🧹 Chore
+
+* **containers:** remove `hr` tag ([de48ffe](https://github.com/YSTUty/ystuty-schedule-web-view/commit/de48ffeffd7f806b7d9fbe35fea88d03da7ced8b))
+* **project:** rename project to `ystuty-schedule-web-view` ([af394a8](https://github.com/YSTUty/ystuty-schedule-web-view/commit/af394a8cbfdd066daab827b9e1c43f93b358d641))
+
 ### [0.2.4](https://github.com/YSTUty/ystuty-schedule-web-view/compare/v0.2.3...v0.2.4) (2023-03-09)
 
 
