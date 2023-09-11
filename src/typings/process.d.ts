@@ -7,7 +7,9 @@ declare namespace NodeJS {
         readonly REACT_APP_PWA_HOST: string;
         readonly REACT_APP_YM_ID?: string;
 
+        readonly REACT_APP_TELEGRAM_USERNAME?: string;
         readonly REACT_APP_TELEGRAM_BOT_NAME?: string;
+        readonly REACT_APP_VK_BOT_GROUP_NAME?: string;
         readonly REACT_APP_HAWK_TOKEN?: string;
 
         readonly REACT_APP_LINK_YSTUTY?: string;

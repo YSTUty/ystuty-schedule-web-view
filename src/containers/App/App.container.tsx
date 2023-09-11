@@ -1,3 +1,7 @@
+import * as React from 'react';
+import { useSelector } from 'react-redux';
+import { Buffer } from 'buffer';
+
 import AppBar from '@mui/material/AppBar';
 import Container from '@mui/material/Container';
 import Toolbar from '@mui/material/Toolbar';
@@ -10,10 +14,13 @@ import Divider from '@mui/material/Divider';
 import Box from '@mui/material/Box';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import Button from '@mui/material/Button';
+import SvgIcon from '@mui/material/SvgIcon';
 
 import ImportExportIcon from '@mui/icons-material/ImportExportSharp';
 import SchoolIcon from '@mui/icons-material/School';
 import AudienceIcon from '@mui/icons-material/DoorSliding';
+import TelegramIcon from '@mui/icons-material/Telegram';
+import { ReactComponent as VkSvg } from '../../assets/img/vk-logo.svg';
 
 import VK, { Like } from '../../components/VK';
 import { ThemeModeButton } from '../../components/ThemeMode.component';
@@ -21,6 +28,16 @@ import NavLinkComponent from '../../components/NavLink.component';
 import * as envUtils from '../../utils/env.utils';
 
 const App = () => {
+    const { selectedGroups } = useSelector((state) => state.schedule);
+
+    const groupNameConv = React.useMemo(
+        () =>
+            ((e) => (e ? Buffer.from(/* encodeURIComponent */ e).toString('base64').replace(/=/g, '') : null))(
+                selectedGroups[0],
+            ),
+        [selectedGroups],
+    );
+
     return (
         <>
             <AppBar
@@ -34,7 +51,7 @@ const App = () => {
             >
                 <Toolbar>
                     <Typography variant="h6" color="inherit" noWrap sx={{ mr: 2 }}>
-                        [YSTUty] <b>View</b>er
+                        [YSTUty] Расписание
                     </Typography>
                     {envUtils.vkWidgetsApiId && (
                         <>
@@ -118,7 +135,7 @@ const App = () => {
                                 Для студентов
                             </Button>
                             <Button to={'/teacher'} component={NavLinkComponent} title="Расписание по преподавателям">
-                                Для преподавателей
+                                Для преподавателей 👨🏼‍🏫👩🏼‍🏫
                             </Button>
                             <Button
                                 to={'/audience'}
@@ -132,7 +149,55 @@ const App = () => {
                         </ButtonGroup>
                     </Box>
 
-                    <Typography sx={{ mt: 2, fontSize: 10 }}>
+                    {(envUtils.telegramBotName || envUtils.vkBotGroupName) && (
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                mt: 2,
+                                '& > *': { m: 1 },
+                            }}
+                        >
+                            <Typography component="h6" variant="body2" align="center">
+                                Добавь бота в свою беседу
+                            </Typography>
+                            <ButtonGroup size="large" orientation="vertical">
+                                {envUtils.telegramBotName && (
+                                    <Button
+                                        href={`https://t.me/${envUtils.telegramBotName}${
+                                            groupNameConv ? `?start=g_${groupNameConv}` : ''
+                                        }`}
+                                        target="_blank"
+                                        component={Link}
+                                        color="primary"
+                                        variant="contained"
+                                        endIcon={<TelegramIcon />}
+                                        title="Бот расписания в Telegram"
+                                    >
+                                        Telegram бот расписания
+                                    </Button>
+                                )}
+                                {envUtils.vkBotGroupName && (
+                                    <Button
+                                        href={`https://vk.me/${envUtils.vkBotGroupName}${
+                                            groupNameConv ? `?ref=g_${groupNameConv}` : ''
+                                        }`}
+                                        target="_blank"
+                                        component={Link}
+                                        color="primary"
+                                        variant="outlined"
+                                        endIcon={<SvgIcon component={VkSvg} inheritViewBox />}
+                                        title="Бот расписания в VK"
+                                    >
+                                        VK бот расписания
+                                    </Button>
+                                )}
+                            </ButtonGroup>
+                        </Box>
+                    )}
+
+                    <Typography sx={{ mt: 2, fontSize: 11 }}>
                         <NavLinkComponent to="/teacher-lessons" style={{ color: 'grey' }}>
                             Список предметов по преподавателям
                         </NavLinkComponent>

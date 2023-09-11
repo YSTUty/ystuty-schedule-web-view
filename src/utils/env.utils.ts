@@ -7,7 +7,9 @@ export const linkToICS = process.env.REACT_APP_LINK_2ICS;
 
 export const pwaHostname = process.env.REACT_APP_PWA_HOST;
 export const pwaHostnameOld = process.env.REACT_APP_PWA_HOST_OLD;
+export const telegramUsername = process.env.REACT_APP_TELEGRAM_USERNAME;
 export const telegramBotName = process.env.REACT_APP_TELEGRAM_BOT_NAME;
+export const vkBotGroupName = process.env.REACT_APP_VK_BOT_GROUP_NAME;
 
 export const vkWidgetsApiId =
     process.env.REACT_APP_VK_WIDGETS_API_ID && !isNaN(+process.env.REACT_APP_VK_WIDGETS_API_ID)

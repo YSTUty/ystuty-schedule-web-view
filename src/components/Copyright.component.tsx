@@ -25,10 +25,10 @@ const Copyright = () => {
                     <GitHubIcon fontSize="small" />
                 </Link>
             )}
-            {envUtils.linkToGitHub && envUtils.telegramBotName && ' '}
-            {envUtils.telegramBotName && (
+            {envUtils.linkToGitHub && envUtils.telegramUsername && ' '}
+            {envUtils.telegramUsername && (
                 <Link
-                    href={`https://${envUtils.telegramBotName}.t.me?start=viewer`}
+                    href={`https://t.me/${envUtils.telegramUsername}`}
                     target="_blank"
                     color="inherit"
                     sx={{ ml: 1 }}
