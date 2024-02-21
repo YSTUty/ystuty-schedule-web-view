@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.6](https://github.com/YSTUty/ystuty-schedule-web-view/compare/v0.2.5...v0.2.6) (2024-02-21)
+
+
+### 🧹 Chore
+
+* **deps:** update `node-sass` ([e33c10b](https://github.com/YSTUty/ystuty-schedule-web-view/commit/e33c10b73c7c3bbfc16121137b3be04c831fc0b6))
+* fix typos and types ([607fb88](https://github.com/YSTUty/ystuty-schedule-web-view/commit/607fb888587de1b03f582d8b5f2813cfdacb7181))
+* **util:** add cleanup local cache for schedule ([7e68f66](https://github.com/YSTUty/ystuty-schedule-web-view/commit/7e68f66f9b2427e3a7992005734d1b8cac0c870d))
+
 ### [0.2.5](https://github.com/YSTUty/ystuty-schedule-web-view/compare/v0.2.4...v0.2.5) (2023-09-11)
 
 
