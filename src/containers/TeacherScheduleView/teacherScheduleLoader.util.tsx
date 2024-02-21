@@ -7,8 +7,8 @@ import alertSlice from '../../store/reducer/alert/alert.slice';
 import scheduleSlice from '../../store/reducer/schedule/schedule.slice';
 import { apiPath } from '../../utils';
 
-// TODO: add removing old cache
-const STORE_CACHED_TEACHER_KEY = 'CACHED_TEACHER_LESSONS::';
+const STORE_CACHED_TEACHER_KEY_OLD = 'CACHED_TEACHER_LESSONS::';
+const STORE_CACHED_TEACHER_KEY = 'CACHED_V2_TEACHER_LESSONS::';
 
 export const useTeacherScheduleLoader = () => {
     const dispatch = useDispatch();
@@ -23,13 +23,14 @@ export const useTeacherScheduleLoader = () => {
     const formatData = React.useCallback(
         (teacherId: number, items: TeacherDayType[] | null) => {
             if (!items) {
-                items = store2.get(STORE_CACHED_TEACHER_KEY + teacherId, null);
+                const stored = store2.get(STORE_CACHED_TEACHER_KEY + teacherId, null);
+                items = stored?.items;
                 if (!items) {
                     return;
                 }
                 setIsCached(true);
             } else if (items.length > 0) {
-                store2.set(STORE_CACHED_TEACHER_KEY + teacherId, items);
+                store2.set(STORE_CACHED_TEACHER_KEY + teacherId, { time: Date.now(), items });
                 setIsCached(false);
             }
 
@@ -45,7 +46,7 @@ export const useTeacherScheduleLoader = () => {
 
             setSchedulesData((state) => ({ ...state, [teacherId]: { time: Date.now(), sources } }));
         },
-        [setSchedulesData, setIsCached]
+        [setSchedulesData, setIsCached],
     );
 
     const loadSchedule = React.useCallback(
@@ -66,19 +67,19 @@ export const useTeacherScheduleLoader = () => {
                     (
                         response:
                             | { isCache: boolean; teacher: any; items: any[] }
-                            | { error: { error: string; message: string } }
+                            | { error: { error: string; message: string } },
                     ) => {
                         if ('error' in response) {
                             dispatch(
                                 alertSlice.actions.add({
                                     message: `Error: ${response.error.message}`,
                                     severity: 'error',
-                                })
+                                }),
                             );
                             return;
                         }
                         formatData(teacherId, response!.items);
-                    }
+                    },
                 )
                 .catch((e) => {
                     console.log(e);
@@ -92,7 +93,7 @@ export const useTeacherScheduleLoader = () => {
                     setFetchings((s) => ({ ...s, [teacherId]: false }));
                 });
         },
-        [schedulesData, fetchings, setFetchings, formatData /* online */]
+        [schedulesData, fetchings, setFetchings, formatData /* online */],
     );
 
     React.useEffect(() => {
@@ -106,7 +107,7 @@ export const useTeacherScheduleLoader = () => {
             selectedTeachers
                 .map((teacherId) => ({ teacherId, data: schedulesData?.[teacherId]?.sources! }))
                 .filter((e) => !!e.data),
-        [selectedTeachers, schedulesData]
+        [selectedTeachers, schedulesData],
     );
 
     const isFetching = React.useMemo(() => Object.values(fetchings).some((e) => e), [fetchings]);
@@ -117,6 +118,31 @@ export const useTeacherScheduleLoader = () => {
     React.useEffect(() => {
         dispatch(scheduleSlice.actions.setFetchingSchedule(isFetching));
     }, [isFetching]);
+
+    // * clear local storage
+    React.useEffect(() => {
+        let index = 0;
+        while (index < localStorage.length) {
+            const key = localStorage.key(index);
+            if (key === null) {
+                break;
+            }
+
+            // remove old keys version
+            if (key.startsWith(STORE_CACHED_TEACHER_KEY_OLD)) {
+                localStorage.removeItem(key);
+            }
+
+            // remove expired keys
+            if (key.startsWith(STORE_CACHED_TEACHER_KEY)) {
+                const { time } = store2.get(key, {});
+                if (Date.now() - time > 24 * 60 * 60 * 1e3) {
+                    localStorage.removeItem(key);
+                }
+            }
+            ++index;
+        }
+    }, []);
 
     return [scheduleData, isFetching, isCached] as const;
 };

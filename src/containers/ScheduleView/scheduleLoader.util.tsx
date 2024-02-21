@@ -8,8 +8,8 @@ import alertSlice from '../../store/reducer/alert/alert.slice';
 import scheduleSlice from '../../store/reducer/schedule/schedule.slice';
 import { apiPath } from '../../utils';
 
-// TODO: add removing old cache
-const STORE_CACHED_GROUP_KEY = 'CACHED_GROUP::';
+const STORE_CACHED_GROUP_KEY_OLD = 'CACHED_GROUP::';
+const STORE_CACHED_GROUP_KEY = 'CACHED_V2_GROUP::';
 
 export const useScheduleLoader = () => {
     // const { online } = useNetworkState();
@@ -24,13 +24,14 @@ export const useScheduleLoader = () => {
     const formatData = React.useCallback(
         (name: string, items: OneWeek[] | null) => {
             if (!items) {
-                items = store2.get(STORE_CACHED_GROUP_KEY + name, null);
+                const stored = store2.get(STORE_CACHED_GROUP_KEY + name, null);
+                items = stored?.items;
                 if (!items) {
                     return;
                 }
                 setIsCached(true);
             } else if (items.length > 0) {
-                store2.set(STORE_CACHED_GROUP_KEY + name, items);
+                store2.set(STORE_CACHED_GROUP_KEY + name, { time: Date.now(), items });
                 setIsCached(false);
             }
 
@@ -123,6 +124,31 @@ export const useScheduleLoader = () => {
     React.useEffect(() => {
         dispatch(scheduleSlice.actions.setFetchingSchedule(isFetching));
     }, [isFetching]);
+
+    // * clear local storage
+    React.useEffect(() => {
+        let index = 0;
+        while (index < localStorage.length) {
+            const key = localStorage.key(index);
+            if (key === null) {
+                break;
+            }
+
+            // remove old keys version
+            if (key.startsWith(STORE_CACHED_GROUP_KEY_OLD)) {
+                localStorage.removeItem(key);
+            }
+
+            // remove expired keys
+            if (key.startsWith(STORE_CACHED_GROUP_KEY)) {
+                const { time } = store2.get(key, {});
+                if (Date.now() - time > 24 * 60 * 60 * 1e3) {
+                    localStorage.removeItem(key);
+                }
+            }
+            ++index;
+        }
+    }, []);
 
     return [scheduleData, isFetching, isCached] as const;
 };
