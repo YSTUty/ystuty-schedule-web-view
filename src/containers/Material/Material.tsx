@@ -328,7 +328,7 @@ const MaterialContainer = () => {
 
     React.useEffect(() => {
         const isComparing = scheduleData.length > 1;
-        const allowedLessonTypes: Record<LessonFlags, any> = {};
+        const allowedLessonTypes: Partial<Record<LessonFlags, any>> = {};
         const data = [
             ...scheduleData.flatMap((data) =>
                 data.data.map((e) => {
