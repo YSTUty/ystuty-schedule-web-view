@@ -18,10 +18,10 @@
     jsonpointer "^5.0.0"
     leven "^3.1.0"
 
-"@appigram/react-yandex-metrika@^2.8.1":
-  version "2.8.1"
-  resolved "https://registry.yarnpkg.com/@appigram/react-yandex-metrika/-/react-yandex-metrika-2.8.1.tgz#8c4d3a96495e50fec1500ad5249485728dd8e008"
-  integrity sha512-4Ej7BCq31pOcrrVu60NgrZfJjG1POmHdzmlZxY27EaECA+/FmdPTaBX81MZqyZGp8nAQ5xgbDa1mxRxvW1YMzQ==
+"@appigram/react-yandex-metrika@^2.8.6":
+  version "2.8.6"
+  resolved "https://registry.yarnpkg.com/@appigram/react-yandex-metrika/-/react-yandex-metrika-2.8.6.tgz#1b7976e00409a8ed369e1ad0af5d05300d0ec1f5"
+  integrity sha512-ifhkNM0igVXT6wM5dkukLD/qmpuV5+ZvtcUPWOQtsY1LvWIt4RO4Sr3NpxAAqXrFIQ0wUlhR2qEvC6T6LIK7Tw==
 
 "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.10.4", "@babel/code-frame@^7.12.13", "@babel/code-frame@^7.16.0", "@babel/code-frame@^7.16.7", "@babel/code-frame@^7.8.3":
   version "7.16.7"
@@ -2353,10 +2353,17 @@
   dependencies:
     "@types/node" "*"
 
-"@types/node@*", "@types/node@^18.7.13":
+"@types/node@*":
   version "18.7.13"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-18.7.13.tgz#23e6c5168333480d454243378b69e861ab5c011a"
   integrity sha512-46yIhxSe5xEaJZXWdIBP7GU4HDTG8/eo0qd9atdiL+lFpA03y8KS+lkTN834TWJj5767GbWv4n/P6efyTFt1Dw==
+
+"@types/node@^20.11.20":
+  version "20.11.20"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.11.20.tgz#f0a2aee575215149a62784210ad88b3a34843659"
+  integrity sha512-7/rR21OS+fq8IyHTgtLkDK949uzsa6n8BkziAKtPVpugIkO6D+/ooXMvzXxDnZrmtXVfjb1bKQafYpb8s89LOg==
+  dependencies:
+    undici-types "~5.26.4"
 
 "@types/normalize-package-data@^2.4.0":
   version "2.4.1"
@@ -10445,6 +10452,11 @@ unbox-primitive@^1.0.1:
     has-bigints "^1.0.1"
     has-symbols "^1.0.2"
     which-boxed-primitive "^1.0.2"
+
+undici-types@~5.26.4:
+  version "5.26.5"
+  resolved "https://registry.yarnpkg.com/undici-types/-/undici-types-5.26.5.tgz#bcd539893d00b56e964fd2657a4866b221a65617"
+  integrity sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==
 
 unicode-canonical-property-names-ecmascript@^2.0.0:
   version "2.0.0"

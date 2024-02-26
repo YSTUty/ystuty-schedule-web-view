@@ -24,7 +24,7 @@
     "release:patch": "standard-version --release-as patch"
   },
   "dependencies": {
-    "@appigram/react-yandex-metrika": "^2.8.1",
+    "@appigram/react-yandex-metrika": "^2.8.6",
     "@devexpress/dx-react-core": "^3.0.5",
     "@devexpress/dx-react-scheduler": "^3.0.5",
     "@devexpress/dx-react-scheduler-material-ui": "^3.0.5",
@@ -75,7 +75,7 @@
     "@types/color-hash": "^1.0.2",
     "@types/history": "4.7.9",
     "@types/jest": "^27.0.1",
-    "@types/node": "^18.7.13",
+    "@types/node": "^20.11.20",
     "@types/node-sass": "^4.11.3",
     "@types/preval.macro": "^3.0.0",
     "@types/react": "^17.0.20",
