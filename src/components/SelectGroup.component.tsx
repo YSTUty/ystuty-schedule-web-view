@@ -185,12 +185,15 @@ export const SelectGroupComponent = (props: {
     }, [online, previousOnline, since]);
 
     React.useEffect(() => {
+        allowMultipleGroupsRef.current = allowMultiple;
+    }, [allowMultiple]);
+
+    React.useEffect(() => {
         fixSelected(defaultValues);
 
         if (window.location.search.includes('allow_multiple')) {
             allowMultiple();
         }
-        allowMultipleGroupsRef.current = allowMultiple;
     }, []);
 
     const isMultiple = allowedMultiple || selected.length > 1;
