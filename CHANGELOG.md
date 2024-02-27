@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.7](https://github.com/YSTUty/ystuty-schedule-web-view/compare/v0.2.6...v0.2.7) (2024-02-27)
+
+
+### 🧹 Chore
+
+* add remover utms from query ([fdf2f3b](https://github.com/YSTUty/ystuty-schedule-web-view/commit/fdf2f3bfa88cb96c6418d62af50e3e952c5c851d))
+* **deps:** update `@types/node` & `react-yandex-metrika` ([4472b00](https://github.com/YSTUty/ystuty-schedule-web-view/commit/4472b00abd41ed898b8d406dfd7e1a64dcf4914b))
+
 ### [0.2.6](https://github.com/YSTUty/ystuty-schedule-web-view/compare/v0.2.5...v0.2.6) (2024-02-21)
 
 
