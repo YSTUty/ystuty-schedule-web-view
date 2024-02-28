@@ -1411,10 +1411,10 @@
   resolved "https://registry.yarnpkg.com/@gar/promisify/-/promisify-1.1.3.tgz#555193ab2e3bb3b6adc3d551c9c030d9e860daf6"
   integrity sha512-k2Ty1JcVojjJFwrg/ThKi2ujJ7XNLYaFGNB/bWT9wGR+oSMJHMa5w+CUq6p/pVrKeNNgA7pCqEcjSnHVoqJQFw==
 
-"@hawk.so/javascript@^3.0.1":
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/@hawk.so/javascript/-/javascript-3.0.1.tgz#364a646dce1448a805ec1b475a729b731820a8c8"
-  integrity sha512-c8YzhxDzginwzavhW9uwYT8FkYl8beUbr5bpuzcTTX+KKR1ryntogBIaYvTSbdr/ZMP9aS6yJQ9vKglJON3f/Q==
+"@hawk.so/javascript@^3.0.2":
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/@hawk.so/javascript/-/javascript-3.0.2.tgz#d10306b1b8314c31b439d645c097e9fda7b4df22"
+  integrity sha512-dvJTdXnkHZ3SMv6BYIRoBcgJmu1g28G/LytlUtOu8THwGxqCM8l1ZDIacU4rBrRCA8wvx0FDHL83LFNUKbi6JQ==
   dependencies:
     "@hawk.so/types" "^0.1.13"
     error-stack-parser "^2.0.6"
