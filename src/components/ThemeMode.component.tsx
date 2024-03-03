@@ -1,5 +1,7 @@
 import React from 'react';
 import store2 from 'store2';
+import { CacheProvider } from '@emotion/react';
+import createCache from '@emotion/cache';
 import { ThemeProvider, createTheme, useTheme } from '@mui/material/styles';
 import { blue as primary } from '@mui/material/colors';
 
@@ -41,7 +43,7 @@ export const ThemeModeProvider = (props: { children: any }) => {
                 });
             },
         }),
-        [prefersDarkMode]
+        [prefersDarkMode],
     );
 
     React.useEffect(() => {
@@ -49,13 +51,16 @@ export const ThemeModeProvider = (props: { children: any }) => {
     }, [prefersDarkMode]);
 
     const theme = React.useMemo(() => createTheme({ palette: { mode, primary } }), [mode]);
+    const emotionCache = createCache({ key: 'css', speedy: false });
 
     return (
         <ThemeModeContext.Provider value={colorMode}>
             <ThemeProvider theme={theme}>
-                <CssBaseline />
+                <CacheProvider value={emotionCache}>
+                    <CssBaseline />
 
-                {props.children}
+                    {props.children}
+                </CacheProvider>
             </ThemeProvider>
         </ThemeModeContext.Provider>
     );
