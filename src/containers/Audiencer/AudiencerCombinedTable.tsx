@@ -18,9 +18,10 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 
 import { FilterContext } from './Filter.provider';
-import { AudienceLesson } from '../../interfaces/ystuty.types';
 import * as lessonsUtils from '../../utils/lessons.utils';
 import * as audiencerUtils from '../../utils/audiencer.utils';
+
+import { AudienceLesson } from '../../interfaces/ystuty.types';
 
 dayjs.extend(isSameOrBefore);
 dayjs.extend(isSameOrAfter);
@@ -157,7 +158,7 @@ const AudiencerCombinedTable = (props: {
                                             {lesson.lessonName}
                                         </StyledTableCell>
                                         <StyledTableCell>
-                                            {lessonsUtils.getLessonTypeStrArr(lesson.lessonType).join(', ')}
+                                            {lessonsUtils.getLessonTypeStrArr(lesson.type).join(', ')}
                                         </StyledTableCell>
                                         <StyledTableCell>{lesson.teacherName}</StyledTableCell>
                                         <StyledTableCell

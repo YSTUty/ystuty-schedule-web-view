@@ -1,5 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { AccumulativeSchedule, IAudienceData, LessonFlags } from '../../../interfaces/ystuty.types';
+
+import { AccumulativeSchedule, IAudienceData } from '../../../interfaces/ystuty.types';
+import { LessonFlags } from '../../../interfaces/schedule';
 
 const initialState = {
     audiences: [] as IAudienceData[],

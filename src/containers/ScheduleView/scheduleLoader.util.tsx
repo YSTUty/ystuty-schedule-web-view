@@ -3,10 +3,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import store2 from 'store2';
 // import { useNetworkState } from 'react-use';
 
-import { LessonData, LessonFlags, OneWeek } from '../../interfaces/ystuty.types';
 import alertSlice from '../../store/reducer/alert/alert.slice';
 import scheduleSlice from '../../store/reducer/schedule/schedule.slice';
 import { apiPath } from '../../utils';
+
+import { LessonData, LessonFlags, OneWeekDto } from '../../interfaces/schedule';
 
 const STORE_CACHED_GROUP_KEY_OLD = 'CACHED_GROUP::';
 const STORE_CACHED_GROUP_KEY = 'CACHED_V2_GROUP::';
@@ -22,7 +23,7 @@ export const useScheduleLoader = () => {
     const [schedulesData, setSchedulesData] = React.useState<Record<string, { time: number; sources: LessonData[] }>>();
 
     const formatData = React.useCallback(
-        (name: string, items: OneWeek[] | null) => {
+        (name: string, items: OneWeekDto[] | null) => {
             if (!items) {
                 const stored = store2.get(STORE_CACHED_GROUP_KEY + name, null);
                 items = stored?.items;
@@ -70,12 +71,12 @@ export const useScheduleLoader = () => {
             }
 
             setFetchings((s) => ({ ...s, [name]: true }));
-            fetch(`${apiPath}/ystu/schedule/group/${name}`)
+            fetch(`${apiPath}/v1/schedule/group/${name}`)
                 .then((response) => response.json())
                 .then(
                     (
                         response:
-                            | { isCache: boolean; items: OneWeek[] }
+                            | { isCache: boolean; items: OneWeekDto[] }
                             | { error: { error: string; message: string } },
                     ) => {
                         if ('error' in response) {

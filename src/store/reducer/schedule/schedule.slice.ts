@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import store2 from 'store2';
-import { TeacherLessonData, LessonData, LessonFlags } from '../../../interfaces/ystuty.types';
+
+import { LessonData, LessonFlags, TeacherLessonData } from '../../../interfaces/schedule';
 
 export const STORE_GROUP_NAME_KEY = 'lastGroupName';
 export const STORE_TEACHER_NAME_KEY = 'lastTeacherName';

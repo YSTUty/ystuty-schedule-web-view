@@ -8,7 +8,8 @@ import Button from '@mui/material/Button';
 
 import scheduleSlice from '../store/reducer/schedule/schedule.slice';
 import audiencerSlice from '../store/reducer/audiencer/audiencer.slice';
-import { LessonFlags } from '../interfaces/ystuty.types';
+
+import { LessonFlags } from '../interfaces/schedule';
 
 const PREFIX = 'LTS';
 

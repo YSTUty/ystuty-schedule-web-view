@@ -77,7 +77,7 @@ export const SelectGroupComponent = (props: {
 
         setFetching(true);
 
-        fetch(`${apiPath}/ystu/schedule/institutes?extramural=true`)
+        fetch(`${apiPath}/v1/schedule/actual_groups`)
             .then((response) => response.json())
             .then(
                 (

@@ -13,6 +13,7 @@ import { StyledAutocomplete } from './StylePulseAnimation.component';
 import scheduleSlice, { getLastTeachers, STORE_TEACHER_NAME_KEY } from '../store/reducer/schedule/schedule.slice';
 import alertSlice from '../store/reducer/alert/alert.slice';
 import { apiPath } from '../utils';
+
 import { ITeacherData } from '../interfaces/ystuty.types';
 
 const STORE_CACHED_TEACHERS_KEY = 'cachedTeachers';
@@ -82,7 +83,7 @@ export const SelectTeacherComponent = (props: {
 
         setFetching(true);
 
-        fetch(`${apiPath}/ystu/schedule/teachers`)
+        fetch(`${apiPath}/v1/schedule/actual_teachers`)
             .then((response) => response.json())
             .then(
                 (

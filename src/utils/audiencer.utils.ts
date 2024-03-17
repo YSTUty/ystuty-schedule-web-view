@@ -1,5 +1,6 @@
 import dayjs, { Dayjs } from 'dayjs';
-import { LessonFlags } from '../interfaces/ystuty.types';
+
+import { LessonFlags } from '../interfaces/schedule';
 
 export const fixAudienceName = <T extends { name: string }>({ name, ...e }: T) => ({
     ...e,
@@ -67,7 +68,7 @@ export const filterByLessonArray = <
     });
 };
 
-export const filterByLessonType = <T extends { items: { lessonType: LessonFlags }[] }>(
+export const filterByLessonType = <T extends { items: { type: LessonFlags }[] }>(
     lessonTypes: LessonFlags | LessonFlags[],
 ) => {
     const lessonFlagFilter = Array.isArray(lessonTypes)
@@ -78,8 +79,6 @@ export const filterByLessonType = <T extends { items: { lessonType: LessonFlags 
         ...e,
 
         items:
-            lessonFlagFilter === 0
-                ? e.items
-                : e.items.filter((item) => (lessonFlagFilter & item.lessonType) === item.lessonType),
+            lessonFlagFilter === 0 ? e.items : e.items.filter((item) => (lessonFlagFilter & item.type) === item.type),
     });
 };

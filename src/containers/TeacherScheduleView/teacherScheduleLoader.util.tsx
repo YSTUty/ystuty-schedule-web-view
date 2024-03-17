@@ -2,10 +2,12 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import store2 from 'store2';
 
-import { TeacherLessonData, LessonFlags, TeacherDayType } from '../../interfaces/ystuty.types';
 import alertSlice from '../../store/reducer/alert/alert.slice';
 import scheduleSlice from '../../store/reducer/schedule/schedule.slice';
 import { apiPath } from '../../utils';
+
+import { LessonFlags, TeacherOneWeekDto, TeacherLessonData } from '../../interfaces/schedule';
+import { ITeacherData } from '../../interfaces/ystuty.types';
 
 const STORE_CACHED_TEACHER_KEY_OLD = 'CACHED_TEACHER_LESSONS::';
 const STORE_CACHED_TEACHER_KEY = 'CACHED_V2_TEACHER_LESSONS::';
@@ -21,7 +23,7 @@ export const useTeacherScheduleLoader = () => {
         React.useState<Record<string, { time: number; sources: TeacherLessonData[] }>>();
 
     const formatData = React.useCallback(
-        (teacherId: number, items: TeacherDayType[] | null) => {
+        (teacherId: number, items: TeacherOneWeekDto[] | null) => {
             if (!items) {
                 const stored = store2.get(STORE_CACHED_TEACHER_KEY + teacherId, null);
                 items = stored?.items;
@@ -34,15 +36,23 @@ export const useTeacherScheduleLoader = () => {
                 setIsCached(false);
             }
 
-            const sources = items.map((lesson) => ({
-                ...lesson,
-                start: lesson.startAt!,
-                end: lesson.endAt!,
-                title: lesson.lessonName!,
-                typeArr: (Object.values(LessonFlags) as LessonFlags[]).filter(
-                    (e) => (lesson.lessonType & e) === e && e !== LessonFlags.None,
-                ),
-            }));
+            const sources = items.reduce(
+                (prev, week) => [
+                    ...prev,
+                    ...week.days.flatMap((day) =>
+                        day.lessons.map((lesson) => ({
+                            ...lesson,
+                            start: lesson.startAt!,
+                            end: lesson.endAt!,
+                            title: lesson.lessonName!,
+                            typeArr: (Object.values(LessonFlags) as LessonFlags[]).filter(
+                                (e) => (lesson.type & e) === e && e !== LessonFlags.None,
+                            ),
+                        })),
+                    ),
+                ],
+                [] as TeacherLessonData[],
+            );
 
             setSchedulesData((state) => ({ ...state, [teacherId]: { time: Date.now(), sources } }));
         },
@@ -61,12 +71,16 @@ export const useTeacherScheduleLoader = () => {
             }
 
             setFetchings((s) => ({ ...s, [teacherId]: true }));
-            fetch(`${apiPath}/ystu/schedule/teacher/${teacherId}`)
+            fetch(`${apiPath}/v1/schedule/teacher/${teacherId}`)
                 .then((response) => response.json())
                 .then(
                     (
                         response:
-                            | { isCache: boolean; teacher: any; items: any[] }
+                            | {
+                                  isCache: boolean;
+                                  teacher: ITeacherData;
+                                  items: TeacherOneWeekDto[];
+                              }
                             | { error: { error: string; message: string } },
                     ) => {
                         if ('error' in response) {

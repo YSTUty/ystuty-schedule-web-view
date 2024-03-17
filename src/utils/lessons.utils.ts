@@ -1,6 +1,7 @@
 import { red, green, teal, blue, yellow } from '@mui/material/colors';
 import ColorHash from 'color-hash';
-import { LessonFlags } from '../interfaces/ystuty.types';
+
+import { LessonFlags } from '../interfaces/schedule';
 
 export const getLessonTypeStrArr = (type: LessonFlags) => {
     const types: string[] = [];

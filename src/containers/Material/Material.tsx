@@ -39,9 +39,10 @@ import LessonFilter from '../../components/LessonFilter.component';
 import LessonTypeSelector from '../../components/LessonTypeSelector.component';
 import GroupGroupingControl from '../../components/GroupGroupingControl.component';
 
-import { LessonData, LessonFlags, WeekParityType } from '../../interfaces/ystuty.types';
 import scheduleSlice from '../../store/reducer/schedule/schedule.slice';
 import * as lessonsUtils from '../../utils/lessons.utils';
+
+import { LessonData, LessonFlags, WeekParityType } from '../../interfaces/schedule';
 
 import {
     classes as dxClasses,
@@ -84,8 +85,8 @@ const AppointmentContent = ({
         title += ` [${data.group}]`;
     }
     title += ` "${data.title}"\n`;
-    if (data.time) {
-        title += `🕑 Время: ${data.time}\n`;
+    if (data.timeRange) {
+        title += `🕑 Время: ${data.timeRange}\n`;
     }
     if (data.type !== 0) {
         title += `• Вид занятий: ${lessonsUtils.getLessonTypeStrArr(data.type).join(', ')}\n`;
@@ -114,7 +115,7 @@ const AppointmentContent = ({
                     )}{' '}
                     {data.title}
                 </div>
-                {data.time && <div className={dxClasses.text}>🕑 {data.time}</div>}
+                {data.timeRange && <div className={dxClasses.text}>🕑 {data.timeRange}</div>}
                 {data.type !== 0 && (
                     <div className={classNames(dxClasses.text, dxClasses.content)}>
                         • Вид занятий: {lessonsUtils.getLessonTypeStrArr(data.type).join(', ')}

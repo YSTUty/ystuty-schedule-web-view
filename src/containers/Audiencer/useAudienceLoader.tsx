@@ -5,7 +5,8 @@ import store2 from 'store2';
 import alertSlice from '../../store/reducer/alert/alert.slice';
 import audiencerSlice from '../../store/reducer/audiencer/audiencer.slice';
 import { apiPath } from '../../utils';
-import type { AccumulativeSchedule, IAudienceData } from '../../interfaces/ystuty.types';
+
+import { AccumulativeSchedule, IAudienceData } from '../../interfaces/ystuty.types';
 
 const STORE_CACHED_ACCUMULATIVE_KEY = 'STORE_CACHED_ACCUMULATIVE_KEY';
 
@@ -80,7 +81,8 @@ const useAudienceLoader = () => {
 
         setFetchingAudience(true);
 
-        fetch(`${apiPath}/ystu/schedule/audiences`)
+        // TODO: need implement this method
+        fetch(`${apiPath}/v1/schedule/audiences`)
             .then((response) => response.json())
             .then((response: { items: IAudienceData[] } | { error: { error: string; message: string } }) => {
                 if ('error' in response) {
@@ -88,7 +90,7 @@ const useAudienceLoader = () => {
                         alertSlice.actions.add({
                             message: `Error: ${response.error.message}`,
                             severity: 'warning',
-                        })
+                        }),
                     );
                     return;
                 }
@@ -109,7 +111,8 @@ const useAudienceLoader = () => {
 
         setFetchingAcc(true);
 
-        fetch(`${apiPath}/ystu/schedule/accumulative`)
+        // TODO: need implement this method
+        fetch(`${apiPath}/v1/schedule/accumulative`)
             .then((response) => response.json())
             .then((response: { items: AccumulativeSchedule[] } | { error: { error: string; message: string } }) => {
                 if ('error' in response) {
@@ -117,7 +120,7 @@ const useAudienceLoader = () => {
                         alertSlice.actions.add({
                             message: `Error: ${response.error.message}`,
                             severity: 'warning',
-                        })
+                        }),
                     );
                     return;
                 }

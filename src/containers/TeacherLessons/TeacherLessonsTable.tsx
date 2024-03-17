@@ -19,9 +19,10 @@ import TableRow from '@mui/material/TableRow';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 
-import { LessonFlags, TeacherLessonData } from '../../interfaces/ystuty.types';
 import scheduleSlice from '../../store/reducer/schedule/schedule.slice';
 import * as lessonsUtils from '../../utils/lessons.utils';
+
+import { LessonFlags, TeacherLessonData } from '../../interfaces/schedule';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
@@ -46,9 +47,9 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 type TeacherLessonType = {
     lessonName: string;
     lessonCount: number;
-    groups: Record<string, Record<LessonFlags, number>>;
+    groups: Record<string, Partial<Record<LessonFlags, number>>>;
     // groups: Record<string, number>;
-    lessonType: LessonFlags;
+    type: LessonFlags;
 };
 
 const RowAccumulative = (props: { row: TeacherLessonType }) => {
@@ -67,9 +68,7 @@ const RowAccumulative = (props: { row: TeacherLessonType }) => {
                     {row.lessonName}
                 </StyledTableCell>
                 <StyledTableCell align="right">{row.lessonCount}</StyledTableCell>
-                <StyledTableCell align="right">
-                    {lessonsUtils.getLessonTypeStrArr(row.lessonType).join(', ')}
-                </StyledTableCell>
+                <StyledTableCell align="right">{lessonsUtils.getLessonTypeStrArr(row.type).join(', ')}</StyledTableCell>
             </StyledTableRow>
 
             <TableRow>
@@ -92,12 +91,12 @@ const RowAccumulative = (props: { row: TeacherLessonType }) => {
                                             <StyledTableCell>{group}</StyledTableCell>
                                             <StyledTableCell align="right">
                                                 {Object.entries(counter)
-                                                    .map(([lessonType, count]) => (
+                                                    .map(([type, count]) => (
                                                         <>
                                                             <Typography
                                                                 style={{
                                                                     color: lessonsUtils.getLessonColor(
-                                                                        Number(lessonType),
+                                                                        Number(type),
                                                                     )[500],
                                                                 }}
                                                                 component="b"
@@ -105,7 +104,7 @@ const RowAccumulative = (props: { row: TeacherLessonType }) => {
                                                             >
                                                                 [
                                                                 {lessonsUtils
-                                                                    .getLessonTypeStrArr(Number(lessonType))
+                                                                    .getLessonTypeStrArr(Number(type))
                                                                     .join(', ')}
                                                                 ]
                                                             </Typography>
@@ -139,7 +138,7 @@ const TeacherLessonsTable: React.FC = () => {
     const [data, setData] = React.useState<TeacherLessonData[]>([]);
 
     React.useEffect(() => {
-        const allowedLessonTypes: Record<LessonFlags, any> = {};
+        const allowedLessonTypes: Partial<Record<LessonFlags, any>> = {};
         const data = [
             ...scheduleData.flatMap((data) =>
                 data.data.map((e) => {
@@ -170,12 +169,24 @@ const TeacherLessonsTable: React.FC = () => {
                             lessonName: item.lessonName,
                             lessonCount: 0,
                             groups: {},
-                            lessonType: LessonFlags.None,
+                            type: LessonFlags.None,
                         };
                     }
 
                     let lesson = acc[item.lessonName];
-                    ++lesson.lessonCount;
+
+                    const allowedTypes = [
+                        LessonFlags.Lecture,
+                        LessonFlags.Practical,
+                        LessonFlags.Labaratory,
+                        LessonFlags.CourseProject,
+                        // LessonFlags.Consultation,
+                        LessonFlags.Test,
+                        LessonFlags.DifferentiatedTest,
+                        LessonFlags.Exam,
+                        LessonFlags.Library,
+                        LessonFlags.ResearchWork,
+                    ];
 
                     for (const group of item.groups) {
                         // if (!(group in lesson.groups)) {
@@ -185,13 +196,18 @@ const TeacherLessonsTable: React.FC = () => {
                         if (!(group in lesson.groups)) {
                             lesson.groups[group] = {};
                         }
-                        if (!(item.lessonType in lesson.groups[group])) {
-                            lesson.groups[group][item.lessonType] = 0;
+                        if (!(item.type in lesson.groups[group])) {
+                            lesson.groups[group][item.type] = 0;
                         }
-                        ++lesson.groups[group][item.lessonType];
+                        lesson.groups[group][item.type]! += item.duration / 2;
+
+                        // TODO: поправить подсчет: какие типы пар считать в количество? (экзамен/зачт тоже считается, а НИР? а другие какие?)
+                        if (allowedTypes.some((e) => (item.type & e) === e)) {
+                            lesson.lessonCount += item.duration / 2;
+                        }
                     }
 
-                    lesson.lessonType |= item.lessonType;
+                    lesson.type |= item.type;
 
                     return acc;
                 }, {} as Record<string, TeacherLessonType>),

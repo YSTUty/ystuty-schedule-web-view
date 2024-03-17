@@ -37,9 +37,11 @@ import LessonTypeSelector from '../../components/LessonTypeSelector.component';
 import GroupGroupingControl from '../../components/GroupGroupingControl.component';
 import { getTeachers } from '../../components/SelectTeacher.component';
 
-import { TeacherLessonData, LessonFlags } from '../../interfaces/ystuty.types';
 import scheduleSlice from '../../store/reducer/schedule/schedule.slice';
 import * as lessonsUtils from '../../utils/lessons.utils';
+
+import { LessonFlags, TeacherLessonData } from '../../interfaces/schedule';
+
 import {
     classes as dxClasses,
     DayScaleCell,
@@ -84,7 +86,7 @@ const AppointmentContent = ({
         title += `🕑 Время: ${data.timeRange}\n`;
     }
     if (data.type !== 0) {
-        title += `• Вид занятий: ${lessonsUtils.getLessonTypeStrArr(data.lessonType).join(', ')}\n`;
+        title += `• Вид занятий: ${lessonsUtils.getLessonTypeStrArr(data.type).join(', ')}\n`;
     }
     if (data.auditoryName) {
         title += `• Аудитория: ${data.auditoryName}\n`;
@@ -116,7 +118,7 @@ const AppointmentContent = ({
                 {data.timeRange && <div className={dxClasses.text}>🕑 {data.timeRange}</div>}
                 {data.type !== 0 && (
                     <div className={classNames(dxClasses.text, dxClasses.content)}>
-                        • Вид занятий: {lessonsUtils.getLessonTypeStrArr(data.lessonType).join(', ')}
+                        • Вид занятий: {lessonsUtils.getLessonTypeStrArr(data.type).join(', ')}
                     </div>
                 )}
                 {data.auditoryName && (
@@ -180,7 +182,7 @@ const AppointmentTooltipContent = ({
                 </Grid>
             </Grid>
         )}
-        {appointmentData.lessonType !== 0 && (
+        {appointmentData.type !== 0 && (
             <Grid container alignItems="center">
                 <StyledGrid item xs={2} className={dxClasses.textCenter}>
                     <StyledIcon className={dxClasses.icon}>
@@ -188,7 +190,7 @@ const AppointmentTooltipContent = ({
                     </StyledIcon>
                 </StyledGrid>
                 <Grid item xs={10}>
-                    Вид занятий: <b>{lessonsUtils.getLessonTypeStrArr(appointmentData.lessonType).join(', ')}</b>
+                    Вид занятий: <b>{lessonsUtils.getLessonTypeStrArr(appointmentData.type).join(', ')}</b>
                 </Grid>
             </Grid>
         )}
@@ -284,7 +286,7 @@ const MaterialTeacherContainer = () => {
 
     React.useEffect(() => {
         const isComparing = scheduleData.length > 1;
-        const allowedLessonTypes: Record<LessonFlags, any> = {};
+        const allowedLessonTypes: Partial<Record<LessonFlags, any>> = {};
         const data = [
             ...scheduleData.flatMap((data) =>
                 data.data.map((e) => {

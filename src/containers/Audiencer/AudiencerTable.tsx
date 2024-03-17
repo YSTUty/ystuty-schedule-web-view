@@ -131,7 +131,7 @@ const RowAccumulative = (props: { row: AccumulativeSchedule; isColoring: boolean
                                                     {lesson.lessonName}
                                                 </StyledTableCell>
                                                 <StyledTableCell>
-                                                    {lessonsUtils.getLessonTypeStrArr(lesson.lessonType).join(', ')}
+                                                    {lessonsUtils.getLessonTypeStrArr(lesson.type).join(', ')}
                                                 </StyledTableCell>
                                                 <StyledTableCell
                                                     align="right"

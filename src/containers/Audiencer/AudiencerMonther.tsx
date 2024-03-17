@@ -23,9 +23,10 @@ import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 
 import { FilterContext } from './Filter.provider';
-import { AudienceLesson } from '../../interfaces/ystuty.types';
 import * as lessonsUtils from '../../utils/lessons.utils';
 import * as audiencerUtils from '../../utils/audiencer.utils';
+
+import { AudienceLesson } from '../../interfaces/ystuty.types';
 
 dayjs.extend(isSameOrBefore);
 dayjs.extend(isSameOrAfter);

@@ -17,13 +17,15 @@ export const vkWidgetsApiId =
         : undefined;
 
 function getApiPath() {
+    const apiPath_key = 'apiPath_v1';
+
     const apiPathFromUrl = new URLSearchParams(window.location.search).get('apiPath');
-    const apiPathFromStorage = localStorage.getItem('apiPath');
+    const apiPathFromStorage = localStorage.getItem(apiPath_key);
     const apiPathFromEnv = process.env.REACT_APP_API_URL;
     const apiPathFromWindow = `//${window.location.host}/api`;
 
     const apiPath = apiPathFromUrl || apiPathFromStorage || apiPathFromEnv || apiPathFromWindow;
-    localStorage.setItem('apiPath', apiPath);
+    localStorage.setItem(apiPath_key, apiPath);
 
     if (apiPathFromUrl) {
         const s = new URLSearchParams(window.location.search);
