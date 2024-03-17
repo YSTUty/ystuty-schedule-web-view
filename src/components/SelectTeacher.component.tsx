@@ -183,12 +183,15 @@ export const SelectTeacherComponent = (props: {
     }, [online, previousOnline, since]);
 
     React.useEffect(() => {
+        allowMultipleTeachersRef.current = allowMultiple;
+    }, [allowMultiple]);
+
+    React.useEffect(() => {
         fixSelected(defaultValues);
 
         if (window.location.search.includes('allow_multiple')) {
             allowMultiple();
         }
-        allowMultipleTeachersRef.current = allowMultiple;
     }, []);
 
     const isMultiple = allowedMultiple || selected.length > 1;
