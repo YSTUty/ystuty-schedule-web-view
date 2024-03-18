@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.3.0](https://github.com/YSTUty/ystuty-schedule-web-view/compare/v0.2.7...v0.3.0) (2024-03-18)
+
+
+### 🐛 Bug Fixes
+
+* **components:** update multiple field state ([dc3c089](https://github.com/YSTUty/ystuty-schedule-web-view/commit/dc3c089f1568d13f76bf1b218dc94d73fb4bd213))
+* **components:** update multiple field state for `teacher` ([030ebdd](https://github.com/YSTUty/ystuty-schedule-web-view/commit/030ebdd9698a8736f301ccdf4de946a3186a069f))
+
+
+### 🚀 Features
+
+* **public:** add meta `keywords` ([305bbb3](https://github.com/YSTUty/ystuty-schedule-web-view/commit/305bbb398f75e06c1699b573dd1eb1c7d9dfbe3b))
+* **schedule:** update to new api version ([fa82c8c](https://github.com/YSTUty/ystuty-schedule-web-view/commit/fa82c8c98aafca3cfca0d0b43db73f48f0cfc3c7))
+
+
+### 📈 Chore
+
+* **app:** temporarily disabling `audience` page ([1e9855b](https://github.com/YSTUty/ystuty-schedule-web-view/commit/1e9855bae2d18837dc03dcea6b730d52f47c0b1c))
+* change emoji for `chore` type ([214f1b6](https://github.com/YSTUty/ystuty-schedule-web-view/commit/214f1b60f9f38232c12abab10fc7d689644c8cd7))
+* **deps:** update `[@hawk](https://github.com/hawk).so/javascript` ([c468fd7](https://github.com/YSTUty/ystuty-schedule-web-view/commit/c468fd71197148017b6a3a8a037332c9140861a8))
+* **interfaces:** remove unnecessary interfaces for `teacher` ([7d9cc4f](https://github.com/YSTUty/ystuty-schedule-web-view/commit/7d9cc4fe96f6f9c6b43a2a7942743cc35941d76a))
+* **interfaces:** update ([fd077cd](https://github.com/YSTUty/ystuty-schedule-web-view/commit/fd077cd2faf28e46fd169e2a13d1a2cd2b5879a6))
+* **readme:** update api info ([79e26d9](https://github.com/YSTUty/ystuty-schedule-web-view/commit/79e26d933e69405317762d6edd7d2163065cc156))
+* **sw:** add force updating client without ask ([754d404](https://github.com/YSTUty/ystuty-schedule-web-view/commit/754d404d47f8bde52dbdb6c9581a754c0b7d6ff4))
+* **theme:** disabple speedy for emotion cache css ([ef9982b](https://github.com/YSTUty/ystuty-schedule-web-view/commit/ef9982b7a171f2c75bd7efb625a6e3e689cb0275))
+* update `.editorconfig` ([7f2a06f](https://github.com/YSTUty/ystuty-schedule-web-view/commit/7f2a06f28b6486d539b04fd6132073a693402974))
+* update store cached keys prefix ([7f71c90](https://github.com/YSTUty/ystuty-schedule-web-view/commit/7f71c902794707cac7d2ff231a27b476b6be644c))
+
 ### [0.2.7](https://github.com/YSTUty/ystuty-schedule-web-view/compare/v0.2.6...v0.2.7) (2024-02-27)
 
 
