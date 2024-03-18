@@ -15,7 +15,8 @@ import alertSlice from '../store/reducer/alert/alert.slice';
 import { apiPath } from '../utils';
 import { IInstituteGroupsData } from '../interfaces/ystuty.types';
 
-const STORE_CACHED_INSTITUTES_KEY = 'CACHED_INSTITUTES';
+// const STORE_CACHED_INSTITUTES_KEY_OLD = 'CACHED_INSTITUTES';
+const STORE_CACHED_INSTITUTES_KEY = 'CACHED_V3_INSTITUTES::';
 
 const StyledPopper = styled(Popper)({
     [`& .${autocompleteClasses.listbox}`]: {

@@ -16,7 +16,9 @@ import { apiPath } from '../utils';
 
 import { ITeacherData } from '../interfaces/ystuty.types';
 
-const STORE_CACHED_TEACHERS_KEY = 'cachedTeachers';
+// const STORE_CACHED_TEACHERS_KEY_OLD = 'cachedTeachers';
+const STORE_CACHED_TEACHERS_KEY = 'CACHED_V3_TEACHERS::';
+
 export const getTeachers = () => store2.get(STORE_CACHED_TEACHERS_KEY, null) as ITeacherData[] | null;
 
 const StyledPopper = styled(Popper)({

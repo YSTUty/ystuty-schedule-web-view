@@ -10,7 +10,8 @@ import { LessonFlags, OneWeekDto, LessonData } from '../../interfaces/schedule';
 import { ITeacherData } from '../../interfaces/ystuty.types';
 
 const STORE_CACHED_TEACHER_KEY_OLD = 'CACHED_TEACHER_LESSONS::';
-const STORE_CACHED_TEACHER_KEY = 'CACHED_V2_TEACHER_LESSONS::';
+const STORE_CACHED_TEACHER_KEY_OLD2 = 'CACHED_V2_TEACHER_LESSONS::';
+const STORE_CACHED_TEACHER_KEY = 'CACHED_V3_TEACHER_LESSONS::';
 
 export const useTeacherScheduleLoader = () => {
     const dispatch = useDispatch();
@@ -19,8 +20,7 @@ export const useTeacherScheduleLoader = () => {
     const [fetchings, setFetchings] = React.useState<Record<number, boolean>>({});
     const [isCached, setIsCached] = React.useState(false);
 
-    const [schedulesData, setSchedulesData] =
-        React.useState<Record<string, { time: number; sources: LessonData[] }>>();
+    const [schedulesData, setSchedulesData] = React.useState<Record<string, { time: number; sources: LessonData[] }>>();
 
     const formatData = React.useCallback(
         (teacherId: number, items: OneWeekDto[] | null) => {
@@ -143,8 +143,9 @@ export const useTeacherScheduleLoader = () => {
             }
 
             // remove old keys version
-            if (key.startsWith(STORE_CACHED_TEACHER_KEY_OLD)) {
+            if (key.startsWith(STORE_CACHED_TEACHER_KEY_OLD) || key.startsWith(STORE_CACHED_TEACHER_KEY_OLD2)) {
                 localStorage.removeItem(key);
+                --index;
             }
 
             // remove expired keys
@@ -152,6 +153,7 @@ export const useTeacherScheduleLoader = () => {
                 const { time } = store2.get(key, {});
                 if (Date.now() - time > 24 * 60 * 60 * 1e3) {
                     localStorage.removeItem(key);
+                    --index;
                 }
             }
             ++index;

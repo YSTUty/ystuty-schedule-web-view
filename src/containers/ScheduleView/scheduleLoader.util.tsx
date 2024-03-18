@@ -10,7 +10,8 @@ import { apiPath } from '../../utils';
 import { LessonData, LessonFlags, OneWeekDto } from '../../interfaces/schedule';
 
 const STORE_CACHED_GROUP_KEY_OLD = 'CACHED_GROUP::';
-const STORE_CACHED_GROUP_KEY = 'CACHED_V2_GROUP::';
+const STORE_CACHED_GROUP_KEY_OLD2 = 'CACHED_V2_GROUP::';
+const STORE_CACHED_GROUP_KEY = 'CACHED_V3_GROUP::';
 
 export const useScheduleLoader = () => {
     // const { online } = useNetworkState();
@@ -136,8 +137,9 @@ export const useScheduleLoader = () => {
             }
 
             // remove old keys version
-            if (key.startsWith(STORE_CACHED_GROUP_KEY_OLD)) {
+            if (key.startsWith(STORE_CACHED_GROUP_KEY_OLD) || key.startsWith(STORE_CACHED_GROUP_KEY_OLD2)) {
                 localStorage.removeItem(key);
+                --index;
             }
 
             // remove expired keys
@@ -145,6 +147,7 @@ export const useScheduleLoader = () => {
                 const { time } = store2.get(key, {});
                 if (Date.now() - time > 24 * 60 * 60 * 1e3) {
                     localStorage.removeItem(key);
+                    --index;
                 }
             }
             ++index;
