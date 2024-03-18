@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.1](https://github.com/YSTUty/ystuty-schedule-web-view/compare/v0.3.0...v0.3.1) (2024-03-18)
+
+
+### 📈 Chore
+
+* **container:** add support `additionalAuditoryName` ([7252967](https://github.com/YSTUty/ystuty-schedule-web-view/commit/7252967291cede6d9d0db283b9fb5f28db579265))
+* display lessons with `Unsupported` type ([a28b3f4](https://github.com/YSTUty/ystuty-schedule-web-view/commit/a28b3f40b7620244915a9c754018c7747566b536))
+* **project:** update structure ([61bda6f](https://github.com/YSTUty/ystuty-schedule-web-view/commit/61bda6fc2577ddf54b5bedd6a65a01ab1b3c5819))
+* **schedule:** add `ru` locale for schedule viwes ([5677abe](https://github.com/YSTUty/ystuty-schedule-web-view/commit/5677abe1e91a0c917c497e7d4ff8a45762dea07f))
+
+
+### 🚀 Features
+
+* add schedule for `audiences` ([f2adef9](https://github.com/YSTUty/ystuty-schedule-web-view/commit/f2adef9027f41e3ce15386df50ec0c6c6964fffc))
+* combine into one schedule component ([a8796be](https://github.com/YSTUty/ystuty-schedule-web-view/commit/a8796beb23854cb4aa49196f5a1b9ecbcd8b584b))
+
 ## [0.3.0](https://github.com/YSTUty/ystuty-schedule-web-view/compare/v0.2.7...v0.3.0) (2024-03-18)
 
 
