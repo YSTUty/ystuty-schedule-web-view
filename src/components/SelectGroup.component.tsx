@@ -13,6 +13,7 @@ import { StyledAutocomplete } from './StylePulseAnimation.component';
 import scheduleSlice, { getLastGroups, STORE_GROUP_NAME_KEY } from '../store/reducer/schedule/schedule.slice';
 import alertSlice from '../store/reducer/alert/alert.slice';
 import { apiPath } from '../utils';
+import { IInstituteGroupsData } from '../interfaces/ystuty.types';
 
 const STORE_CACHED_INSTITUTES_KEY = 'CACHED_INSTITUTES';
 
@@ -52,7 +53,7 @@ export const SelectGroupComponent = (props: {
     const [isCached, setIsCached] = React.useState(false);
 
     const applyInstitutes = React.useCallback(
-        (items: { name: string; groups: string[] }[] | null) => {
+        (items: IInstituteGroupsData[] | null) => {
             if (!items) {
                 items = store2.get(STORE_CACHED_INSTITUTES_KEY, null);
                 if (!items) {
@@ -82,7 +83,11 @@ export const SelectGroupComponent = (props: {
             .then(
                 (
                     response:
-                        | { items: { name: string; groups: string[] }[] }
+                        | {
+                              name: string;
+                              items: IInstituteGroupsData[];
+                              isCache: boolean;
+                          }
                         | { error: { error: string; message: string } },
                 ) => {
                     if ('error' in response) {

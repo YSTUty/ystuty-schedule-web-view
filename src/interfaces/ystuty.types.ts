@@ -1,4 +1,20 @@
-import { LessonDto, LessonFlags, WeekNumberType, WeekParityType } from './schedule';
+import { LessonFlags } from './schedule';
+
+/**
+ * Название института и массив групп
+ */
+export interface IInstituteGroupsData {
+    /**
+     * Название института
+     * @example Институт цифровых систем
+     */
+    name: string;
+
+    /**
+     * Название групп (`string`) или детальная информация (`object`) о группах при `additional=true`
+     */
+    groups: /* GroupDetailDto | */ string[];
+}
 
 /**
  * Данные об институте
@@ -42,7 +58,6 @@ export interface ITeacherData {
 export interface IAudienceData {
     id: number;
     name: string;
-    days: string[];
 }
 
 export interface AccumulativeSchedule {

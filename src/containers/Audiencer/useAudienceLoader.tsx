@@ -84,18 +84,24 @@ const useAudienceLoader = () => {
         // TODO: need implement this method
         fetch(`${apiPath}/v1/schedule/audiences`)
             .then((response) => response.json())
-            .then((response: { items: IAudienceData[] } | { error: { error: string; message: string } }) => {
-                if ('error' in response) {
-                    dispatch(
-                        alertSlice.actions.add({
-                            message: `Error: ${response.error.message}`,
-                            severity: 'warning',
-                        }),
-                    );
-                    return;
-                }
-                applyAudiences(response!.items);
-            })
+            .then(
+                (
+                    response:
+                        | { isCache: boolean; items: IAudienceData[]; count: number }
+                        | { error: { error: string; message: string } },
+                ) => {
+                    if ('error' in response) {
+                        dispatch(
+                            alertSlice.actions.add({
+                                message: `Error: ${response.error.message}`,
+                                severity: 'warning',
+                            }),
+                        );
+                        return;
+                    }
+                    applyAudiences(response!.items);
+                },
+            )
             .catch((e) => {
                 applyAudiences(null);
             })

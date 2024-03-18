@@ -85,22 +85,18 @@ export const SelectTeacherComponent = (props: {
 
         fetch(`${apiPath}/v1/schedule/actual_teachers`)
             .then((response) => response.json())
-            .then(
-                (
-                    response: { items: { name: string; id: number }[] } | { error: { error: string; message: string } },
-                ) => {
-                    if ('error' in response) {
-                        dispatch(
-                            alertSlice.actions.add({
-                                message: `Error: ${response.error.message}`,
-                                severity: 'warning',
-                            }),
-                        );
-                        return;
-                    }
-                    applyTeachers(response!.items);
-                },
-            )
+            .then((response: { items: ITeacherData[] } | { error: { error: string; message: string } }) => {
+                if ('error' in response) {
+                    dispatch(
+                        alertSlice.actions.add({
+                            message: `Error: ${response.error.message}`,
+                            severity: 'warning',
+                        }),
+                    );
+                    return;
+                }
+                applyTeachers(response!.items);
+            })
             .catch((e) => {
                 applyTeachers(null);
                 if (online) {
