@@ -32,8 +32,8 @@ const LoadingUpdates = ({ children }: any) => {
 
     React.useEffect(() => {
         if (isUpdateAvailable) {
-            // startUpdate();
-            setOpen(true);
+            startUpdate();
+            // setOpen(true);
         }
     }, [isUpdateAvailable, startUpdate, setOpen]);
 
@@ -41,7 +41,7 @@ const LoadingUpdates = ({ children }: any) => {
         () => () => {
             clearTimeout(timer.current);
         },
-        []
+        [],
     );
 
     return showLoading ? (
