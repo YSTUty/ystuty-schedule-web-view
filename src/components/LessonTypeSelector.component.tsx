@@ -78,8 +78,9 @@ const LESSON_TYPES = [
     LessonFlags.Library,
     LessonFlags.ResearchWork,
     LessonFlags.OrganizationalMeeting,
+    LessonFlags.Unsupported,
 ];
-const LESSON_TYPE_SHORT_NAMES = ['Лек', 'ЛР', 'ПР', 'КП', 'КОН', 'ЗАЧ', 'ДИФ', 'ЭКЗ', 'БИБЛ', 'НИР', 'Соб'];
+const LESSON_TYPE_SHORT_NAMES = ['Лек', 'ЛР', 'ПР', 'КП', 'КОН', 'ЗАЧ', 'ДИФ', 'ЭКЗ', 'БИБЛ', 'НИР', 'Соб', 'N/A'];
 const LESSON_TYPE_NAMES = [
     'Лекции',
     'Лабы',
@@ -92,6 +93,7 @@ const LESSON_TYPE_NAMES = [
     'Библиотека',
     'НИР',
     'Орг. собрание',
+    'Другое',
 ];
 
 const getButtonClass = (lessonTypes: LessonFlags[], type: LessonFlags) =>

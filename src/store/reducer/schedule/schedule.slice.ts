@@ -30,6 +30,8 @@ const initialState = {
         LessonFlags.Exam,
         LessonFlags.Library,
         LessonFlags.ResearchWork,
+        LessonFlags.OrganizationalMeeting,
+        LessonFlags.Unsupported,
     ],
     lessonFilter: '',
     groupsSplitColor: true,
