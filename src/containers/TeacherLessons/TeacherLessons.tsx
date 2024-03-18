@@ -16,13 +16,13 @@ import VK, { Like } from '../../components/VK';
 import { ThemeModeButton } from '../../components/ThemeMode.component';
 import NavLinkComponent from '../../components/NavLink.component';
 import { SelectTeacherComponent } from '../../components/SelectTeacher.component';
-import { useTeacherScheduleLoader } from '../../pages/ScheduleView/Teacher/teacher.scheduleLoader';
 import TeacherLessonsTable from './TeacherLessonsTable';
+import { useScheduleLoader } from '../../pages/ScheduleView/scheduleLoader.hook';
 
 import * as envUtils from '../../utils/env.utils';
 
 const TeacherLessons = () => {
-    useTeacherScheduleLoader();
+    useScheduleLoader({ scheduleFor: 'teacher' });
     const allowMultipleTeachersRef = React.useRef<(state?: any) => void>(() => {});
     const { formatMessage } = useIntl();
 
@@ -82,7 +82,7 @@ const TeacherLessons = () => {
                             Нагрузка преподавателя
                         </Typography>
                         <Box sx={{ mt: 2 }}>
-                            <SelectTeacherComponent allowMultipleTeachersRef={allowMultipleTeachersRef} />
+                            <SelectTeacherComponent allowMultipleRef={allowMultipleTeachersRef} />
                         </Box>
                     </Paper>
                 </Container>

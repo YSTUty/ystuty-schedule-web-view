@@ -128,16 +128,14 @@ const RowAccumulative = (props: { row: TeacherLessonType }) => {
 
 const TeacherLessonsTable: React.FC = () => {
     const dispatch = useDispatch();
-    const {
-        lessonTypes,
-        lessonFilter = '',
-        fetchingSchedule,
-        teacherScheduleData: scheduleData,
-    } = useSelector((state) => state.schedule);
+    const { lessonTypes, lessonFilter = '', fetchingSchedule } = useSelector((state) => state.schedule);
+    const scheduleData = useSelector((state) => state.schedule.scheduleData.teacher);
 
     const [data, setData] = React.useState<LessonData[]>([]);
 
     React.useEffect(() => {
+        if (!scheduleData) return;
+
         const allowedLessonTypes: Partial<Record<LessonFlags, any>> = {};
         const data = [
             ...scheduleData.flatMap((data) =>

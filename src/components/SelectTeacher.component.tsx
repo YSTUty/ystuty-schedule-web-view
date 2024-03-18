@@ -30,16 +30,12 @@ const StyledPopper = styled(Popper)({
 
 const MyPopper = (props: PopperProps) => <StyledPopper {...props} style={{ width: 350 }} />;
 
-export const SelectTeacherComponent = (props: {
-    allowMultipleTeachersRef: React.MutableRefObject<(state?: any) => void>;
-}) => {
-    const { allowMultipleTeachersRef } = props;
+export const SelectTeacherComponent = (props: { allowMultipleRef: React.MutableRefObject<(state?: any) => void> }) => {
+    const { allowMultipleRef } = props;
     const dispatch = useDispatch();
-    const {
-        selectedTeachers: selected,
-        fetchingSchedule,
-        allowedMultipleTeachers: allowedMultiple,
-    } = useSelector((state) => state.schedule);
+    const { fetchingSchedule } = useSelector((state) => state.schedule);
+    const allowedMultiple = useSelector((state) => state.schedule.allowedMultiple.teacher);
+    const selected = useSelector((state) => state.schedule.selectedItems.teacher) as number[];
     const { online, previous: previousOnline, since } = useNetworkState();
 
     const [hash, setHash] = useHash();
@@ -123,7 +119,7 @@ export const SelectTeacherComponent = (props: {
             const values = value.length > maxCount ? [value[0], ...value.slice(-maxCount)] : value;
 
             if (values.length !== selected.length || values.some((e, i) => selected[i] !== e)) {
-                dispatch(scheduleSlice.actions.setSelectedTeachers(values));
+                dispatch(scheduleSlice.actions.setSelectedItems({ scheduleFor: 'teacher', items: values }));
                 if (values.length > 0) {
                     setHash(values.join(','));
                     store2.set(STORE_TEACHER_NAME_KEY, values);
@@ -150,7 +146,7 @@ export const SelectTeacherComponent = (props: {
 
     const allowMultiple = React.useCallback(
         (state = true) => {
-            dispatch(scheduleSlice.actions.setAllowedMultipleTeachers(state));
+            dispatch(scheduleSlice.actions.setAllowedMultiple({ scheduleFor: 'teacher', allowed: state }));
             if (!state) {
                 const [value] = selected;
                 onChangeValues(value);
@@ -182,7 +178,7 @@ export const SelectTeacherComponent = (props: {
     }, [online, previousOnline, since]);
 
     React.useEffect(() => {
-        allowMultipleTeachersRef.current = allowMultiple;
+        allowMultipleRef.current = allowMultiple;
     }, [allowMultiple]);
 
     React.useEffect(() => {

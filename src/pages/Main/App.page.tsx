@@ -18,7 +18,7 @@ import SvgIcon from '@mui/material/SvgIcon';
 
 import ImportExportIcon from '@mui/icons-material/ImportExportSharp';
 import SchoolIcon from '@mui/icons-material/School';
-// import AudienceIcon from '@mui/icons-material/DoorSliding';
+import AudienceIcon from '@mui/icons-material/DoorSliding';
 import TelegramIcon from '@mui/icons-material/Telegram';
 import { ReactComponent as VkSvg } from '../../assets/img/vk-logo.svg';
 
@@ -28,7 +28,7 @@ import NavLinkComponent from '../../components/NavLink.component';
 import * as envUtils from '../../utils/env.utils';
 
 const MainPage = () => {
-    const { selectedGroups } = useSelector((state) => state.schedule);
+    const selectedGroups = useSelector((state) => state.schedule.selectedItems.group) as string[];
 
     const groupNameConv = React.useMemo(
         () =>
@@ -137,15 +137,15 @@ const MainPage = () => {
                             <Button to={'/teacher'} component={NavLinkComponent} title="Расписание по преподавателям">
                                 Для преподавателей 👨🏼‍🏫👩🏼‍🏫
                             </Button>
-                            {/* <Button
-                                to={'/audience'}
+                            <Button
+                                to={'/by_audience'}
                                 component={NavLinkComponent}
                                 endIcon={<AudienceIcon />}
                                 title="Расписание по аудиториям"
                                 size="medium"
                             >
                                 Аудитории
-                            </Button> */}
+                            </Button>
                         </ButtonGroup>
                     </Box>
 

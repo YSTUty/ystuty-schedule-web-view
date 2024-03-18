@@ -11,9 +11,9 @@ export const Routes = () => {
     return (
         <Switch>
             <Route exact path="/" component={App} />
-            <Route strict path="/(group|teacher)" component={Schedule} />
+            <Route strict path="/(group|teacher|by_audience)" component={Schedule} />
             {/* <Route path="/audience" component={Audiencer} /> */}
-            <Redirect path="/audience" to="/" />
+            <Redirect path="/audience" to="/by_audience" />
             <Route path="/teacher-lessons" component={TeacherLessons} />
             <Route component={() => <b>not found</b>} />
         </Switch>

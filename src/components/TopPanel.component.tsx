@@ -1,5 +1,4 @@
 import React from 'react';
-import { useLocation } from 'react-router';
 import { useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 
@@ -18,23 +17,32 @@ import HomeIcon from '@mui/icons-material/Home';
 import VK, { Like } from './VK';
 import { ThemeModeButton } from './ThemeMode.component';
 import { AlertMeToggler } from './AlertMe.component';
+import NavLinkComponent from './NavLink.component';
 import { SelectGroupComponent } from './SelectGroup.component';
 import { SelectTeacherComponent } from './SelectTeacher.component';
-import NavLinkComponent from './NavLink.component';
+import { SelectAudienceComponent } from './SelectAudience.component';
 
 import * as envUtils from '../utils/env.utils';
+import { ScheduleFor } from '../interfaces/ystuty.types';
 
-const TopPanel = () => {
-    const { pathname } = useLocation();
+export type TopPanelProps = {
+    scheduleFor: ScheduleFor;
+};
+
+const TopPanel: React.FC<TopPanelProps> = (props) => {
+    const { scheduleFor } = props;
+
     const { formatMessage } = useIntl();
     const theme = useTheme();
     const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
 
-    const { allowedMultipleGroups, allowedMultipleTeachers } = useSelector((state) => state.schedule);
-    const allowMultipleGroupsRef = React.useRef<(state?: any) => void>(() => {});
-    const allowMultipleTeachersRef = React.useRef<(state?: any) => void>(() => {});
+    const allowedMultiple = useSelector((state) => state.schedule.allowedMultiple);
 
-    const forTeacher = pathname.startsWith('/teacher');
+    const allowMultipleRef = React.useRef<(state?: any) => void>(() => {});
+
+    const onChangeMultiple = React.useCallback(() => {
+        allowMultipleRef.current(!allowedMultiple[scheduleFor]);
+    }, [allowedMultiple, scheduleFor, allowMultipleRef]);
 
     return (
         <>
@@ -53,6 +61,7 @@ const TopPanel = () => {
                             {formatMessage({ id: 'schedule.viewer' })}
                         </Typography>
                     )}
+
                     {!isSmall && <Divider orientation="vertical" flexItem />}
                     <FormControl sx={!isSmall ? { mx: 1 } : { m: 0 }}>
                         <NavLinkComponent to="/" style={{ color: 'inherit' }} title={formatMessage({ id: 'to_home' })}>
@@ -61,34 +70,30 @@ const TopPanel = () => {
                     </FormControl>
 
                     {!isSmall && <Divider orientation="vertical" flexItem />}
-
                     <FormControl sx={{ m: 1, minWidth: { xs: 120, sm: 230 } }}>
-                        {forTeacher ? (
-                            <SelectTeacherComponent allowMultipleTeachersRef={allowMultipleTeachersRef} />
+                        {scheduleFor === 'group' ? (
+                            <SelectGroupComponent allowMultipleRef={allowMultipleRef} />
+                        ) : scheduleFor === 'teacher' ? (
+                            <SelectTeacherComponent allowMultipleRef={allowMultipleRef} />
                         ) : (
-                            <SelectGroupComponent allowMultipleGroupsRef={allowMultipleGroupsRef} />
+                            <SelectAudienceComponent allowMultipleRef={allowMultipleRef} />
                         )}
                     </FormControl>
 
                     {!isSmall && <Divider orientation="vertical" flexItem />}
-
                     <FormControl sx={{ pl: 1 }}>
                         <IconButton
-                            onClick={() =>
-                                forTeacher
-                                    ? allowMultipleTeachersRef.current(!allowedMultipleTeachers)
-                                    : allowMultipleGroupsRef.current(!allowedMultipleGroups)
-                            }
-                            title={
-                                forTeacher
-                                    ? 'Разрешить выбор нескольких преподавателей'
-                                    : 'Разрешить выбор нескольких групп'
-                            }
+                            onClick={onChangeMultiple}
+                            title={`Разрешить выбор нескольких ${
+                                scheduleFor === 'group'
+                                    ? 'групп'
+                                    : scheduleFor === 'teacher'
+                                    ? 'преподавателей'
+                                    : 'аудиторий'
+                            }`}
                             color="inherit"
                             sx={{
-                                transform: (forTeacher ? allowedMultipleTeachers : allowedMultipleGroups)
-                                    ? 'rotate(180deg)'
-                                    : '',
+                                transform: allowedMultiple[scheduleFor] ? 'rotate(180deg)' : '',
                                 transition: 'transform 150ms ease',
                             }}
                         >
@@ -97,13 +102,14 @@ const TopPanel = () => {
                     </FormControl>
 
                     <FormControl sx={{ pl: 1 }}>
+                        {/* // * Switch between groups and teachers */}
                         <IconButton
                             component={NavLinkComponent}
-                            href={forTeacher ? '/group' : '/teacher'}
+                            href={scheduleFor === 'teacher' ? '/group' : '/teacher'}
                             color="inherit"
-                            title={forTeacher ? 'Расписание для группы' : 'Расписание для преподавателя'}
+                            title={scheduleFor === 'teacher' ? 'Расписание для группы' : 'Расписание для преподавателя'}
                             sx={{
-                                transform: !forTeacher ? 'rotate(180deg)' : '',
+                                transform: scheduleFor !== 'teacher' ? 'rotate(180deg)' : '',
                                 transition: 'transform 150ms ease',
                             }}
                         >
@@ -132,7 +138,6 @@ const TopPanel = () => {
                     )}
 
                     <Typography sx={{ flex: 1 }}></Typography>
-
                     <FormControl sx={{ mx: 1 }}>
                         <ThemeModeButton />
                     </FormControl>

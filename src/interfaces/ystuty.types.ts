@@ -1,5 +1,7 @@
 import { LessonFlags } from './schedule';
 
+export type ScheduleFor = 'group' | 'teacher' | 'audience';
+
 /**
  * Название института и массив групп
  */

@@ -1,19 +1,32 @@
 import React from 'react';
-import { Route } from 'react-router';
+import { useLocation } from 'react-router';
 
-import LazyLoadComponent from '../../components/LazyLoad.component';
 import TopPanelComponent from '../../components/TopPanel.component';
-
-const GroupScheduleView = LazyLoadComponent(React.lazy(() => import('./Group/Group.scheduleView')));
-const TeacherScheduleView = LazyLoadComponent(React.lazy(() => import('./Teacher/Teacher.scheduleView')));
+import SchedulerContainer from '../../containers/Scheduler/Scheduler.container';
+import { useScheduleLoader } from './scheduleLoader.hook';
+import { ScheduleFor } from '../../interfaces/ystuty.types';
 
 const SchedulePage = () => {
+    const { pathname } = useLocation();
+
+    const [scheduleFor, setScheduleFor] = React.useState<ScheduleFor>('group');
+
+    React.useEffect(() => {
+        if (pathname.startsWith('/group')) {
+            setScheduleFor('group');
+        } else if (pathname.startsWith('/teacher')) {
+            setScheduleFor('teacher');
+        } else if (pathname.startsWith('/by_audience')) {
+            setScheduleFor('audience');
+        }
+    }, [pathname, setScheduleFor]);
+
+    useScheduleLoader({ scheduleFor });
+
     return (
         <>
-            <TopPanelComponent />
-
-            <Route strict path="/group" component={GroupScheduleView} />
-            <Route strict path="/teacher" component={TeacherScheduleView} />
+            <TopPanelComponent scheduleFor={scheduleFor}/>
+            <SchedulerContainer scheduleFor={scheduleFor} />
         </>
     );
 };

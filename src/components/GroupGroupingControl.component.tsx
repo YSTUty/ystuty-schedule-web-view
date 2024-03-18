@@ -4,7 +4,9 @@ import { styled } from '@mui/material';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Collapse from '@mui/material/Collapse';
+
 import scheduleSlice from '../store/reducer/schedule/schedule.slice';
+import { ScheduleFor } from '../interfaces/ystuty.types';
 
 const StyledToggleButtonGroup = styled(ToggleButtonGroup)(() => ({
     '@media (max-width: 600px)': {
@@ -12,11 +14,16 @@ const StyledToggleButtonGroup = styled(ToggleButtonGroup)(() => ({
     },
 }));
 
-const GroupGroupingControl = () => {
-    const { groupsSplitColor, groupingGroups, isGroupByDate, selectedGroups, selectedTeachers } = useSelector(
-        (state) => state.schedule
-    );
+type GroupGroupingControlProps = {
+    scheduleFor: ScheduleFor;
+};
+
+const GroupGroupingControl: React.FC<GroupGroupingControlProps> = (props) => {
+    const { scheduleFor } = props;
+
     const dispatch = useDispatch();
+    const { groupsSplitColor, groupingGroups, isGroupByDate } = useSelector((state) => state.schedule);
+    const selectedItems = useSelector((state) => state.schedule.selectedItems[scheduleFor]);
 
     const handleChange = (event: React.MouseEvent<HTMLElement>, val: string) => {
         switch (val) {
@@ -33,9 +40,8 @@ const GroupGroupingControl = () => {
                 break;
         }
     };
-    const show = window.location.pathname.startsWith('/teacher')
-        ? selectedTeachers.length > 1
-        : selectedGroups.length > 1;
+
+    const show = selectedItems.length > 1;
 
     return (
         <Collapse sx={{ px: 1 }} in={show}>

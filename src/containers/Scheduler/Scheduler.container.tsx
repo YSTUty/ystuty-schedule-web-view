@@ -23,7 +23,13 @@ import {
     GroupingPanel,
     AllDayPanel,
 } from '@devexpress/dx-react-scheduler-material-ui';
-import { GroupingState, IntegratedGrouping, Resource, ViewState } from '@devexpress/dx-react-scheduler';
+import {
+    GroupingState,
+    IntegratedGrouping,
+    Resource,
+    SchedulerDateTime,
+    ViewState,
+} from '@devexpress/dx-react-scheduler';
 
 import RoomIcon from '@mui/icons-material/Room';
 import TimeIcon from '@mui/icons-material/MoreTime';
@@ -45,6 +51,7 @@ import scheduleSlice from '../../store/reducer/schedule/schedule.slice';
 import * as lessonsUtils from '../../utils/lessons.utils';
 
 import { LessonData, LessonFlags, WeekParityType } from '../../interfaces/schedule';
+import { ScheduleFor } from '../../interfaces/ystuty.types';
 
 import {
     classes as dxClasses,
@@ -58,23 +65,38 @@ import {
     ToolbarWithLoading,
 } from './dx.components';
 
-type ScheduleFor = 'group' | 'teacher';
+export interface AppointmentModel extends LessonData {
+    /** The start date. */
+    startDate: SchedulerDateTime;
+    /** The end date. */
+    endDate?: SchedulerDateTime;
+    /** The all day flag. */
+    allDay?: boolean;
+    /** The identifier. */
+    id?: number | string;
+    /** Specifies the appointment recurrence rule. */
+    rRule?: string | undefined;
+    /** Specifies dates excluded from recurrence. */
+    exDate?: string | undefined;
 
-type AdditionalData = {
+    // /** Any other properties. */
+    // [propertyName: string]: any;
+
     group?: string;
+    audienceName_?: string;
     scheduleFor: ScheduleFor;
-};
+}
 
 type AppointmentProps = Appointments.AppointmentProps & {
-    data: Appointments.AppointmentProps['data'] & LessonData & AdditionalData;
+    data: AppointmentModel;
 };
 
 type AppointmentContentProps = Appointments.AppointmentContentProps & {
-    data: Appointments.AppointmentContentProps['data'] & LessonData & AdditionalData;
+    data: AppointmentModel;
 };
 
 type AppointmentTooltipContentProps = AppointmentTooltip.ContentProps & {
-    appointmentData: AppointmentTooltip.ContentProps['appointmentData'] & LessonData & AdditionalData;
+    appointmentData: AppointmentModel;
 };
 
 const Appointment = ({ data, ...restProps }: AppointmentProps) => (
@@ -100,13 +122,19 @@ const AppointmentContent = ({ data, ...restProps }: AppointmentContentProps) => 
 
     if (data.group && data.scheduleFor === 'group') {
         title += ` [${data.group}]`;
-    }
-    if (data.teacherId && data.scheduleFor !== 'group') {
+    } else if (data.teacherId && data.scheduleFor === 'teacher') {
         title += ` [${
             data.teacherName || /* teachers?.find((e) => e.id === data.teacherId)?.name || */ data.teacherId
         }`;
         if (data.additionalTeacherName) {
             title += `/${data.additionalTeacherName}`;
+        }
+        title += ']';
+    } else if (data.audienceName_ && data.scheduleFor === 'audience') {
+        title += ` [`;
+        title += `${data.audienceName_}`;
+        if (data.additionalAuditoryName) {
+            title += `/${data.additionalAuditoryName}`;
         }
         title += ']';
     }
@@ -125,9 +153,9 @@ const AppointmentContent = ({ data, ...restProps }: AppointmentContentProps) => 
     }
 
     if (data.groups && data.groups.length > 0) {
-        title += `• Группы: ${data.groups.join(', ')}`;
+        title += `• Группы: ${data.groups.join(', ')}\n`;
     }
-    if (data.teacherName) {
+    if (data.teacherName || data.additionalTeacherName) {
         title += `• Преподаватель: ${data.teacherName}${
             data.additionalTeacherName ? `/${data.additionalTeacherName}` : ''
         }\n`;
@@ -168,6 +196,14 @@ const AppointmentContent = ({ data, ...restProps }: AppointmentContentProps) => 
                                   {']'}
                               </span>
                           )
+                        : data.scheduleFor === 'audience'
+                        ? data.audienceName_ && (
+                              <span style={{ fontSize: 10, fontWeight: 700, color: green['900'] }}>
+                                  {' '}
+                                  [{data.audienceName_}
+                                  {data.additionalAuditoryName && `/${data.additionalAuditoryName}`}]
+                              </span>
+                          )
                         : null}{' '}
                     {data.title}
                 </div>
@@ -183,13 +219,13 @@ const AppointmentContent = ({ data, ...restProps }: AppointmentContentProps) => 
                         {data.additionalAuditoryName && `/${data.additionalAuditoryName}`}
                     </div>
                 )}
-                {data.scheduleFor !== 'teacher' && data.teacherName && (
+                {data.scheduleFor !== 'teacher' && (data.teacherName || data.additionalTeacherName) && (
                     <div className={classNames(dxClasses.text, dxClasses.content)}>
                         • Преподаватель: {data.teacherName}
                         {data.additionalTeacherName && `/${data.additionalTeacherName}`}
                     </div>
                 )}
-                {data.scheduleFor !== 'group' && data.groups && (
+                {data.scheduleFor !== 'group' && data.groups && data.groups.length > 0 && (
                     <div className={classNames(dxClasses.text, dxClasses.content)}>
                         • Группы: {data.groups.join(', ')}
                     </div>
@@ -351,13 +387,16 @@ const AppointmentTooltipContent = ({ children, appointmentData, ...restProps }: 
 
 const TitleCellComponent = () => <AllDayPanel.TitleCell getMessage={(e) => (e === 'allDay' ? 'Весь день' : e)} />;
 
-const FlexibleSpace = ({ ...props }: Toolbar.FlexibleSpaceProps) => (
-    <StyledToolbarFlexibleSpace {...props} className={dxClasses.flexibleSpace}>
-        <LessonFilter />
-        <LessonTypeSelector />
-        <GroupGroupingControl />
-    </StyledToolbarFlexibleSpace>
-);
+const getFlexibleSpace =
+    (scheduleFor: ScheduleFor) =>
+    ({ ...props }: Toolbar.FlexibleSpaceProps) =>
+        (
+            <StyledToolbarFlexibleSpace {...props} className={dxClasses.flexibleSpace}>
+                <LessonFilter />
+                <LessonTypeSelector />
+                <GroupGroupingControl scheduleFor={scheduleFor} />
+            </StyledToolbarFlexibleSpace>
+        );
 
 const getResources = (scheduleFor: ScheduleFor, selectedItems: (number | string)[] = []) => {
     const resources: Resource[] = [];
@@ -365,9 +404,9 @@ const getResources = (scheduleFor: ScheduleFor, selectedItems: (number | string)
         resources.push({
             fieldName: 'group',
             title: 'Группа',
-            instances: selectedItems.map((e, i) => ({
-                id: e,
-                text: e as string,
+            instances: selectedItems.map((name, i) => ({
+                id: name,
+                text: name as string,
                 color: [green, blue, yellow, teal, red][i],
             })),
         });
@@ -388,6 +427,16 @@ const getResources = (scheduleFor: ScheduleFor, selectedItems: (number | string)
                 color: [green, blue, yellow, teal, red][i],
             })),
         });
+    } else if (scheduleFor === 'audience') {
+        resources.push({
+            fieldName: 'auditoryName',
+            title: 'Аудитория',
+            instances: selectedItems.map((name, i) => ({
+                id: name,
+                text: String(name),
+                color: [green, blue, yellow, teal, red][i],
+            })),
+        });
     }
 
     resources.push({
@@ -404,6 +453,8 @@ const getResources = (scheduleFor: ScheduleFor, selectedItems: (number | string)
             { id: LessonFlags.Exam, text: 'Экзамен', color: red },
             { id: LessonFlags.Library, text: 'Библиотека', color: teal },
             { id: LessonFlags.ResearchWork, text: 'Научно-исследовательская работа', color: yellow },
+            { id: LessonFlags.OrganizationalMeeting, text: 'Орг. собрание', color: yellow },
+            { id: LessonFlags.Unsupported, text: 'N/A', color: yellow },
             // etc...
         ],
         allowMultiple: true,
@@ -429,18 +480,14 @@ const SchedulerContainer: React.FC<MaterialSchedulerProps> = (props) => {
         fetchingSchedule,
     } = useSelector((state) => state.schedule);
 
-    const selectedItems = useSelector(
-        (state) => state.schedule[scheduleFor === 'group' ? 'selectedGroups' : 'selectedTeachers'],
-    );
-    const scheduleData = useSelector(
-        (state) => state.schedule[scheduleFor === 'group' ? 'studScheduleData' : 'teacherScheduleData'],
-    );
+    const selectedItems = useSelector((state) => state.schedule.selectedItems[scheduleFor]);
+    const scheduleData = useSelector((state) => state.schedule.scheduleData[scheduleFor]);
 
-    const [data, setData] = React.useState<
-        (LessonData & { startDate: Date; endDate: Date; allDay?: boolean } & AdditionalData)[]
-    >([]);
+    const [data, setData] = React.useState<AppointmentModel[]>([]);
 
     React.useEffect(() => {
+        if (!scheduleData) return;
+
         const isComparing = scheduleData.length > 1;
         const allowedLessonTypes: Partial<Record<LessonFlags, any>> = {};
         const data = [
@@ -452,15 +499,18 @@ const SchedulerContainer: React.FC<MaterialSchedulerProps> = (props) => {
                     const startDate = dayjs(e.start);
                     const endDate = dayjs(e.end);
                     const durationDays = endDate.diff(startDate, 'days');
+                    const durationHours = endDate.diff(startDate, 'hours');
                     return {
                         ...e,
                         startDate: startDate.toDate(),
                         endDate: endDate.toDate(),
                         scheduleFor,
-                        ...(durationDays > 0 && { allDay: true }),
+                        ...((durationDays > 0 || durationHours > 21) && { allDay: true }),
                         ...(scheduleFor === 'group'
-                            ? isComparing && { group: (data as { name: string }).name }
-                            : { teacherId: isComparing ? e.teacherId : undefined }),
+                            ? isComparing && { group: data.itemKey as string }
+                            : scheduleFor === 'teacher'
+                            ? { teacherId: isComparing ? e.teacherId : undefined }
+                            : isComparing && { audienceName_: e.auditoryName as string }),
                     };
                 }),
             ),
@@ -485,15 +535,21 @@ const SchedulerContainer: React.FC<MaterialSchedulerProps> = (props) => {
                         dataItem.auditoryName?.toLowerCase()?.includes(lowerCaseFilter) ||
                         dataItem.additionalAuditoryName?.toLowerCase()?.includes(lowerCaseFilter) ||
                         dataItem.additionalTeacherName?.toLowerCase()?.includes(lowerCaseFilter) ||
-                        (scheduleFor === 'group'
-                            ? dataItem.teacherName?.toLowerCase()?.includes(lowerCaseFilter)
-                            : dataItem.groups?.join(', ')?.toLowerCase()?.includes(lowerCaseFilter)),
+                        dataItem.teacherName?.toLowerCase()?.includes(lowerCaseFilter) ||
+                        (scheduleFor !== 'group' &&
+                            dataItem.groups?.join(', ')?.toLowerCase()?.includes(lowerCaseFilter)),
                 ),
         [data, lessonTypes, lowerCaseFilter],
     );
 
     const mainResourceName =
-        selectedItems.length > 1 && groupsSplitColor ? (scheduleFor === 'group' ? 'group' : 'teacherId') : 'typeArr';
+        selectedItems.length > 1 && groupsSplitColor
+            ? scheduleFor === 'group'
+                ? 'group'
+                : scheduleFor === 'teacher'
+                ? 'teacherId'
+                : 'auditoryName'
+            : 'typeArr';
     const hasGroupingGroups = selectedItems.length > 1 && groupingGroups;
 
     return (
@@ -529,7 +585,7 @@ const SchedulerContainer: React.FC<MaterialSchedulerProps> = (props) => {
                 <CurrentTimeIndicator shadePreviousCells shadePreviousAppointments updateInterval={60e3} />
                 <Toolbar
                     {...(fetchingSchedule ? { rootComponent: ToolbarWithLoading } : null)}
-                    flexibleSpaceComponent={FlexibleSpace}
+                    flexibleSpaceComponent={getFlexibleSpace(scheduleFor)}
                 />
                 <DateNavigator />
                 <ViewSwitcher />
