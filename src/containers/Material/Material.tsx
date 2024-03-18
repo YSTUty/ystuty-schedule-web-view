@@ -92,10 +92,14 @@ const AppointmentContent = ({
         title += `• Вид занятий: ${lessonsUtils.getLessonTypeStrArr(data.type).join(', ')}\n`;
     }
     if (data.auditoryName) {
-        title += `• Аудитория: ${data.auditoryName}\n`;
+        title += `• Аудитория: ${data.auditoryName}${
+            data.additionalAuditoryName ? `/${data.additionalAuditoryName}` : ''
+        }\n`;
     }
     if (data.teacherName) {
-        title += `• Преподаватель: ${data.teacherName}\n`;
+        title += `• Преподаватель: ${data.teacherName}${
+            data.additionalTeacherName ? `/${data.additionalTeacherName}` : ''
+        }\n`;
     }
     if (data.isDivision) {
         title += `• По П/Г\n`;
@@ -124,11 +128,13 @@ const AppointmentContent = ({
                 {data.auditoryName && (
                     <div className={classNames(dxClasses.text, dxClasses.content)}>
                         • Аудитория: {data.auditoryName}
+                        {data.additionalAuditoryName && `/${data.additionalAuditoryName}`}
                     </div>
                 )}
                 {data.teacherName && (
                     <div className={classNames(dxClasses.text, dxClasses.content)}>
                         • Преподаватель: {data.teacherName}
+                        {data.additionalTeacherName && `/${data.additionalTeacherName}`}
                     </div>
                 )}
                 {data.isDivision && <div className={classNames(dxClasses.text, dxClasses.content)}>• По П/Г</div>}
@@ -228,7 +234,10 @@ const AppointmentTooltipContent = ({
                     </StyledIcon>
                 </StyledGrid>
                 <Grid item xs={10}>
-                    <span>{appointmentData.teacherName}</span>
+                    <span>
+                        {appointmentData.teacherName}
+                        {appointmentData.additionalTeacherName && `/${appointmentData.additionalTeacherName}`}
+                    </span>
                 </Grid>
             </Grid>
         )}
@@ -367,6 +376,8 @@ const MaterialContainer = () => {
                     (dataItem) =>
                         dataItem.title?.toLowerCase()?.includes(lowerCaseFilter) ||
                         dataItem.auditoryName?.toLowerCase()?.includes(lowerCaseFilter) ||
+                        dataItem.additionalAuditoryName?.toLowerCase()?.includes(lowerCaseFilter) ||
+                        dataItem.additionalTeacherName?.toLowerCase()?.includes(lowerCaseFilter) ||
                         dataItem.teacherName?.toLowerCase()?.includes(lowerCaseFilter),
                 ),
         [data, lessonTypes, lowerCaseFilter],

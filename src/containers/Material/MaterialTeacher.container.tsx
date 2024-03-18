@@ -72,14 +72,18 @@ const AppointmentContent = ({
     data,
     ...restProps
 }: Appointments.AppointmentContentProps & {
-    data: Appointments.AppointmentContentProps['data'] & LessonData & { teacherId?: number };
+    data: Appointments.AppointmentContentProps['data'] & LessonData;
 }) => {
     let title = '';
     if (data.number) {
         title += `#${data.number}`;
     }
     if (data.teacherId) {
-        title += ` [${teachers?.find((e) => e.id === data.teacherId)?.name || data.teacherId}]`;
+        title += ` [${data.teacherName || teachers?.find((e) => e.id === data.teacherId)?.name || data.teacherId}`;
+        if (data.additionalTeacherName) {
+            title += `/${data.additionalTeacherName}`;
+        }
+        title += ']';
     }
     title += ` "${data.title}"\n`;
     if (data.timeRange) {
@@ -89,7 +93,9 @@ const AppointmentContent = ({
         title += `• Вид занятий: ${lessonsUtils.getLessonTypeStrArr(data.type).join(', ')}\n`;
     }
     if (data.auditoryName) {
-        title += `• Аудитория: ${data.auditoryName}\n`;
+        title += `• Аудитория: ${data.auditoryName}${
+            data.additionalAuditoryName ? `/${data.additionalAuditoryName}` : ''
+        }\n`;
     }
     if (data.groups) {
         title += `• Группы: ${data.groups.join(', ')}`;
@@ -109,7 +115,9 @@ const AppointmentContent = ({
                                     ?.split(' ')
                                     .map((e, i) => /* i === 0 ? e.slice(0, 5) : */ e[0])
                                     .join('.')
-                                    .trim())(teachers?.find((e) => e.id === data.teacherId)?.name) || data.teacherId}
+                                    .trim())(
+                                data.teacherName || teachers?.find((e) => e.id === data.teacherId)?.name,
+                            ) || data.teacherId}
                             {']'}
                         </span>
                     )}{' '}
@@ -124,6 +132,7 @@ const AppointmentContent = ({
                 {data.auditoryName && (
                     <div className={classNames(dxClasses.text, dxClasses.content)}>
                         • Аудитория: {data.auditoryName}
+                        {data.additionalAuditoryName && `/${data.additionalAuditoryName}`}
                     </div>
                 )}
                 {data.groups && (
@@ -141,7 +150,7 @@ const AppointmentTooltipContent = ({
     appointmentData,
     ...restProps
 }: AppointmentTooltip.ContentProps & {
-    appointmentData: AppointmentTooltip.ContentProps['appointmentData'] & LessonData & { teacherId?: number };
+    appointmentData: AppointmentTooltip.ContentProps['appointmentData'] & LessonData;
 }) => (
     <AppointmentTooltip.Content {...restProps} appointmentData={appointmentData}>
         {appointmentData.isDistant && (
@@ -280,9 +289,7 @@ const MaterialTeacherContainer = () => {
         fetchingSchedule,
         teacherScheduleData: scheduleData,
     } = useSelector((state) => state.schedule);
-    const [data, setData] = React.useState<
-        (LessonData & { startDate: Date; endDate: Date; teacherId?: number; allDay?: boolean })[]
-    >([]);
+    const [data, setData] = React.useState<(LessonData & { startDate: Date; endDate: Date; allDay?: boolean })[]>([]);
 
     React.useEffect(() => {
         const isComparing = scheduleData.length > 1;
@@ -301,7 +308,7 @@ const MaterialTeacherContainer = () => {
                         startDate: startDate.toDate(),
                         endDate: endDate.toDate(),
                         ...(durationDays > 0 && { allDay: true }),
-                        ...(isComparing && { teacherId: data.teacherId }),
+                        teacherId: isComparing ? e.teacherId : undefined,
                     };
                 }),
             ),
@@ -323,6 +330,8 @@ const MaterialTeacherContainer = () => {
                     (dataItem) =>
                         dataItem.title?.toLowerCase()?.includes(lowerCaseFilter) ||
                         dataItem.auditoryName?.toLowerCase()?.includes(lowerCaseFilter) ||
+                        dataItem.additionalAuditoryName?.toLowerCase()?.includes(lowerCaseFilter) ||
+                        dataItem.additionalTeacherName?.toLowerCase()?.includes(lowerCaseFilter) ||
                         dataItem.groups?.join(', ')?.toLowerCase()?.includes(lowerCaseFilter),
                 ),
         [data, lessonTypes, lowerCaseFilter],
