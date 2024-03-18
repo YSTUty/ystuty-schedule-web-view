@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import store2 from 'store2';
 
-import { LessonData, LessonFlags, TeacherLessonData } from '../../../interfaces/schedule';
+import { LessonData, LessonFlags } from '../../../interfaces/schedule';
 
 export const STORE_GROUP_NAME_KEY = 'lastGroupName';
 export const STORE_TEACHER_NAME_KEY = 'lastTeacherName';
@@ -44,7 +44,7 @@ const initialState = {
     }[],
     teacherScheduleData: [] as {
         teacherId: number;
-        data: TeacherLessonData[];
+        data: LessonData[];
     }[],
     allowedLessonTypes: [] as LessonFlags[],
 };
@@ -98,7 +98,7 @@ export const scheduleSlice = createSlice({
         setStudScheduleData: (state, action: PayloadAction<{ name: string; data: LessonData[] }[]>) => {
             state.studScheduleData = action.payload;
         },
-        setTeacherScheduleData: (state, action: PayloadAction<{ teacherId: number; data: TeacherLessonData[] }[]>) => {
+        setTeacherScheduleData: (state, action: PayloadAction<{ teacherId: number; data: LessonData[] }[]>) => {
             state.teacherScheduleData = action.payload;
         },
     },

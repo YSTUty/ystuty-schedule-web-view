@@ -6,7 +6,7 @@ import alertSlice from '../../store/reducer/alert/alert.slice';
 import scheduleSlice from '../../store/reducer/schedule/schedule.slice';
 import { apiPath } from '../../utils';
 
-import { LessonFlags, TeacherOneWeekDto, TeacherLessonData } from '../../interfaces/schedule';
+import { LessonFlags, OneWeekDto, LessonData } from '../../interfaces/schedule';
 import { ITeacherData } from '../../interfaces/ystuty.types';
 
 const STORE_CACHED_TEACHER_KEY_OLD = 'CACHED_TEACHER_LESSONS::';
@@ -20,10 +20,10 @@ export const useTeacherScheduleLoader = () => {
     const [isCached, setIsCached] = React.useState(false);
 
     const [schedulesData, setSchedulesData] =
-        React.useState<Record<string, { time: number; sources: TeacherLessonData[] }>>();
+        React.useState<Record<string, { time: number; sources: LessonData[] }>>();
 
     const formatData = React.useCallback(
-        (teacherId: number, items: TeacherOneWeekDto[] | null) => {
+        (teacherId: number, items: OneWeekDto[] | null) => {
             if (!items) {
                 const stored = store2.get(STORE_CACHED_TEACHER_KEY + teacherId, null);
                 items = stored?.items;
@@ -51,7 +51,7 @@ export const useTeacherScheduleLoader = () => {
                         })),
                     ),
                 ],
-                [] as TeacherLessonData[],
+                [] as LessonData[],
             );
 
             setSchedulesData((state) => ({ ...state, [teacherId]: { time: Date.now(), sources } }));
@@ -79,7 +79,7 @@ export const useTeacherScheduleLoader = () => {
                             | {
                                   isCache: boolean;
                                   teacher: ITeacherData;
-                                  items: TeacherOneWeekDto[];
+                                  items: OneWeekDto[];
                               }
                             | { error: { error: string; message: string } },
                     ) => {

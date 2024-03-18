@@ -2,6 +2,10 @@ import { LessonFlags, WeekParityType } from './schedule.enums';
 
 export interface LessonDto {
     /**
+     * Названия групп
+     */
+    groups?: string[];
+    /**
      * Порядковый номер пары на дню
      */
     number: number;
@@ -12,10 +16,12 @@ export interface LessonDto {
     timeRange: string;
     /**
      * Timestamp начала пары
+     * @example '2024-06-04T09:20:00.000Z'
      */
     startAt?: string | Date;
     /**
      * Timestamp конца пары
+     * @example '2024-06-04T12:30:00.000Z'
      */
     endAt?: string | Date;
     /**
@@ -35,7 +41,7 @@ export interface LessonDto {
     /**
      * Название предмета пары
      */
-    lessonName: string;
+    lessonName?: string;
     /**
      * Флаг типа пары
      */
@@ -69,11 +75,23 @@ export interface LessonDto {
      */
     auditoryName?: string;
     /**
+     * Буква корпуса и номер дополнительной аудитори
+     */
+    additionalAuditoryName?: string;
+    /**
      * ФИО преподователя
      *
      * @example 'Иванов ИИ'
      */
     teacherName?: string;
+    teacherId?: number;
+    /**
+     * ФИО второго преподователя
+     *
+     * @example 'Иванов ИИ'
+     */
+    additionalTeacherName?: string;
+    additionalTeacherId?: number;
     /**
      * Дополнительная информация
      */

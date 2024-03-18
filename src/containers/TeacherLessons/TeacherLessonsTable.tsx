@@ -22,7 +22,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import scheduleSlice from '../../store/reducer/schedule/schedule.slice';
 import * as lessonsUtils from '../../utils/lessons.utils';
 
-import { LessonFlags, TeacherLessonData } from '../../interfaces/schedule';
+import { LessonFlags, LessonData } from '../../interfaces/schedule';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
@@ -135,7 +135,7 @@ const TeacherLessonsTable: React.FC = () => {
         teacherScheduleData: scheduleData,
     } = useSelector((state) => state.schedule);
 
-    const [data, setData] = React.useState<TeacherLessonData[]>([]);
+    const [data, setData] = React.useState<LessonData[]>([]);
 
     React.useEffect(() => {
         const allowedLessonTypes: Partial<Record<LessonFlags, any>> = {};
@@ -164,6 +164,8 @@ const TeacherLessonsTable: React.FC = () => {
                 .filter((item) => lessonTypes.length < 1 || lessonTypes.some((type) => item.typeArr.includes(type)))
                 .filter((dataItem) => dataItem.groups?.join(', ')?.toLowerCase()?.includes(lowerCaseFilter))
                 .reduce((acc, item) => {
+                    if (!item.lessonName) return acc;
+
                     if (!(item.lessonName in acc)) {
                         acc[item.lessonName] = {
                             lessonName: item.lessonName,
@@ -188,7 +190,7 @@ const TeacherLessonsTable: React.FC = () => {
                         LessonFlags.ResearchWork,
                     ];
 
-                    for (const group of item.groups) {
+                    for (const group of item.groups!) {
                         // if (!(group in lesson.groups)) {
                         //     lesson.groups[group] = 0;
                         // }

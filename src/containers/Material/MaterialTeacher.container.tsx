@@ -40,7 +40,7 @@ import { getTeachers } from '../../components/SelectTeacher.component';
 import scheduleSlice from '../../store/reducer/schedule/schedule.slice';
 import * as lessonsUtils from '../../utils/lessons.utils';
 
-import { LessonFlags, TeacherLessonData } from '../../interfaces/schedule';
+import { LessonFlags, LessonData } from '../../interfaces/schedule';
 
 import {
     classes as dxClasses,
@@ -72,7 +72,7 @@ const AppointmentContent = ({
     data,
     ...restProps
 }: Appointments.AppointmentContentProps & {
-    data: Appointments.AppointmentContentProps['data'] & TeacherLessonData & { teacherId?: number };
+    data: Appointments.AppointmentContentProps['data'] & LessonData & { teacherId?: number };
 }) => {
     let title = '';
     if (data.number) {
@@ -141,7 +141,7 @@ const AppointmentTooltipContent = ({
     appointmentData,
     ...restProps
 }: AppointmentTooltip.ContentProps & {
-    appointmentData: AppointmentTooltip.ContentProps['appointmentData'] & TeacherLessonData & { teacherId?: number };
+    appointmentData: AppointmentTooltip.ContentProps['appointmentData'] & LessonData & { teacherId?: number };
 }) => (
     <AppointmentTooltip.Content {...restProps} appointmentData={appointmentData}>
         {appointmentData.isDistant && (
@@ -194,7 +194,7 @@ const AppointmentTooltipContent = ({
                 </Grid>
             </Grid>
         )}
-        {appointmentData.groups.length > 0 && (
+        {appointmentData.groups!.length > 0 && (
             <Grid container alignItems="center">
                 <StyledGrid item xs={2} className={dxClasses.textCenter}>
                     <StyledIcon className={dxClasses.icon}>
@@ -202,7 +202,7 @@ const AppointmentTooltipContent = ({
                     </StyledIcon>
                 </StyledGrid>
                 <Grid item xs={10}>
-                    <span>{appointmentData.groups.join(', ')}</span>
+                    <span>{appointmentData.groups!.join(', ')}</span>
                 </Grid>
             </Grid>
         )}
@@ -281,7 +281,7 @@ const MaterialTeacherContainer = () => {
         teacherScheduleData: scheduleData,
     } = useSelector((state) => state.schedule);
     const [data, setData] = React.useState<
-        (TeacherLessonData & { startDate: Date; endDate: Date; teacherId?: number; allDay?: boolean })[]
+        (LessonData & { startDate: Date; endDate: Date; teacherId?: number; allDay?: boolean })[]
     >([]);
 
     React.useEffect(() => {
