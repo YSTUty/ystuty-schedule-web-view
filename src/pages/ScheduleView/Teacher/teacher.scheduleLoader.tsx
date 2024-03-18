@@ -2,12 +2,12 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import store2 from 'store2';
 
-import alertSlice from '../../store/reducer/alert/alert.slice';
-import scheduleSlice from '../../store/reducer/schedule/schedule.slice';
-import { apiPath } from '../../utils';
+import alertSlice from '../../../store/reducer/alert/alert.slice';
+import scheduleSlice from '../../../store/reducer/schedule/schedule.slice';
+import { apiPath } from '../../../utils';
 
-import { LessonFlags, OneWeekDto, LessonData } from '../../interfaces/schedule';
-import { ITeacherData } from '../../interfaces/ystuty.types';
+import { LessonFlags, OneWeekDto, LessonData } from '../../../interfaces/schedule';
+import { ITeacherData } from '../../../interfaces/ystuty.types';
 
 const STORE_CACHED_TEACHER_KEY_OLD = 'CACHED_TEACHER_LESSONS::';
 const STORE_CACHED_TEACHER_KEY_OLD2 = 'CACHED_V2_TEACHER_LESSONS::';

@@ -27,20 +27,22 @@ import { GroupingState, IntegratedGrouping, ViewState } from '@devexpress/dx-rea
 
 import RoomIcon from '@mui/icons-material/Room';
 import TimeIcon from '@mui/icons-material/MoreTime';
-import GroupsIcon from '@mui/icons-material/Groups2';
+import TeacherIcon from '@mui/icons-material/PermIdentity';
 import LessonIcon from '@mui/icons-material/BookRounded';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import DivisionGroupsIcon from '@mui/icons-material/PeopleOutlined';
+import StreamGroupsIcon from '@mui/icons-material/Groups';
 import OnlinePredictionIcon from '@mui/icons-material/OnlinePrediction';
 import InfoIcon from '@mui/icons-material/Info';
 
 import LessonFilter from '../../components/LessonFilter.component';
 import LessonTypeSelector from '../../components/LessonTypeSelector.component';
 import GroupGroupingControl from '../../components/GroupGroupingControl.component';
-import { getTeachers } from '../../components/SelectTeacher.component';
 
 import scheduleSlice from '../../store/reducer/schedule/schedule.slice';
 import * as lessonsUtils from '../../utils/lessons.utils';
 
-import { LessonFlags, LessonData } from '../../interfaces/schedule';
+import { LessonData, LessonFlags, WeekParityType } from '../../interfaces/schedule';
 
 import {
     classes as dxClasses,
@@ -62,6 +64,7 @@ const Appointment = ({ data, ...restProps }: Appointments.AppointmentProps) => (
             [dxClasses.parityOddAppointment]: data.parity === 1,
             [dxClasses.parityEvenAppointment]: data.parity === 2,
             [dxClasses.distantAppointment]: data.isDistant,
+            [dxClasses.streamAppointment]: data.isStream,
             [dxClasses.appointment]: true,
         })}
         data={data}
@@ -72,18 +75,14 @@ const AppointmentContent = ({
     data,
     ...restProps
 }: Appointments.AppointmentContentProps & {
-    data: Appointments.AppointmentContentProps['data'] & LessonData;
+    data: Appointments.AppointmentContentProps['data'] & LessonData & { group?: string };
 }) => {
     let title = '';
     if (data.number) {
         title += `#${data.number}`;
     }
-    if (data.teacherId) {
-        title += ` [${data.teacherName || teachers?.find((e) => e.id === data.teacherId)?.name || data.teacherId}`;
-        if (data.additionalTeacherName) {
-            title += `/${data.additionalTeacherName}`;
-        }
-        title += ']';
+    if (data.group) {
+        title += ` [${data.group}]`;
     }
     title += ` "${data.title}"\n`;
     if (data.timeRange) {
@@ -97,8 +96,16 @@ const AppointmentContent = ({
             data.additionalAuditoryName ? `/${data.additionalAuditoryName}` : ''
         }\n`;
     }
-    if (data.groups) {
-        title += `• Группы: ${data.groups.join(', ')}`;
+    if (data.teacherName) {
+        title += `• Преподаватель: ${data.teacherName}${
+            data.additionalTeacherName ? `/${data.additionalTeacherName}` : ''
+        }\n`;
+    }
+    if (data.isDivision) {
+        title += `• По П/Г\n`;
+    }
+    if (data.isStream) {
+        title += `• В потоке`;
     }
 
     return (
@@ -107,19 +114,8 @@ const AppointmentContent = ({
                 {/* Дисциплина */}
                 <div className={dxClasses.text}>
                     {data.number && <>#{data.number}</>}
-                    {data.teacherId && (
-                        <span style={{ fontSize: 10, fontWeight: 700, color: green['900'] }}>
-                            {' ['}
-                            {((e?: string) =>
-                                e
-                                    ?.split(' ')
-                                    .map((e, i) => /* i === 0 ? e.slice(0, 5) : */ e[0])
-                                    .join('.')
-                                    .trim())(
-                                data.teacherName || teachers?.find((e) => e.id === data.teacherId)?.name,
-                            ) || data.teacherId}
-                            {']'}
-                        </span>
+                    {data.group && (
+                        <span style={{ fontSize: 10, fontWeight: 700, color: green['900'] }}> [{data.group}]</span>
                     )}{' '}
                     {data.title}
                 </div>
@@ -135,11 +131,14 @@ const AppointmentContent = ({
                         {data.additionalAuditoryName && `/${data.additionalAuditoryName}`}
                     </div>
                 )}
-                {data.groups && (
+                {data.teacherName && (
                     <div className={classNames(dxClasses.text, dxClasses.content)}>
-                        • Группы: {data.groups.join(', ')}
+                        • Преподаватель: {data.teacherName}
+                        {data.additionalTeacherName && `/${data.additionalTeacherName}`}
                     </div>
                 )}
+                {data.isDivision && <div className={classNames(dxClasses.text, dxClasses.content)}>• По П/Г</div>}
+                {data.isStream && <div className={classNames(dxClasses.text, dxClasses.content)}>• В потоке</div>}
             </div>
         </StyledAppointmentsAppointmentContent>
     );
@@ -150,7 +149,7 @@ const AppointmentTooltipContent = ({
     appointmentData,
     ...restProps
 }: AppointmentTooltip.ContentProps & {
-    appointmentData: AppointmentTooltip.ContentProps['appointmentData'] & LessonData;
+    appointmentData: AppointmentTooltip.ContentProps['appointmentData'] & LessonData & { group?: string };
 }) => (
     <AppointmentTooltip.Content {...restProps} appointmentData={appointmentData}>
         {appointmentData.isDistant && (
@@ -203,15 +202,70 @@ const AppointmentTooltipContent = ({
                 </Grid>
             </Grid>
         )}
-        {appointmentData.groups!.length > 0 && (
+        {appointmentData.isStream && (
             <Grid container alignItems="center">
                 <StyledGrid item xs={2} className={dxClasses.textCenter}>
                     <StyledIcon className={dxClasses.icon}>
-                        <GroupsIcon />
+                        <StreamGroupsIcon />
                     </StyledIcon>
                 </StyledGrid>
                 <Grid item xs={10}>
-                    <span>{appointmentData.groups!.join(', ')}</span>
+                    В потоке
+                </Grid>
+            </Grid>
+        )}
+        {appointmentData.isDivision && (
+            <Grid container alignItems="center">
+                <StyledGrid item xs={2} className={dxClasses.textCenter}>
+                    <StyledIcon className={dxClasses.icon}>
+                        <DivisionGroupsIcon />
+                    </StyledIcon>
+                </StyledGrid>
+                <Grid item xs={10}>
+                    По П/Г
+                </Grid>
+            </Grid>
+        )}
+        {appointmentData.teacherName && (
+            <Grid container alignItems="center">
+                <StyledGrid item xs={2} className={dxClasses.textCenter}>
+                    <StyledIcon className={dxClasses.icon}>
+                        <TeacherIcon />
+                    </StyledIcon>
+                </StyledGrid>
+                <Grid item xs={10}>
+                    <span>
+                        {appointmentData.teacherName}
+                        {appointmentData.additionalTeacherName && `/${appointmentData.additionalTeacherName}`}
+                    </span>
+                </Grid>
+            </Grid>
+        )}
+        {appointmentData.subInfo && (
+            <Grid container alignItems="center">
+                <StyledGrid item xs={2} className={dxClasses.textCenter}>
+                    <StyledIcon className={dxClasses.icon}>
+                        <InfoIcon />
+                    </StyledIcon>
+                </StyledGrid>
+                <Grid item xs={10}>
+                    <span>
+                        <i>
+                            <b>{appointmentData.subInfo}</b>
+                        </i>
+                    </span>
+                </Grid>
+            </Grid>
+        )}
+        {appointmentData.parity !== WeekParityType.CUSTOM && (
+            <Grid container alignItems="center">
+                <StyledGrid item xs={2} className={dxClasses.textCenter}>
+                    <StyledIcon className={dxClasses.icon}>
+                        <CalendarTodayIcon />
+                    </StyledIcon>
+                </StyledGrid>
+                <Grid item xs={10}>
+                    Только на <b>{appointmentData.parity === WeekParityType.EVEN ? '' : 'не'}четной</b> неделе
                 </Grid>
             </Grid>
         )}
@@ -240,22 +294,11 @@ const FlexibleSpace = ({ ...props }: Toolbar.FlexibleSpaceProps) => (
     </StyledToolbarFlexibleSpace>
 );
 
-const teachers = getTeachers();
-const getResources = (selectedTeachers: number[] = []) => [
+const getResources = (selectedGroups: string[] = []) => [
     {
-        fieldName: 'teacherId',
-        title: 'Преподаватель',
-        instances: selectedTeachers.map((id, i) => ({
-            id,
-            text:
-                ((e?: string) =>
-                    e
-                        ?.split(' ')
-                        .map((e, i) => /* i === 0 ? e.slice(0, 5) : */ e[0])
-                        .join('.')
-                        .trim())(teachers?.find((e) => e.id === id)?.name) || `#${id}`,
-            color: [green, blue, yellow, teal, red][i],
-        })),
+        fieldName: 'group',
+        title: 'Группа',
+        instances: selectedGroups.map((e, i) => ({ id: e, text: e, color: [green, blue, yellow, teal, red][i] })),
     },
     {
         fieldName: 'typeArr',
@@ -277,19 +320,21 @@ const getResources = (selectedTeachers: number[] = []) => [
     },
 ];
 
-const MaterialTeacherContainer = () => {
+const GroupScheduler = () => {
     const dispatch = useDispatch();
     const {
         lessonTypes,
         lessonFilter = '',
-        selectedTeachers,
         groupsSplitColor,
         groupingGroups,
         isGroupByDate,
         fetchingSchedule,
-        teacherScheduleData: scheduleData,
+        selectedGroups: selectedItems,
+        studScheduleData: scheduleData,
     } = useSelector((state) => state.schedule);
-    const [data, setData] = React.useState<(LessonData & { startDate: Date; endDate: Date; allDay?: boolean })[]>([]);
+    const [data, setData] = React.useState<
+        (LessonData & { startDate: Date; endDate: Date; group?: string; allDay?: boolean })[]
+    >([]);
 
     React.useEffect(() => {
         const isComparing = scheduleData.length > 1;
@@ -308,11 +353,12 @@ const MaterialTeacherContainer = () => {
                         startDate: startDate.toDate(),
                         endDate: endDate.toDate(),
                         ...(durationDays > 0 && { allDay: true }),
-                        teacherId: isComparing ? e.teacherId : undefined,
+                        ...(isComparing && { group: data.name }),
                     };
                 }),
             ),
         ];
+
         dispatch(
             scheduleSlice.actions.setAllowedLessonTypes(
                 Object.keys(allowedLessonTypes).map((e) => Number(e)) as LessonFlags[],
@@ -332,13 +378,13 @@ const MaterialTeacherContainer = () => {
                         dataItem.auditoryName?.toLowerCase()?.includes(lowerCaseFilter) ||
                         dataItem.additionalAuditoryName?.toLowerCase()?.includes(lowerCaseFilter) ||
                         dataItem.additionalTeacherName?.toLowerCase()?.includes(lowerCaseFilter) ||
-                        dataItem.groups?.join(', ')?.toLowerCase()?.includes(lowerCaseFilter),
+                        dataItem.teacherName?.toLowerCase()?.includes(lowerCaseFilter),
                 ),
         [data, lessonTypes, lowerCaseFilter],
     );
 
-    const mainResourceName = selectedTeachers.length > 1 && groupsSplitColor ? 'teacherId' : 'typeArr';
-    const hasGroupingGroups = selectedTeachers.length > 1 && groupingGroups;
+    const mainResourceName = selectedItems.length > 1 && groupsSplitColor ? 'group' : 'typeArr';
+    const hasGroupingGroups = selectedItems.length > 1 && groupingGroups;
 
     return (
         <Paper style={{ height: 'calc(100vh - 56px)' }}>
@@ -368,7 +414,7 @@ const MaterialTeacherContainer = () => {
                 />
                 <AppointmentTooltip contentComponent={AppointmentTooltipContent as any} />
                 <AppointmentForm readOnly />
-                <Resources data={getResources(selectedTeachers)} mainResourceName={mainResourceName} />
+                <Resources data={getResources(selectedItems)} mainResourceName={mainResourceName} />
 
                 <CurrentTimeIndicator shadePreviousCells shadePreviousAppointments updateInterval={60e3} />
                 <Toolbar
@@ -386,4 +432,4 @@ const MaterialTeacherContainer = () => {
     );
 };
 
-export default MaterialTeacherContainer;
+export default GroupScheduler;

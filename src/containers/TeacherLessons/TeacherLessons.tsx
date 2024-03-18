@@ -16,7 +16,7 @@ import VK, { Like } from '../../components/VK';
 import { ThemeModeButton } from '../../components/ThemeMode.component';
 import NavLinkComponent from '../../components/NavLink.component';
 import { SelectTeacherComponent } from '../../components/SelectTeacher.component';
-import { useTeacherScheduleLoader } from '../TeacherScheduleView/teacherScheduleLoader.util';
+import { useTeacherScheduleLoader } from '../../pages/ScheduleView/Teacher/teacher.scheduleLoader';
 import TeacherLessonsTable from './TeacherLessonsTable';
 
 import * as envUtils from '../../utils/env.utils';

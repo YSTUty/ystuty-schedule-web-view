@@ -3,11 +3,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import store2 from 'store2';
 // import { useNetworkState } from 'react-use';
 
-import alertSlice from '../../store/reducer/alert/alert.slice';
-import scheduleSlice from '../../store/reducer/schedule/schedule.slice';
-import { apiPath } from '../../utils';
+import alertSlice from '../../../store/reducer/alert/alert.slice';
+import scheduleSlice from '../../../store/reducer/schedule/schedule.slice';
+import { apiPath } from '../../../utils';
 
-import { LessonData, LessonFlags, OneWeekDto } from '../../interfaces/schedule';
+import { LessonData, LessonFlags, OneWeekDto } from '../../../interfaces/schedule';
 
 const STORE_CACHED_GROUP_KEY_OLD = 'CACHED_GROUP::';
 const STORE_CACHED_GROUP_KEY_OLD2 = 'CACHED_V2_GROUP::';

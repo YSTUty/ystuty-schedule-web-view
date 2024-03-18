@@ -8,7 +8,7 @@ import store, { history } from './store';
 
 import './index.css';
 
-import Routes from './containers/Routes/Routes';
+import AppContainer from './containers/App/App.container';
 import { ThemeModeProvider } from './components/ThemeMode.component';
 import { YandexMetrika } from './components/YandexMetrika.component';
 import LocalizerComponent from './components/Localizer.component';
@@ -26,7 +26,7 @@ ReactDOM.render(
                     <Router history={history}>
                         <ServiceWorkerProvider>
                             <LoadingUpdatesComponent>
-                                <Routes />
+                                <AppContainer />
                             </LoadingUpdatesComponent>
                         </ServiceWorkerProvider>
                     </Router>
