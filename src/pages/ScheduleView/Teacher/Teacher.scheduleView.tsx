@@ -1,14 +1,10 @@
-import TeacherScheduler from '../../../containers/MaterialScheduler/Teacher.scheduler';
 import { useTeacherScheduleLoader } from './teacher.scheduleLoader';
+import SchedulerContainer from '../../../containers/Scheduler/Scheduler.container';
 
 const TeacherScheduleView = () => {
     useTeacherScheduleLoader();
 
-    return (
-        <>
-            <TeacherScheduler />
-        </>
-    );
+    return <SchedulerContainer scheduleFor="teacher" />;
 };
 
 export default TeacherScheduleView;

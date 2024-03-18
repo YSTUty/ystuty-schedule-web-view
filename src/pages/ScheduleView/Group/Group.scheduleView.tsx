@@ -1,14 +1,10 @@
-import GroupScheduler from '../../../containers/MaterialScheduler/Group.scheduler';
 import { useScheduleLoader } from './group.scheduleLoader';
+import SchedulerContainer from '../../../containers/Scheduler/Scheduler.container';
 
-const ScheduleView = () => {
+const GroupScheduleView = () => {
     useScheduleLoader();
 
-    return (
-        <>
-            <GroupScheduler />
-        </>
-    );
+    return <SchedulerContainer scheduleFor="group" />;
 };
 
-export default ScheduleView;
+export default GroupScheduleView;
