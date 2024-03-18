@@ -400,12 +400,12 @@ const MaterialContainer = () => {
                 )}
 
                 <MonthView
+                    displayName="Месяц"
                     dayScaleCellComponent={DayScaleCell}
                     timeTableCellComponent={getTimeTableCell(hasGroupingGroups)}
                 />
-                <WeekView startDayHour={6} endDayHour={23} excludedDays={[0]} />
-                {/* <DayView displayName="Days" startDayHour={6} endDayHour={23} intervalCount={3} /> */}
-                <DayView startDayHour={6} endDayHour={23} />
+                <WeekView displayName="Неделя" startDayHour={6} endDayHour={23} excludedDays={[0]} />
+                <DayView displayName="День" startDayHour={6} endDayHour={23} intervalCount={1} />
                 <AllDayPanel titleCellComponent={TitleCellComponent} />
 
                 <Appointments
