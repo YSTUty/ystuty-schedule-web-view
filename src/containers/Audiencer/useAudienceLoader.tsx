@@ -81,8 +81,7 @@ const useAudienceLoader = () => {
 
         setFetchingAudience(true);
 
-        // TODO: need implement this method
-        fetch(`${apiPath}/v1/schedule/audiences`)
+        fetch(`${apiPath}/v1/schedule/actual_audiences`)
             .then((response) => response.json())
             .then(
                 (

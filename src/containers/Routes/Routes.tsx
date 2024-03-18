@@ -1,5 +1,5 @@
 import React from 'react';
-import { Route, Switch, useLocation } from 'react-router';
+import { Route, Switch, Redirect, useLocation } from 'react-router';
 import { useNetworkState } from 'react-use';
 import store2 from 'store2';
 
@@ -58,7 +58,8 @@ const Routes = () => {
             <Switch>
                 <Route exact path="/" component={App} />
                 <Route strict path="/(group|teacher)" component={Schedule} />
-                <Route path="/audience" component={Audiencer} />
+                {/* <Route path="/audience" component={Audiencer} /> */}
+                <Redirect path="/audience" to="/" />
                 <Route path="/teacher-lessons" component={TeacherLessons} />
                 <Route component={() => <b>not found</b>} />
             </Switch>

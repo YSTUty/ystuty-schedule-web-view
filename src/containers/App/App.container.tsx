@@ -18,7 +18,7 @@ import SvgIcon from '@mui/material/SvgIcon';
 
 import ImportExportIcon from '@mui/icons-material/ImportExportSharp';
 import SchoolIcon from '@mui/icons-material/School';
-import AudienceIcon from '@mui/icons-material/DoorSliding';
+// import AudienceIcon from '@mui/icons-material/DoorSliding';
 import TelegramIcon from '@mui/icons-material/Telegram';
 import { ReactComponent as VkSvg } from '../../assets/img/vk-logo.svg';
 
@@ -137,7 +137,7 @@ const App = () => {
                             <Button to={'/teacher'} component={NavLinkComponent} title="Расписание по преподавателям">
                                 Для преподавателей 👨🏼‍🏫👩🏼‍🏫
                             </Button>
-                            <Button
+                            {/* <Button
                                 to={'/audience'}
                                 component={NavLinkComponent}
                                 endIcon={<AudienceIcon />}
@@ -145,7 +145,7 @@ const App = () => {
                                 size="medium"
                             >
                                 Аудитории
-                            </Button>
+                            </Button> */}
                         </ButtonGroup>
                     </Box>
 
@@ -201,10 +201,10 @@ const App = () => {
                         <NavLinkComponent to="/teacher-lessons" style={{ color: 'grey' }}>
                             Список предметов по преподавателям
                         </NavLinkComponent>
-                        <br />
+                        {/* <br />
                         <NavLinkComponent to="/audience/month" style={{ color: 'grey' }}>
                             Статистика аудиторий по месяцам
-                        </NavLinkComponent>
+                        </NavLinkComponent> */}
                     </Typography>
                 </Paper>
             </Container>
