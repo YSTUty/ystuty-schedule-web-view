@@ -16,6 +16,7 @@ declare namespace NodeJS {
         readonly REACT_APP_LINK_2GH?: string;
         readonly REACT_APP_LINK_2VK?: string;
         readonly REACT_APP_LINK_2ICS?: string;
+        readonly REACT_APP_LINK_SUPPORT?: string;
 
         readonly REACT_APP_VK_WIDGETS_API_ID?: string;
     }

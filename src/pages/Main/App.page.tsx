@@ -20,6 +20,7 @@ import ImportExportIcon from '@mui/icons-material/ImportExportSharp';
 import SchoolIcon from '@mui/icons-material/School';
 import AudienceIcon from '@mui/icons-material/DoorSliding';
 import TelegramIcon from '@mui/icons-material/Telegram';
+import SupportAgentIcon from '@mui/icons-material/SupportAgentSharp';
 import { ReactComponent as VkSvg } from '../../assets/img/vk-logo.svg';
 
 import VK, { Like } from '../../components/VK';
@@ -194,6 +195,30 @@ const MainPage = () => {
                                     </Button>
                                 )}
                             </ButtonGroup>
+                        </Box>
+                    )}
+
+                    {envUtils.linkToSupport && (
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                mt: 2,
+                                '& > *': { m: 1 },
+                            }}
+                        >
+                            <Button
+                                href={envUtils.linkToSupport}
+                                target="_blank"
+                                component={Link}
+                                color="warning"
+                                variant="outlined"
+                                endIcon={<SupportAgentIcon />}
+                                title="Поддержка/Задать вопрос/Что-нибудь предложить"
+                            >
+                                Поддержка
+                            </Button>
                         </Box>
                     )}
 
