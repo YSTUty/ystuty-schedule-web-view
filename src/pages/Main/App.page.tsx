@@ -133,10 +133,10 @@ const MainPage = () => {
                                 endIcon={<SchoolIcon />}
                                 title="Расписание по группам"
                             >
-                                Для студентов
+                                По группам
                             </Button>
                             <Button to={'/teacher'} component={NavLinkComponent} title="Расписание по преподавателям">
-                                Для преподавателей 👨🏼‍🏫👩🏼‍🏫
+                                По преподавателям 👨🏼‍🏫👩🏼‍🏫
                             </Button>
                             <Button
                                 to={'/by_audience'}
@@ -145,81 +145,92 @@ const MainPage = () => {
                                 title="Расписание по аудиториям"
                                 size="medium"
                             >
-                                Аудитории
+                                По аудиториям
                             </Button>
                         </ButtonGroup>
                     </Box>
 
                     {(envUtils.telegramBotName || envUtils.vkBotGroupName) && (
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',
-                                mt: 2,
-                                '& > *': { m: 1 },
-                            }}
-                        >
-                            <Typography component="h6" variant="body2" align="center">
-                                Добавь бота в свою беседу
-                            </Typography>
-                            <ButtonGroup size="large" orientation="vertical">
-                                {envUtils.telegramBotName && (
-                                    <Button
-                                        href={`https://t.me/${envUtils.telegramBotName}${
-                                            groupNameConv ? `?start=g_${groupNameConv}` : ''
-                                        }`}
-                                        target="_blank"
-                                        component={Link}
-                                        color="primary"
-                                        variant="contained"
-                                        endIcon={<TelegramIcon />}
-                                        title="Бот расписания в Telegram"
-                                    >
-                                        Telegram бот расписания
-                                    </Button>
-                                )}
-                                {envUtils.vkBotGroupName && (
-                                    <Button
-                                        href={`https://vk.me/${envUtils.vkBotGroupName}${
-                                            groupNameConv ? `?ref=g_${groupNameConv}` : ''
-                                        }`}
-                                        target="_blank"
-                                        component={Link}
-                                        color="primary"
-                                        variant="outlined"
-                                        endIcon={<SvgIcon component={VkSvg} inheritViewBox />}
-                                        title="Бот расписания в VK"
-                                    >
-                                        VK бот расписания
-                                    </Button>
-                                )}
-                            </ButtonGroup>
-                        </Box>
+                        <>
+                            <Divider sx={{ my: 2 }} />
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    mt: 2,
+                                    '& > *': { m: 1 },
+                                }}
+                            >
+                                <Typography component="h6" variant="body2" align="center">
+                                    Добавь бота в свою беседу или используй лично 🤖
+                                </Typography>
+                                <ButtonGroup size="large" orientation="vertical">
+                                    {envUtils.telegramBotName && (
+                                        <Button
+                                            href={`https://t.me/${envUtils.telegramBotName}${
+                                                groupNameConv ? `?start=g_${groupNameConv}` : ''
+                                            }`}
+                                            target="_blank"
+                                            component={Link}
+                                            color="primary"
+                                            variant="contained"
+                                            endIcon={<TelegramIcon />}
+                                            title="Бот расписания в Telegram"
+                                        >
+                                            Telegram бот расписания
+                                        </Button>
+                                    )}
+                                    {envUtils.vkBotGroupName && (
+                                        <Button
+                                            href={`https://vk.me/${envUtils.vkBotGroupName}${
+                                                groupNameConv ? `?ref=g_${groupNameConv}` : ''
+                                            }`}
+                                            target="_blank"
+                                            component={Link}
+                                            color="primary"
+                                            variant="outlined"
+                                            endIcon={<SvgIcon component={VkSvg} inheritViewBox />}
+                                            title="Бот расписания в VK"
+                                        >
+                                            VK бот расписания
+                                        </Button>
+                                    )}
+                                </ButtonGroup>
+                            </Box>
+                        </>
                     )}
 
                     {envUtils.linkToSupport && (
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',
-                                mt: 2,
-                                '& > *': { m: 1 },
-                            }}
-                        >
-                            <Button
-                                href={envUtils.linkToSupport}
-                                target="_blank"
-                                component={Link}
-                                color="warning"
-                                variant="outlined"
-                                endIcon={<SupportAgentIcon />}
-                                title="Поддержка/Задать вопрос/Что-нибудь предложить"
+                        <>
+                            <Divider sx={{ my: 2 }} />
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    mt: 2,
+                                    '& > *': { m: 1 },
+                                }}
                             >
-                                Поддержка
-                            </Button>
-                        </Box>
+                                <Button
+                                    href={envUtils.linkToSupport}
+                                    target="_blank"
+                                    component={Link}
+                                    color="warning"
+                                    variant="outlined"
+                                    endIcon={<SupportAgentIcon />}
+                                    title="Поддержка/Задать вопрос/Что-нибудь предложить"
+                                >
+                                    Поддержка
+                                </Button>
+                            </Box>
+
+                            <Typography sx={{ mt: 2 }} variant="body2">
+                                ℹ️ Функционал расписания по аудиториям и преподавателям <b>в виде таблиц</b> сейчас
+                                обновляется...
+                            </Typography>
+                        </>
                     )}
 
                     <Typography sx={{ mt: 2, fontSize: 11 }}>
