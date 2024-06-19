@@ -445,7 +445,7 @@ const getResources = (scheduleFor: ScheduleFor, selectedItems: (number | string)
         instances: [
             { id: LessonFlags.Lecture, text: 'Лекция', color: green },
             { id: LessonFlags.Practical, text: 'Практика', color: yellow },
-            { id: LessonFlags.Labaratory, text: 'Лабораторна работа', color: blue },
+            { id: LessonFlags.Labaratory, text: 'Лабораторная работа', color: blue },
             { id: LessonFlags.CourseProject, text: 'Курсовой проект', color: red },
             { id: LessonFlags.Consultation, text: 'Консультация', color: green },
             { id: LessonFlags.Test, text: 'Зачет', color: teal },
