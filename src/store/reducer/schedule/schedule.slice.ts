@@ -111,13 +111,13 @@ export const scheduleSlice = createSlice({
         },
         toggleSelectedTypeLessons: (state, action: PayloadAction<LessonFlags>) => {
             const { lessonTypes } = state;
-            const locationName = action.payload;
+            const lessonFlag = action.payload;
 
-            if (lessonTypes.includes(locationName)) {
-                state.lessonTypes = lessonTypes.filter((location) => location !== locationName);
+            if (lessonTypes.includes(lessonFlag)) {
+                state.lessonTypes = lessonTypes.filter((flag) => flag !== lessonFlag);
                 return;
             }
-            lessonTypes.push(locationName);
+            lessonTypes.push(lessonFlag);
         },
         setAllowedLessonTypes: (state, action: PayloadAction<LessonFlags[]>) => {
             state.allowedLessonTypes = action.payload;
