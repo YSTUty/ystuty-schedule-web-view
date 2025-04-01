@@ -13,47 +13,59 @@ const checkNewDomain = () =>
         })
         .catch();
 
-export const apiCheckAppVersion = () => {
+export const apiCheckAppVersion = async () => {
+    const CHECK_INTERVAL_MS = 3 * 60e3;
+    const RELOAD_DELAY_MS = 1e3;
+    const MAX_ATTEMPTS = 3;
+
     try {
-        if (resAttempts >= 3) {
+        let resAttempts = store2.get('resAttempts', 0);
+
+        if (resAttempts >= MAX_ATTEMPTS) {
             checkNewDomain();
+            // Max attempts reached
+            return null;
         }
 
         const lastChecked = store2.get('lastChecked', 0);
-        if (Date.now() - lastChecked < 180e3) {
-            return Promise.resolve(0);
+        if (Date.now() - lastChecked < CHECK_INTERVAL_MS) {
+            return null;
         }
 
-        return new Promise((resolve, reject) =>
-            fetch(`//${window.location.host}/version.json?t=${Date.now()}`, {
-                method: 'get',
-                headers: {
-                    'Cache-Control': 'no-cache, no-store, must-revalidate',
-                },
-            })
-                .then((response) => response.json())
-                .then((data) => {
-                    const appVersion = store2.get('appVersion');
-                    console.log('[VersionChecker] Current:', appVersion, 'New:', data.v);
+        const response = await fetch(`//${window.location.host}/version.json?t=${Date.now()}`, {
+            method: 'GET',
+            headers: {
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+            },
+        });
 
-                    if (data.v && data.v !== appVersion) {
-                        store2.set('appVersion', data.v);
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 1e3);
-                    }
-                    resolve('reload');
-                })
-                .catch((err) => {
-                    ++resAttempts;
-                    reject(err);
-                })
-                .finally(() => {
-                    store2.set('lastChecked', Date.now());
-                })
-        );
-    } catch (t) {
-        return t;
+        if (!response.ok) {
+            throw new Error(`HTTP Error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const appVersion = store2.get('appVersion');
+
+        console.log('[VersionChecker] Current:', appVersion, 'New:', data.v);
+
+        if (data.v && data.v !== appVersion) {
+            store2.set('appVersion', data.v);
+            setTimeout(() => window.location.reload(), RELOAD_DELAY_MS);
+            return true;
+        }
+
+        // no update
+        return null;
+    } catch (err) {
+        // console.error('[VersionChecker] Error:', err);
+
+        store2.set('resAttempts', (store2.get('resAttempts', 0) || 0) + 1);
+        store2.set('lastChecked', Date.now());
+
+        // throw err;
+        return err;
+    } finally {
+        store2.set('lastChecked', Date.now());
     }
 };
 
