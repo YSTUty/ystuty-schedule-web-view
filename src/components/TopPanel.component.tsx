@@ -26,7 +26,7 @@ import * as envUtils from '../utils/env.utils';
 import { ScheduleFor } from '../interfaces/ystuty.types';
 
 export type TopPanelProps = {
-    scheduleFor: ScheduleFor;
+    scheduleFor: ScheduleFor | null;
 };
 
 const TopPanel: React.FC<TopPanelProps> = (props) => {
@@ -41,7 +41,7 @@ const TopPanel: React.FC<TopPanelProps> = (props) => {
     const allowMultipleRef = React.useRef<(state?: any) => void>(() => {});
 
     const onChangeMultiple = React.useCallback(() => {
-        allowMultipleRef.current(!allowedMultiple[scheduleFor]);
+        allowMultipleRef.current(!allowedMultiple[scheduleFor!]);
     }, [allowedMultiple, scheduleFor, allowMultipleRef]);
 
     return (
@@ -68,55 +68,62 @@ const TopPanel: React.FC<TopPanelProps> = (props) => {
                             <HomeIcon />
                         </NavLinkComponent>
                     </FormControl>
+                    {scheduleFor && (
+                        <>
+                            {!isSmall && <Divider orientation="vertical" flexItem />}
+                            <FormControl sx={{ m: 1, minWidth: { xs: 120, sm: 230 } }}>
+                                {scheduleFor === 'group' ? (
+                                    <SelectGroupComponent allowMultipleRef={allowMultipleRef} />
+                                ) : scheduleFor === 'teacher' ? (
+                                    <SelectTeacherComponent allowMultipleRef={allowMultipleRef} />
+                                ) : (
+                                    <SelectAudienceComponent allowMultipleRef={allowMultipleRef} />
+                                )}
+                            </FormControl>
 
-                    {!isSmall && <Divider orientation="vertical" flexItem />}
-                    <FormControl sx={{ m: 1, minWidth: { xs: 120, sm: 230 } }}>
-                        {scheduleFor === 'group' ? (
-                            <SelectGroupComponent allowMultipleRef={allowMultipleRef} />
-                        ) : scheduleFor === 'teacher' ? (
-                            <SelectTeacherComponent allowMultipleRef={allowMultipleRef} />
-                        ) : (
-                            <SelectAudienceComponent allowMultipleRef={allowMultipleRef} />
-                        )}
-                    </FormControl>
+                            {!isSmall && <Divider orientation="vertical" flexItem />}
+                            <FormControl sx={{ pl: 1 }}>
+                                <IconButton
+                                    onClick={onChangeMultiple}
+                                    title={`Разрешить выбор нескольких ${
+                                        scheduleFor === 'group'
+                                            ? 'групп'
+                                            : scheduleFor === 'teacher'
+                                            ? 'преподавателей'
+                                            : 'аудиторий'
+                                    }`}
+                                    color="inherit"
+                                    sx={{
+                                        transform: allowedMultiple[scheduleFor] ? 'rotate(180deg)' : '',
+                                        transition: 'transform 150ms ease',
+                                    }}
+                                >
+                                    <LocalPizzaIcon />
+                                </IconButton>
+                            </FormControl>
 
-                    {!isSmall && <Divider orientation="vertical" flexItem />}
-                    <FormControl sx={{ pl: 1 }}>
-                        <IconButton
-                            onClick={onChangeMultiple}
-                            title={`Разрешить выбор нескольких ${
-                                scheduleFor === 'group'
-                                    ? 'групп'
-                                    : scheduleFor === 'teacher'
-                                    ? 'преподавателей'
-                                    : 'аудиторий'
-                            }`}
-                            color="inherit"
-                            sx={{
-                                transform: allowedMultiple[scheduleFor] ? 'rotate(180deg)' : '',
-                                transition: 'transform 150ms ease',
-                            }}
-                        >
-                            <LocalPizzaIcon />
-                        </IconButton>
-                    </FormControl>
-
-                    <FormControl sx={{ pl: 1 }}>
-                        {/* // * Switch between groups and teachers */}
-                        <IconButton
-                            component={NavLinkComponent}
-                            href={scheduleFor === 'teacher' ? '/group' : '/teacher'}
-                            color="inherit"
-                            title={scheduleFor === 'teacher' ? 'Расписание для группы' : 'Расписание для преподавателя'}
-                            sx={{
-                                transform: scheduleFor !== 'teacher' ? 'rotate(180deg)' : '',
-                                transition: 'transform 150ms ease',
-                            }}
-                        >
-                            <SchoolIcon />
-                        </IconButton>
-                        <AlertMeToggler />
-                    </FormControl>
+                            <FormControl sx={{ pl: 1 }}>
+                                {/* // * Switch between groups and teachers */}
+                                <IconButton
+                                    component={NavLinkComponent}
+                                    href={scheduleFor === 'teacher' ? '/group' : '/teacher'}
+                                    color="inherit"
+                                    title={
+                                        scheduleFor === 'teacher'
+                                            ? 'Расписание для группы'
+                                            : 'Расписание для преподавателя'
+                                    }
+                                    sx={{
+                                        transform: scheduleFor !== 'teacher' ? 'rotate(180deg)' : '',
+                                        transition: 'transform 150ms ease',
+                                    }}
+                                >
+                                    <SchoolIcon />
+                                </IconButton>
+                                <AlertMeToggler />
+                            </FormControl>
+                        </>
+                    )}
 
                     {!isSmall && envUtils.vkWidgetsApiId && (
                         <>

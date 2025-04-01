@@ -9,7 +9,7 @@ import { ScheduleFor } from '../../interfaces/ystuty.types';
 const SchedulePage = () => {
     const { pathname } = useLocation();
 
-    const [scheduleFor, setScheduleFor] = React.useState<ScheduleFor>('group');
+    const [scheduleFor, setScheduleFor] = React.useState<ScheduleFor | null>(null);
 
     React.useEffect(() => {
         if (pathname.startsWith('/group')) {
@@ -25,7 +25,7 @@ const SchedulePage = () => {
 
     return (
         <>
-            <TopPanelComponent scheduleFor={scheduleFor}/>
+            <TopPanelComponent scheduleFor={scheduleFor} />
             <SchedulerContainer scheduleFor={scheduleFor} />
         </>
     );

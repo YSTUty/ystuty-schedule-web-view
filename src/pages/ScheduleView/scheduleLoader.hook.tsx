@@ -10,7 +10,7 @@ import { apiPath } from '../../utils';
 import { LessonData, LessonFlags, OneWeekDto } from '../../interfaces/schedule';
 import { ITeacherData, ScheduleFor } from '../../interfaces/ystuty.types';
 
-export const useScheduleLoader = (props: { scheduleFor: ScheduleFor }) => {
+export const useScheduleLoader = (props: { scheduleFor: ScheduleFor | null }) => {
     const { scheduleFor } = props;
 
     const STORE_CACHED_OLD_KEYs =
@@ -32,7 +32,7 @@ export const useScheduleLoader = (props: { scheduleFor: ScheduleFor }) => {
 
     // const { online } = useNetworkState();
     const dispatch = useDispatch();
-    const selectedItems = useSelector((state) => state.schedule.selectedItems[scheduleFor]);
+    const selectedItems = useSelector((state) => (!scheduleFor ? [] : state.schedule.selectedItems[scheduleFor]));
 
     const [fetchings, setFetchings] = React.useState<Record<string, boolean>>({});
     const [isCached, setIsCached] = React.useState(false);
@@ -86,7 +86,7 @@ export const useScheduleLoader = (props: { scheduleFor: ScheduleFor }) => {
                 return;
             }
 
-            if (fetchings[itemKey]) {
+            if (fetchings[itemKey] || !scheduleFor) {
                 return;
             }
 
@@ -163,7 +163,9 @@ export const useScheduleLoader = (props: { scheduleFor: ScheduleFor }) => {
     const isFetching = React.useMemo(() => Object.values(fetchings).some((e) => e), [fetchings]);
 
     React.useEffect(() => {
-        dispatch(scheduleSlice.actions.setScheduleData({ scheduleFor, items: scheduleData }));
+        if (scheduleFor) {
+            dispatch(scheduleSlice.actions.setScheduleData({ scheduleFor, items: scheduleData }));
+        }
     }, [scheduleFor, scheduleData]);
 
     React.useEffect(() => {

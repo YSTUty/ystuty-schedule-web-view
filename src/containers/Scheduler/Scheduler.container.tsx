@@ -463,7 +463,7 @@ const getResources = (scheduleFor: ScheduleFor, selectedItems: (number | string)
 };
 
 export type MaterialSchedulerProps = {
-    scheduleFor: ScheduleFor;
+    scheduleFor: ScheduleFor | null;
 };
 
 const SchedulerContainer: React.FC<MaterialSchedulerProps> = (props) => {
@@ -480,13 +480,13 @@ const SchedulerContainer: React.FC<MaterialSchedulerProps> = (props) => {
         fetchingSchedule,
     } = useSelector((state) => state.schedule);
 
-    const selectedItems = useSelector((state) => state.schedule.selectedItems[scheduleFor]);
-    const scheduleData = useSelector((state) => state.schedule.scheduleData[scheduleFor]);
+    const selectedItems = useSelector((state) => (!scheduleFor ? [] : state.schedule.selectedItems[scheduleFor]));
+    const scheduleData = useSelector((state) => scheduleFor && state.schedule.scheduleData[scheduleFor]);
 
     const [data, setData] = React.useState<AppointmentModel[]>([]);
 
     React.useEffect(() => {
-        if (!scheduleData) return;
+        if (!scheduleData || !scheduleFor) return;
 
         const isComparing = scheduleData.length > 1;
         const allowedLessonTypes: Partial<Record<LessonFlags, any>> = {};
@@ -522,7 +522,7 @@ const SchedulerContainer: React.FC<MaterialSchedulerProps> = (props) => {
             ),
         );
         setData(data);
-    }, [setData, scheduleData]);
+    }, [setData, scheduleFor, scheduleData]);
 
     const lowerCaseFilter = lessonFilter.toLowerCase();
     const dataMemo = React.useMemo(
@@ -541,6 +541,10 @@ const SchedulerContainer: React.FC<MaterialSchedulerProps> = (props) => {
                 ),
         [data, lessonTypes, lowerCaseFilter],
     );
+
+    if (!scheduleFor) {
+        return null;
+    }
 
     const mainResourceName =
         selectedItems.length > 1 && groupsSplitColor
