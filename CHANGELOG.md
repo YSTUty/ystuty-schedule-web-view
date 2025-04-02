@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.2](https://github.com/YSTUty/ystuty-schedule-web-view/compare/v0.3.1...v0.3.2) (2025-04-02)
+
+
+### 📈 Chore
+
+* **page:** update text on main page ([7f79dfe](https://github.com/YSTUty/ystuty-schedule-web-view/commit/7f79dfe37038bf88e752dfdf06d3cb3249e5c9fd))
+* **shared:** update check app version function ([d2bd089](https://github.com/YSTUty/ystuty-schedule-web-view/commit/d2bd089d0c40a59e13b8522e2f629bca8f6c3033))
+* **store:** rename variables ([f8f9fdc](https://github.com/YSTUty/ystuty-schedule-web-view/commit/f8f9fdca231630e858a66dbbf7e64b5a85ff031d))
+
+
+### 🐛 Bug Fixes
+
+* **page:** fix incorrect `scheduleFor` by path; set default as `null` ([97b1679](https://github.com/YSTUty/ystuty-schedule-web-view/commit/97b167984cf4aece5872e82ca7f3eea096895209))
+* typo in lesson type name ([6010d07](https://github.com/YSTUty/ystuty-schedule-web-view/commit/6010d07d27c6ab4c891bb4287f362a395bc31cb0))
+
+
+### 🚀 Features
+
+* add `commitlint` ([6cdc9cd](https://github.com/YSTUty/ystuty-schedule-web-view/commit/6cdc9cd16399711eb6aa5a0205965c3f70ec78db))
+* add deploy script ([2b42561](https://github.com/YSTUty/ystuty-schedule-web-view/commit/2b42561a5ae0644c788fa5fa8220bae6a3f0e297))
+* add link to support ([90f6cff](https://github.com/YSTUty/ystuty-schedule-web-view/commit/90f6cff054e1f263667a7f57f395d4207102517c))
+* **api:** add api fn and toastify ([1886783](https://github.com/YSTUty/ystuty-schedule-web-view/commit/188678393944c7af06bec3ee19a8df9184d3fc67))
+
 ### [0.3.1](https://github.com/YSTUty/ystuty-schedule-web-view/compare/v0.3.0...v0.3.1) (2024-03-18)
 
 
