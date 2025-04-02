@@ -2,10 +2,10 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { Router } from 'react-router';
-
 import './utils/hawk.util';
 import store, { history } from './store';
 
+import 'react-toastify/dist/ReactToastify.css';
 import './index.css';
 
 import AppContainer from './containers/App/App.container';
@@ -23,6 +23,7 @@ ReactDOM.render(
         <Provider store={store}>
             <LocalizerComponent>
                 <ThemeModeProvider>
+                    {/* <ToastContainer /> */}
                     <Router history={history}>
                         <ServiceWorkerProvider>
                             <LoadingUpdatesComponent>

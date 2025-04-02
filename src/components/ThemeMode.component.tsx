@@ -4,6 +4,7 @@ import { CacheProvider } from '@emotion/react';
 import createCache from '@emotion/cache';
 import { ThemeProvider, createTheme, useTheme } from '@mui/material/styles';
 import { blue as primary } from '@mui/material/colors';
+import { ToastContainer } from 'react-toastify';
 
 import IconButton from '@mui/material/IconButton';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -56,6 +57,7 @@ export const ThemeModeProvider = (props: { children: any }) => {
     return (
         <ThemeModeContext.Provider value={colorMode}>
             <ThemeProvider theme={theme}>
+                <ToastContainer position="bottom-left" pauseOnHover closeButton theme={mode} />
                 <CacheProvider value={emotionCache}>
                     <CssBaseline />
 

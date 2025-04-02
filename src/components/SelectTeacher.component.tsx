@@ -1,6 +1,8 @@
 import React from 'react';
 import { useHash, useNetworkState } from 'react-use';
 import { useDispatch, useSelector } from 'react-redux';
+import { useIntl } from 'react-intl';
+import { toast } from 'react-toastify';
 import classNames from 'clsx';
 import store2 from 'store2';
 
@@ -12,7 +14,7 @@ import { styled } from '@mui/material/styles';
 import { StyledAutocomplete } from './StylePulseAnimation.component';
 import scheduleSlice, { getLastTeachers, STORE_TEACHER_NAME_KEY } from '../store/reducer/schedule/schedule.slice';
 import alertSlice from '../store/reducer/alert/alert.slice';
-import { apiPath } from '../utils';
+import { useApi } from '../shared/api.hook';
 
 import { ITeacherData } from '../interfaces/ystuty.types';
 
@@ -33,6 +35,7 @@ const MyPopper = (props: PopperProps) => <StyledPopper {...props} style={{ width
 export const SelectTeacherComponent = (props: { allowMultipleRef: React.MutableRefObject<(state?: any) => void> }) => {
     const { allowMultipleRef } = props;
     const dispatch = useDispatch();
+    const { formatMessage } = useIntl();
     const { fetchingSchedule } = useSelector((state) => state.schedule);
     const allowedMultiple = useSelector((state) => state.schedule.allowedMultiple.teacher);
     const selected = useSelector((state) => state.schedule.selectedItems.teacher) as number[];
@@ -41,7 +44,7 @@ export const SelectTeacherComponent = (props: { allowMultipleRef: React.MutableR
     const [hash, setHash] = useHash();
 
     const [teachers, setTeachers] = React.useState<ITeacherData[]>([]);
-    const [fetching, setFetching] = React.useState(false);
+    const [fetchApi, isFetching] = useApi();
     const [isCached, setIsCached] = React.useState(false);
 
     const defaultValues: number[] = React.useMemo(() => {
@@ -74,42 +77,43 @@ export const SelectTeacherComponent = (props: { allowMultipleRef: React.MutableR
         [setTeachers, setIsCached],
     );
 
-    const loadTeachersList = React.useCallback(() => {
-        if (fetching) {
-            return;
+    const loadTeachersList = React.useCallback(async () => {
+        if (isFetching) return;
+
+        try {
+            const response = await fetchApi<{ items: ITeacherData[] }>(
+                `v1/schedule/actual_teachers`,
+                {},
+                {
+                    setError: (message) =>
+                        dispatch(
+                            alertSlice.actions.add({
+                                message: `Error: ${message}`,
+                                severity: 'warning',
+                            }),
+                        ),
+                },
+            );
+
+            if (!response || 'error' in response || !('data' in response)) {
+                return;
+            }
+            applyTeachers(response.data.items);
+        } catch (err) {
+            // ??
+            applyTeachers(null);
+            if (online) {
+                dispatch(
+                    alertSlice.actions.add({
+                        message: `Error: ${(err as Error).message}`,
+                        severity: 'error',
+                    }),
+                );
+            } else {
+                toast.warning(formatMessage({ id: 't.api.offline.error' }));
+            }
         }
-
-        setFetching(true);
-
-        fetch(`${apiPath}/v1/schedule/actual_teachers`)
-            .then((response) => response.json())
-            .then((response: { items: ITeacherData[] } | { error: { error: string; message: string } }) => {
-                if ('error' in response) {
-                    dispatch(
-                        alertSlice.actions.add({
-                            message: `Error: ${response.error.message}`,
-                            severity: 'warning',
-                        }),
-                    );
-                    return;
-                }
-                applyTeachers(response!.items);
-            })
-            .catch((e) => {
-                applyTeachers(null);
-                if (online) {
-                    dispatch(
-                        alertSlice.actions.add({
-                            message: `Error: ${e.message}`,
-                            severity: 'error',
-                        }),
-                    );
-                }
-            })
-            .finally(() => {
-                setFetching(false);
-            });
-    }, [fetching, setFetching, applyTeachers, online]);
+    }, [applyTeachers, online]);
 
     const onChangeValues = React.useCallback(
         (value: number | number[] | null) => {

@@ -1,6 +1,8 @@
 import React from 'react';
 import { useHash, useNetworkState } from 'react-use';
 import { useDispatch, useSelector } from 'react-redux';
+import { useIntl } from 'react-intl';
+import { toast } from 'react-toastify';
 import classNames from 'clsx';
 import store2 from 'store2';
 
@@ -12,7 +14,7 @@ import { styled } from '@mui/material/styles';
 import { StyledAutocomplete } from './StylePulseAnimation.component';
 import scheduleSlice, { getLastAudiences, STORE_AUDIENCE_NAME_KEY } from '../store/reducer/schedule/schedule.slice';
 import alertSlice from '../store/reducer/alert/alert.slice';
-import { apiPath } from '../utils';
+import { useApi } from '../shared/api.hook';
 import { IAudienceData } from '../interfaces/ystuty.types';
 
 const STORE_CACHED_AUDIENCE_KEY = 'CACHED_V1_AUDIENCE::';
@@ -29,6 +31,7 @@ const MyPopper = (props: PopperProps) => <StyledPopper {...props} style={{ width
 export const SelectAudienceComponent = (props: { allowMultipleRef: React.MutableRefObject<(state?: any) => void> }) => {
     const { allowMultipleRef } = props;
     const dispatch = useDispatch();
+    const { formatMessage } = useIntl();
     const { fetchingSchedule } = useSelector((state) => state.schedule);
     const allowedMultiple = useSelector((state) => state.schedule.allowedMultiple.audience);
     const selected = useSelector((state) => state.schedule.selectedItems['audience']);
@@ -44,8 +47,8 @@ export const SelectAudienceComponent = (props: { allowMultipleRef: React.Mutable
     }, [hash]);
 
     const [audiences, setAudiences] = React.useState<IAudienceData[]>([]);
-    const [fetching, setFetching] = React.useState(false);
     const [isCached, setIsCached] = React.useState(false);
+    const [fetchApi, isFetching] = useApi();
 
     const applyAudiences = React.useCallback(
         (items: IAudienceData[] | null) => {
@@ -80,48 +83,44 @@ export const SelectAudienceComponent = (props: { allowMultipleRef: React.Mutable
         [setAudiences, setIsCached],
     );
 
-    const loadAudiences = React.useCallback(() => {
-        if (fetching) {
-            return;
-        }
+    const loadAudiences = React.useCallback(async () => {
+        if (isFetching) return;
 
-        setFetching(true);
-
-        fetch(`${apiPath}/v1/schedule/actual_audiences`)
-            .then((response) => response.json())
-            .then(
-                (
-                    response:
-                        | { isCache: boolean; items: IAudienceData[]; count: number }
-                        | { error: { error: string; message: string } },
-                ) => {
-                    if ('error' in response) {
+        try {
+            const response = await fetchApi<{ isCache: boolean; items: IAudienceData[]; count: number }>(
+                `v1/schedule/actual_audiences`,
+                {},
+                {
+                    setError: (message) =>
                         dispatch(
                             alertSlice.actions.add({
-                                message: `Error: ${response.error.message}`,
+                                message: `Error: ${message}`,
                                 severity: 'warning',
                             }),
-                        );
-                        return;
-                    }
-                    applyAudiences(response!.items);
+                        ),
                 },
-            )
-            .catch((e) => {
-                applyAudiences(null);
-                if (online) {
-                    dispatch(
-                        alertSlice.actions.add({
-                            message: `Error: ${e.message}`,
-                            severity: 'error',
-                        }),
-                    );
-                }
-            })
-            .finally(() => {
-                setFetching(false);
-            });
-    }, [fetching, setFetching, applyAudiences, online]);
+            );
+
+            if (!response || 'error' in response || !('data' in response)) {
+                return;
+            }
+
+            applyAudiences(response.data.items);
+        } catch (err) {
+            // ??
+            applyAudiences(null);
+            if (online) {
+                dispatch(
+                    alertSlice.actions.add({
+                        message: `Error: ${(err as Error).message}`,
+                        severity: 'error',
+                    }),
+                );
+            } else {
+                toast.warning(formatMessage({ id: 't.api.offline.error' }));
+            }
+        }
+    }, [applyAudiences, online]);
 
     const onChangeValues = React.useCallback(
         (value: string | string[] | null) => {

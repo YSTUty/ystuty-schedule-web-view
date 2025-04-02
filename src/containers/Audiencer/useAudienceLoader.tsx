@@ -1,10 +1,12 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
+import { useIntl } from 'react-intl';
+import { toast } from 'react-toastify';
 import store2 from 'store2';
 
 import alertSlice from '../../store/reducer/alert/alert.slice';
 import audiencerSlice from '../../store/reducer/audiencer/audiencer.slice';
-import { apiPath } from '../../utils';
+import { useApi } from '../../shared/api.hook';
 
 import { AccumulativeSchedule, IAudienceData } from '../../interfaces/ystuty.types';
 
@@ -12,8 +14,8 @@ const STORE_CACHED_ACCUMULATIVE_KEY = 'STORE_CACHED_ACCUMULATIVE_KEY';
 
 const useAudienceLoader = () => {
     const dispatch = useDispatch();
-    const [fetchingAudience, setFetchingAudience] = React.useState(false);
-    const [fetchingAcc, setFetchingAcc] = React.useState(false);
+    const { formatMessage } = useIntl();
+    const [fetchApi, , isFetchings] = useApi();
 
     // const [audiences, setAudiences] = React.useState<IAudienceData[]>([]);
     // const [accumulative, setAccumulative] = React.useState<AccumulativeSchedule[]>([]);
@@ -74,71 +76,68 @@ const useAudienceLoader = () => {
         // setAccumulative(items);
     }, []);
 
-    const loadAudiences = React.useCallback(() => {
-        if (fetchingAudience) {
-            return;
-        }
+    const loadAudiences = React.useCallback(async () => {
+        if (isFetchings['actual_audiences']) return;
 
-        setFetchingAudience(true);
-
-        fetch(`${apiPath}/v1/schedule/actual_audiences`)
-            .then((response) => response.json())
-            .then(
-                (
-                    response:
-                        | { isCache: boolean; items: IAudienceData[]; count: number }
-                        | { error: { error: string; message: string } },
-                ) => {
-                    if ('error' in response) {
+        try {
+            const response = await fetchApi<{ isCache: boolean; items: IAudienceData[]; count: number }>(
+                `v1/schedule/actual_audiences`,
+                {},
+                {
+                    fKey: 'actual_audiences',
+                    setError: (message) =>
                         dispatch(
                             alertSlice.actions.add({
-                                message: `Error: ${response.error.message}`,
+                                message: `Error: ${message}`,
                                 severity: 'warning',
                             }),
-                        );
-                        return;
-                    }
-                    applyAudiences(response!.items);
+                        ),
                 },
-            )
-            .catch((e) => {
-                applyAudiences(null);
-            })
-            .finally(() => {
-                setFetchingAudience(false);
-            });
-    }, [fetchingAudience, setFetchingAudience, applyAudiences]);
+            );
 
-    const loadAccumulative = React.useCallback(() => {
-        if (fetchingAcc) {
-            return;
+            if (!response || 'error' in response || !('data' in response)) {
+                return;
+            }
+
+            applyAudiences(response.data.items);
+        } catch (err) {
+            // ??
+            applyAudiences(null);
+            toast.warning('Ошибка загрузки аудиторий');
         }
+    }, [applyAudiences]);
 
-        setFetchingAcc(true);
+    const loadAccumulative = React.useCallback(async () => {
+        if (isFetchings['accumulative']) return;
 
         // TODO: need implement this method
-        fetch(`${apiPath}/v1/schedule/accumulative`)
-            .then((response) => response.json())
-            .then((response: { items: AccumulativeSchedule[] } | { error: { error: string; message: string } }) => {
-                if ('error' in response) {
-                    dispatch(
-                        alertSlice.actions.add({
-                            message: `Error: ${response.error.message}`,
-                            severity: 'warning',
-                        }),
-                    );
-                    return;
-                }
-                applyAccumulative(response!.items);
-            })
-            .catch((e) => {
-                console.error(e);
-                applyAccumulative(null);
-            })
-            .finally(() => {
-                setFetchingAcc(false);
-            });
-    }, [fetchingAcc, setFetchingAcc, applyAccumulative]);
+        try {
+            const response = await fetchApi<{ items: AccumulativeSchedule[] }>(
+                `v1/schedule/accumulative`,
+                {},
+                {
+                    fKey: 'accumulative',
+                    setError: (message) =>
+                        dispatch(
+                            alertSlice.actions.add({
+                                message: `Error: ${message}`,
+                                severity: 'warning',
+                            }),
+                        ),
+                },
+            );
+            if (!response || 'error' in response || !('data' in response)) {
+                return;
+            }
+
+            applyAccumulative(response.data.items);
+        } catch (err) {
+            console.error(err);
+            // ??
+            applyAccumulative(null);
+            toast.warning('Ошибка загрузки аудиторий #2');
+        }
+    }, [applyAccumulative]);
 
     React.useEffect(() => {
         loadAudiences();

@@ -2,10 +2,13 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import store2 from 'store2';
 import { useDebounce } from 'react-use';
+import { toast } from 'react-toastify';
+import { useIntl } from 'react-intl';
 
 import alertSlice from '../../store/reducer/alert/alert.slice';
 import scheduleSlice from '../../store/reducer/schedule/schedule.slice';
-import { apiPath } from '../../utils';
+import { useApi } from '../../shared/api.hook';
+import { delay } from '../../utils';
 
 import { LessonData, LessonFlags, OneWeekDto } from '../../interfaces/schedule';
 import { ITeacherData, ScheduleFor } from '../../interfaces/ystuty.types';
@@ -32,9 +35,10 @@ export const useScheduleLoader = (props: { scheduleFor: ScheduleFor | null }) =>
 
     // const { online } = useNetworkState();
     const dispatch = useDispatch();
+    const { formatMessage } = useIntl();
     const selectedItems = useSelector((state) => (!scheduleFor ? [] : state.schedule.selectedItems[scheduleFor]));
 
-    const [fetchings, setFetchings] = React.useState<Record<string, boolean>>({});
+    const [fetchApi, isFetching, isFetchings, abortControllers] = useApi();
     const [isCached, setIsCached] = React.useState(false);
 
     const [schedulesData, setSchedulesData] = React.useState<Record<string, { time: number; sources: LessonData[] }>>();
@@ -80,70 +84,66 @@ export const useScheduleLoader = (props: { scheduleFor: ScheduleFor | null }) =>
     );
 
     const loadSchedule = React.useCallback(
-        (itemKey: string | number) => {
+        async (itemKey: string | number) => {
             if (schedulesData?.[itemKey] && Date.now() - schedulesData[itemKey].time < 30e3) {
                 formatData(itemKey, null);
                 return;
             }
 
-            if (fetchings[itemKey] || !scheduleFor) {
+            if (isFetchings[itemKey] || !scheduleFor) {
                 return;
             }
 
-            const abortController = new AbortController();
-            const signal = abortController.signal;
-
-            setFetchings((s) => ({ ...s, [itemKey]: true }));
-            fetch(`${apiPath}/v1/schedule/${scheduleFor}/${itemKey}`, { signal })
-                .then((response) => response.json())
-                .then(
-                    (
-                        response:
-                            | {
-                                  isCache: boolean;
-                                  items: OneWeekDto[];
-                                  teacher?: ITeacherData;
-                              }
-                            | { error: { error: string; message: string } },
-                    ) => {
-                        if ('error' in response) {
+            try {
+                const response = await fetchApi<{
+                    isCache: boolean;
+                    items: OneWeekDto[];
+                    teacher?: ITeacherData;
+                }>(
+                    `v1/schedule/${scheduleFor}/${itemKey}`,
+                    {},
+                    {
+                        fKey: `${scheduleFor}/${itemKey}`,
+                        fKeySub: `${scheduleFor}`,
+                        setError: (error) =>
                             dispatch(
                                 alertSlice.actions.add({
-                                    message: `Error: ${response.error.message}`,
+                                    message: `Error: ${error}`,
                                     severity: 'error',
                                 }),
-                            );
-                            return;
-                        }
-                        formatData(itemKey, response!.items);
+                            ),
                     },
-                )
-                .catch((e) => {
-                    console.log(e);
+                );
 
-                    formatData(itemKey, null);
-                    // if (online) {
-                    //     alert(`Fail: ${e.message}`);
-                    // }
-                })
-                .finally(() => {
-                    setFetchings(({ [itemKey]: _del, ...rest }) => rest);
-                });
+                if (!response || 'error' in response || !('data' in response)) {
+                    return;
+                }
 
-            return abortController;
+                formatData(itemKey, response.data.items);
+            } catch (err) {
+                // ??
+                formatData(itemKey, null);
+                toast.warning('Ошибка загрузки актуального расписания');
+                // if (online) {
+                //     dispatch(
+                //         alertSlice.actions.add({
+                //             message: `Error: ${(err as Error).message}`,
+                //             severity: 'error',
+                //         }),
+                //     );
+                // }
+            }
         },
-        [scheduleFor, schedulesData, fetchings, setFetchings, formatData /* online */],
+        [isFetchings, scheduleFor, schedulesData, formatData /* online */],
     );
 
     useDebounce(
         () => {
-            let abortControllers: AbortController[] = [];
             for (const val of selectedItems) {
-                const abortController = loadSchedule(val);
-                abortController && abortControllers.push(abortController);
+                loadSchedule(val);
             }
             return () => {
-                for (const abortController of abortControllers) {
+                for (const abortController of Object.values(abortControllers.current)) {
                     abortController.abort();
                 }
             };
@@ -159,8 +159,6 @@ export const useScheduleLoader = (props: { scheduleFor: ScheduleFor | null }) =>
                 .filter((e) => !!e.data),
         [selectedItems, schedulesData],
     );
-
-    const isFetching = React.useMemo(() => Object.values(fetchings).some((e) => e), [fetchings]);
 
     React.useEffect(() => {
         if (scheduleFor) {
