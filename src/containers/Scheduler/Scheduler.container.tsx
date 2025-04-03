@@ -165,7 +165,10 @@ const AppointmentContent = ({ data, ...restProps }: AppointmentContentProps) => 
         title += `• По П/Г\n`;
     }
     if (data.isStream) {
-        title += `• В потоке`;
+        title += `• В потоке\n`;
+    }
+    if (data.isDistant) {
+        title += `• Дистант 📡\n`;
     }
 
     return (
