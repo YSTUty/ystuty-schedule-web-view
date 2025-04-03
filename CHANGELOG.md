@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.3](https://github.com/YSTUty/ystuty-schedule-web-view/compare/v0.3.2...v0.3.3) (2025-04-03)
+
+
+### 🚀 Features
+
+* add hawk webpack plugin and sentry ([b739ecb](https://github.com/YSTUty/ystuty-schedule-web-view/commit/b739ecbdf46d339b97cb6122c5fb56706a77eaba))
+
+
+### 📈 Chore
+
+* **component:** add correct sorted groups for option `SelectGroup` ([7de4b67](https://github.com/YSTUty/ystuty-schedule-web-view/commit/7de4b67aa80f89f893ef717c38111720462fc7ac))
+* **project:** eject react-scripts ([149ba9b](https://github.com/YSTUty/ystuty-schedule-web-view/commit/149ba9bd6d9272c7c86ced3eaf7ff28e9e511d6f))
+* **schedule:** add display `isDistant` for title ([69a949c](https://github.com/YSTUty/ystuty-schedule-web-view/commit/69a949cf74399ec21df9f5c83640e4715af2265a))
+* **shared:** add correct catch for `checkNewDomain`; add reseting `resAttempts` ([dfed77b](https://github.com/YSTUty/ystuty-schedule-web-view/commit/dfed77b17a9225e844511805c30e67ec15ec42a7))
+* temporarily rename scripts folder ([a9fff5d](https://github.com/YSTUty/ystuty-schedule-web-view/commit/a9fff5d0232c80ee186f86c46f4def5ff7ef7f39))
+
 ### [0.3.2](https://github.com/YSTUty/ystuty-schedule-web-view/compare/v0.3.1...v0.3.2) (2025-04-02)
 
 
