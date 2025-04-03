@@ -1,8 +1,6 @@
 import React from 'react';
 import store2 from 'store2';
 
-let resAttempts = 1;
-
 const checkNewDomain = () =>
     fetch('https://ystuty.web.app/dom-view.json', { method: 'POST' })
         .then((response) => response.json())
@@ -11,7 +9,10 @@ const checkNewDomain = () =>
                 window.location.replace(`https://${data.origin}`);
             }
         })
-        .catch();
+        .catch(() => {});
+
+// Reset attempts
+store2.set('resAttempts', 0);
 
 export const apiCheckAppVersion = async () => {
     const CHECK_INTERVAL_MS = 3 * 60e3;
@@ -20,7 +21,6 @@ export const apiCheckAppVersion = async () => {
 
     try {
         let resAttempts = store2.get('resAttempts', 0);
-
         if (resAttempts >= MAX_ATTEMPTS) {
             checkNewDomain();
             // Max attempts reached
@@ -58,12 +58,8 @@ export const apiCheckAppVersion = async () => {
         return null;
     } catch (err) {
         // console.error('[VersionChecker] Error:', err);
-
         store2.set('resAttempts', (store2.get('resAttempts', 0) || 0) + 1);
-        store2.set('lastChecked', Date.now());
-
-        // throw err;
-        return err;
+        return /* throw */ err;
     } finally {
         store2.set('lastChecked', Date.now());
     }
