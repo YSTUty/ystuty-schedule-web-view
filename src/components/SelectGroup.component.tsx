@@ -207,6 +207,10 @@ export const SelectGroupComponent = (props: { allowMultipleRef: React.MutableRef
             ),
         [institutes],
     );
+    const sortedOptions = React.useMemo(
+        () => Object.keys(options).sort((a, b) => options[a].localeCompare(options[b])),
+        [options],
+    );
 
     const value = isMultiple ? (institutes.length > 0 ? selected : []) : institutes.length > 0 ? selected[0] : '';
 
@@ -218,7 +222,7 @@ export const SelectGroupComponent = (props: { allowMultipleRef: React.MutableRef
             multiple={isMultiple}
             sx={{ minWidth: 200, maxWidth: 400 }}
             size="small"
-            options={Object.keys(options)}
+            options={sortedOptions}
             disableCloseOnSelect
             disableListWrap
             getOptionLabel={(option) => option as string}
