@@ -10,7 +10,9 @@ declare namespace NodeJS {
         readonly REACT_APP_TELEGRAM_USERNAME?: string;
         readonly REACT_APP_TELEGRAM_BOT_NAME?: string;
         readonly REACT_APP_VK_BOT_GROUP_NAME?: string;
+
         readonly REACT_APP_HAWK_TOKEN?: string;
+        readonly REACT_APP_SENTRY_DSN?: string;
 
         readonly REACT_APP_LINK_YSTUTY?: string;
         readonly REACT_APP_LINK_2GH?: string;
@@ -21,3 +23,6 @@ declare namespace NodeJS {
         readonly REACT_APP_VK_WIDGETS_API_ID?: string;
     }
 }
+
+/** Autogen in webpack */
+declare const HAWK_RELEASE: string;

@@ -25,8 +25,14 @@ const ForkTsCheckerWebpackPlugin =
     ? require('react-dev-utils/ForkTsCheckerWarningWebpackPlugin')
     : require('react-dev-utils/ForkTsCheckerWebpackPlugin');
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
+const HawkWebpackPlugin = require("@hawk.so/webpack-plugin");
 
 const createEnvironmentHash = require('./webpack/persistentCache/createEnvironmentHash');
+
+/**
+ * Create a random release key that will be used in HawkWebpackPlugin and in HawkCatcher
+ */
+const releaseKey = [...Array(12)].map(() => Math.random().toString(36)[2]).join('').toUpperCase();
 
 // Source maps are resource heavy and can cause out of memory issue for large source files.
 const shouldUseSourceMap = process.env.GENERATE_SOURCEMAP !== 'false';
@@ -604,12 +610,16 @@ module.exports = function (webpackEnv) {
       // This gives some necessary context to module not found errors, such as
       // the requesting resource.
       new ModuleNotFoundPlugin(paths.appPath),
+      new HawkWebpackPlugin({
+        integrationToken: process.env.REACT_APP_HAWK_TOKEN,
+        release: releaseKey,
+      }),
       // Makes some environment variables available to the JS code, for example:
       // if (process.env.NODE_ENV === 'production') { ... }. See `./env.js`.
       // It is absolutely essential that NODE_ENV is set to production
       // during a production build.
       // Otherwise React will be compiled in the very slow development mode.
-      new webpack.DefinePlugin(env.stringified),
+      new webpack.DefinePlugin({ ...env.stringified, HAWK_RELEASE: JSON.stringify(releaseKey) }),
       // Experimental hot reloading for React .
       // https://github.com/facebook/react/tree/main/packages/react-refresh
       isEnvDevelopment &&
