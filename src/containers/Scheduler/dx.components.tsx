@@ -82,7 +82,7 @@ export const StyledAppointmentsAppointmentContent = styled(Appointments.Appointm
             height: '100%',
             lineHeight: 1.1,
         },
-    })
+    }),
 );
 
 export const StyledGrid = styled(Grid)(() => ({
@@ -149,13 +149,12 @@ export const DayScaleCell = (props: MonthView.DayScaleCellProps) => (
     />
 );
 
-export const getTimeTableCell = (groupingGroups: boolean) => (props: MonthView.TimeTableCellProps) =>
-    (
-        <StyledMonthViewTimeTableCell
-            className={classNames({
-                [classes.weekCellFullSize + (!groupingGroups ? 1 : 2)]: true,
-                [classes.weekEndCell]: isWeekEnd(props.startDate!),
-            })}
-            {...props}
-        />
-    );
+export const getTimeTableCell = (groupingGroups: boolean) => (props: MonthView.TimeTableCellProps) => (
+    <StyledMonthViewTimeTableCell
+        className={classNames({
+            [classes.weekCellFullSize + (!groupingGroups ? 1 : 2)]: true,
+            [classes.weekEndCell]: isWeekEnd(props.startDate!),
+        })}
+        {...props}
+    />
+);

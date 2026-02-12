@@ -26,7 +26,7 @@ const NavLinkComponent = React.forwardRef<
                 }
             }
         },
-        [isDisabled, to]
+        [isDisabled, to],
     );
 
     return 'button' === tag ? (

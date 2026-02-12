@@ -14,7 +14,10 @@ export interface VKApiOptions {
 class VKApi {
     public promise: Promise<any> | null = null;
 
-    constructor(public readonly apiId: number | string | null, public options: VKApiOptions = {}) {
+    constructor(
+        public readonly apiId: number | string | null,
+        public options: VKApiOptions = {},
+    ) {
         this.load();
     }
 

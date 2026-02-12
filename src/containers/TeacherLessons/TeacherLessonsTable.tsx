@@ -161,56 +161,59 @@ const TeacherLessonsTable: React.FC = () => {
             data
                 .filter((item) => lessonTypes.length < 1 || lessonTypes.some((type) => item.typeArr.includes(type)))
                 .filter((dataItem) => dataItem.groups?.join(', ')?.toLowerCase()?.includes(lowerCaseFilter))
-                .reduce((acc, item) => {
-                    if (!item.lessonName) return acc;
+                .reduce(
+                    (acc, item) => {
+                        if (!item.lessonName) return acc;
 
-                    if (!(item.lessonName in acc)) {
-                        acc[item.lessonName] = {
-                            lessonName: item.lessonName,
-                            lessonCount: 0,
-                            groups: {},
-                            type: LessonFlags.None,
-                        };
-                    }
-
-                    let lesson = acc[item.lessonName];
-
-                    const allowedTypes = [
-                        LessonFlags.Lecture,
-                        LessonFlags.Practical,
-                        LessonFlags.Labaratory,
-                        LessonFlags.CourseProject,
-                        // LessonFlags.Consultation,
-                        LessonFlags.Test,
-                        LessonFlags.DifferentiatedTest,
-                        LessonFlags.Exam,
-                        LessonFlags.Library,
-                        LessonFlags.ResearchWork,
-                    ];
-
-                    for (const group of item.groups!) {
-                        // if (!(group in lesson.groups)) {
-                        //     lesson.groups[group] = 0;
-                        // }
-                        // ++lesson.groups[group];
-                        if (!(group in lesson.groups)) {
-                            lesson.groups[group] = {};
+                        if (!(item.lessonName in acc)) {
+                            acc[item.lessonName] = {
+                                lessonName: item.lessonName,
+                                lessonCount: 0,
+                                groups: {},
+                                type: LessonFlags.None,
+                            };
                         }
-                        if (!(item.type in lesson.groups[group])) {
-                            lesson.groups[group][item.type] = 0;
+
+                        let lesson = acc[item.lessonName];
+
+                        const allowedTypes = [
+                            LessonFlags.Lecture,
+                            LessonFlags.Practical,
+                            LessonFlags.Labaratory,
+                            LessonFlags.CourseProject,
+                            // LessonFlags.Consultation,
+                            LessonFlags.Test,
+                            LessonFlags.DifferentiatedTest,
+                            LessonFlags.Exam,
+                            LessonFlags.Library,
+                            LessonFlags.ResearchWork,
+                        ];
+
+                        for (const group of item.groups!) {
+                            // if (!(group in lesson.groups)) {
+                            //     lesson.groups[group] = 0;
+                            // }
+                            // ++lesson.groups[group];
+                            if (!(group in lesson.groups)) {
+                                lesson.groups[group] = {};
+                            }
+                            if (!(item.type in lesson.groups[group])) {
+                                lesson.groups[group][item.type] = 0;
+                            }
+                            lesson.groups[group][item.type]! += item.duration / 2;
+
+                            // TODO: поправить подсчет: какие типы пар считать в количество? (экзамен/зачт тоже считается, а НИР? а другие какие?)
+                            if (allowedTypes.some((e) => (item.type & e) === e)) {
+                                lesson.lessonCount += item.duration / 2;
+                            }
                         }
-                        lesson.groups[group][item.type]! += item.duration / 2;
 
-                        // TODO: поправить подсчет: какие типы пар считать в количество? (экзамен/зачт тоже считается, а НИР? а другие какие?)
-                        if (allowedTypes.some((e) => (item.type & e) === e)) {
-                            lesson.lessonCount += item.duration / 2;
-                        }
-                    }
+                        lesson.type |= item.type;
 
-                    lesson.type |= item.type;
-
-                    return acc;
-                }, {} as Record<string, TeacherLessonType>),
+                        return acc;
+                    },
+                    {} as Record<string, TeacherLessonType>,
+                ),
         [data, lessonTypes, lowerCaseFilter],
     );
 

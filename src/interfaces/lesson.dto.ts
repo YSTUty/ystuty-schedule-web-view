@@ -41,7 +41,7 @@ export interface LessonDto {
     /**
      * Название предмета пары
      */
-    lessonName?: string;
+    lessonName?: string | null;
     /**
      * Флаг типа пары
      */

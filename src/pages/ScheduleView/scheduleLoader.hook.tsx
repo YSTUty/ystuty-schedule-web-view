@@ -20,18 +20,18 @@ export const useScheduleLoader = (props: { scheduleFor: ScheduleFor | null }) =>
         scheduleFor === 'group'
             ? ['CACHED_GROUP::', 'CACHED_V2_GROUP::']
             : scheduleFor === 'teacher'
-            ? ['CACHED_TEACHER_LESSONS::', 'CACHED_V2_TEACHER_LESSONS::']
-            : scheduleFor === 'audience'
-            ? []
-            : [];
+              ? ['CACHED_TEACHER_LESSONS::', 'CACHED_V2_TEACHER_LESSONS::']
+              : scheduleFor === 'audience'
+                ? []
+                : [];
     const STORE_CACHED_KEY =
         scheduleFor === 'group'
             ? 'CACHED_V3_GROUP::'
             : scheduleFor === 'teacher'
-            ? 'CACHED_V3_TEACHER_LESSONS::'
-            : scheduleFor === 'audience'
-            ? 'CACHED_V1_AUDIENCE::'
-            : null;
+              ? 'CACHED_V3_TEACHER_LESSONS::'
+              : scheduleFor === 'audience'
+                ? 'CACHED_V1_AUDIENCE::'
+                : null;
 
     // const { online } = useNetworkState();
     const dispatch = useDispatch();
@@ -57,22 +57,25 @@ export const useScheduleLoader = (props: { scheduleFor: ScheduleFor | null }) =>
                 setIsCached(false);
             }
 
-            const sources = items.reduce(
+            const sources = items.reduce<LessonData[]>(
                 (prev, week) => [
                     ...prev,
                     ...week.days.flatMap((day) =>
-                        day.lessons.map((lesson) => ({
-                            ...lesson,
-                            start: lesson.startAt!,
-                            end: lesson.endAt!,
-                            title: lesson.lessonName!,
-                            typeArr: (Object.values(LessonFlags) as LessonFlags[]).filter(
-                                (e) => (lesson.type & e) === e && e !== LessonFlags.None,
-                            ),
-                        })),
+                        day.lessons.map(
+                            (lesson) =>
+                                ({
+                                    ...lesson,
+                                    start: lesson.startAt!,
+                                    end: lesson.endAt!,
+                                    title: lesson.lessonName,
+                                    typeArr: (Object.values(LessonFlags) as LessonFlags[]).filter(
+                                        (e) => (lesson.type & e) === e && e !== LessonFlags.None,
+                                    ),
+                                }) as LessonData,
+                        ),
                     ),
                 ],
-                [] as LessonData[],
+                [],
             );
 
             setSchedulesData((state) => ({

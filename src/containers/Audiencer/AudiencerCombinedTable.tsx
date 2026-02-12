@@ -77,11 +77,14 @@ const AudiencerCombinedTable = (props: {
             .map(audiencerUtils.filterByLessonArray(filters.lesson.value))
             .map(audiencerUtils.filterByLessonType(lessonTypes))
             .filter((audience) => audience.items.length > 0)
-            .reduce((acc, audience) => {
-                const { name, items } = audience;
-                acc.push(...items.map((e) => ({ ...e, audienceName: name })));
-                return acc;
-            }, [] as (AudienceLesson & { audienceName: string })[])
+            .reduce(
+                (acc, audience) => {
+                    const { name, items } = audience;
+                    acc.push(...items.map((e) => ({ ...e, audienceName: name })));
+                    return acc;
+                },
+                [] as (AudienceLesson & { audienceName: string })[],
+            )
             .sort((a, b) => (dayjs(a.startAt).isAfter(b.startAt) ? 1 : -1));
     }, [accumulatives, filters, filterDateTime, selectedAudiences, lessonTypes]);
 

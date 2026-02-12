@@ -89,8 +89,8 @@ const TopPanel: React.FC<TopPanelProps> = (props) => {
                                         scheduleFor === 'group'
                                             ? 'групп'
                                             : scheduleFor === 'teacher'
-                                            ? 'преподавателей'
-                                            : 'аудиторий'
+                                              ? 'преподавателей'
+                                              : 'аудиторий'
                                     }`}
                                     color="inherit"
                                     sx={{

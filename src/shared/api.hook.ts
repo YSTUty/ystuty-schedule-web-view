@@ -58,16 +58,17 @@ export const useApi = () => {
             noAlert,
             setError,
             handleError,
-            handleRateLimit = (retryAfter) => (
+            handleRateLimit = (retryAfter) =>
                 // toast.promise(delay(retryAfter * 1e3), {
                 //     pending: formatMessage({ id: 't.api.rate_limit.retry' }, { retryAfter }),
                 //     success: 'Можно повторить запрос',
                 // }),
-                toast.warning(formatMessage({ id: 't.api.rate_limit.retry' }, { retryAfter }), {
-                    autoClose: Math.max(2, retryAfter) * 1e3,
-                }),
-                true
-            ),
+                (
+                    toast.warning(formatMessage({ id: 't.api.rate_limit.retry' }, { retryAfter }), {
+                        autoClose: Math.max(2, retryAfter) * 1e3,
+                    }),
+                    true
+                ),
             returnResponse,
         } = params;
 

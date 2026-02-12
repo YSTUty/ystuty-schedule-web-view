@@ -213,17 +213,20 @@ export const SelectAudienceComponent = (props: { allowMultipleRef: React.Mutable
 
     const options = React.useMemo(
         () =>
-            audiences.reduce((prev, cur) => {
-                let { name } = cur;
-                if (name === 'Актовый зал') {
-                    name = 'А-АктовыйЗал';
-                } else if (name === 'В-корпус_библиотека') {
-                    name = 'В-Библиотека';
-                }
-                const [corpName] = name.split('-');
-                prev[name] = corpName;
-                return prev;
-            }, {} as Record<string, string>),
+            audiences.reduce(
+                (prev, cur) => {
+                    let { name } = cur;
+                    if (name === 'Актовый зал') {
+                        name = 'А-АктовыйЗал';
+                    } else if (name === 'В-корпус_библиотека') {
+                        name = 'В-Библиотека';
+                    }
+                    const [corpName] = name.split('-');
+                    prev[name] = corpName;
+                    return prev;
+                },
+                {} as Record<string, string>,
+            ),
         [audiences],
     );
 

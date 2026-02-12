@@ -34,12 +34,12 @@ const ServiceWorkerProvider = ({ children }: any) => {
             (
                 event: Event & {
                     target: (Partial<ServiceWorker> & EventTarget) | null;
-                }
+                },
             ) => {
                 if (event.target && event.target.state === 'activated') {
                     window.location.reload();
                 }
-            }
+            },
         );
     }, [waitingServiceWorker]);
 
@@ -54,7 +54,7 @@ const ServiceWorkerProvider = ({ children }: any) => {
                 }
             },
         }),
-        [isUpdateAvailable, waitingServiceWorker]
+        [isUpdateAvailable, waitingServiceWorker],
     );
 
     return <ServiceWorkerContext.Provider value={value} children={children} />;

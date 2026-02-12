@@ -25,9 +25,10 @@ clientsClaim();
 precacheAndRoute(
     self.__WB_MANIFEST.filter(
         (e) => (
-            (e = typeof e === 'string' ? e : e.url), !(e.includes('.png') || e.includes('.jpg') || e.includes('.pdf'))
-        )
-    )
+            (e = typeof e === 'string' ? e : e.url),
+            !(e.includes('.png') || e.includes('.jpg') || e.includes('.pdf'))
+        ),
+    ),
 );
 
 // Set up App Shell-style routing, so that all navigation requests
@@ -56,7 +57,7 @@ registerRoute(
         // Return true to signal that we want to use the handler.
         return true;
     },
-    createHandlerBoundToURL(process.env.PUBLIC_URL + '/index.html')
+    createHandlerBoundToURL(process.env.PUBLIC_URL + '/index.html'),
 );
 
 // An example runtime caching route for requests that aren't handled by the
@@ -72,7 +73,7 @@ registerRoute(
             // least-recently used images are removed.
             new ExpirationPlugin({ maxEntries: 50 }),
         ],
-    })
+    }),
 );
 
 // This allows the web app to trigger skipWaiting via

@@ -13,6 +13,7 @@
     "url": "https://github.com/YSTUty/ystuty-schedule-web-view/issues"
   },
   "scripts": {
+    "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,json,css,scss}\"",
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
     "deploy": "yarn build && ./deploy.sh",
@@ -69,7 +70,6 @@
     "jest-resolve": "^27.4.2",
     "jest-watch-typeahead": "^1.0.0",
     "mini-css-extract-plugin": "^2.4.5",
-    "node-sass": "^9.0.0",
     "postcss": "^8.4.4",
     "postcss-flexbugs-fixes": "^5.0.2",
     "postcss-loader": "^6.2.1",
@@ -91,7 +91,7 @@
     "redux": "^4.1.2",
     "resolve": "^1.20.0",
     "resolve-url-loader": "^4.0.0",
-    "sass-loader": "^12.3.0",
+    "sass-loader": "^16.0.7",
     "semver": "^7.3.5",
     "source-map-loader": "^3.0.0",
     "standard-version": "^9.5.0",
@@ -133,10 +133,9 @@
     "@types/react-dom": "^17.0.9",
     "@types/react-router": "^5.1.18",
     "husky": "^8.0.1",
+    "prettier": "^3.8.1",
+    "sass": "^1.97.3",
     "typescript": "^4.4.2"
-  },
-  "resolutions": {
-    "sass-loader": "14.1.0"
   },
   "eslintConfig": {
     "extends": [

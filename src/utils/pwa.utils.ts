@@ -45,7 +45,7 @@ export const getDescriptionByOS = (os: 'ios' | 'android') =>
                 text: `pwa.${os}.step3.desc`,
             },
         ],
-    }[os] || []);
+    })[os] || [];
 
 export const checkPWA = () => {
     if (window.location.search.includes('?mode=pwa')) {

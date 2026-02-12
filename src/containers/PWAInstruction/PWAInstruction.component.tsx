@@ -26,7 +26,7 @@ const PWAInstructionComponent = () => {
             e.preventDefault();
             setAndroidDeferredPrompt(e as BeforeInstallPromptEvent);
         },
-        [setAndroidDeferredPrompt]
+        [setAndroidDeferredPrompt],
     );
 
     React.useEffect(() => {

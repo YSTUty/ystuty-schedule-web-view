@@ -185,29 +185,29 @@ const AppointmentContent = ({ data, ...restProps }: AppointmentContentProps) => 
                               </span>
                           )
                         : data.scheduleFor === 'teacher'
-                        ? data.teacherId && (
-                              <span style={{ fontSize: 10, fontWeight: 700, color: green['900'] }}>
-                                  {' ['}
-                                  {((e?: string) =>
-                                      e
-                                          ?.split(' ')
-                                          .map((e, i) => /* i === 0 ? e.slice(0, 5) : */ e[0])
-                                          .join('.')
-                                          .trim())(
-                                      data.teacherName /* || teachers?.find((e) => e.id === data.teacherId)?.name */,
-                                  ) || data.teacherId}
-                                  {']'}
-                              </span>
-                          )
-                        : data.scheduleFor === 'audience'
-                        ? data.audienceName_ && (
-                              <span style={{ fontSize: 10, fontWeight: 700, color: green['900'] }}>
-                                  {' '}
-                                  [{data.audienceName_}
-                                  {data.additionalAuditoryName && `/${data.additionalAuditoryName}`}]
-                              </span>
-                          )
-                        : null}{' '}
+                          ? data.teacherId && (
+                                <span style={{ fontSize: 10, fontWeight: 700, color: green['900'] }}>
+                                    {' ['}
+                                    {((e?: string) =>
+                                        e
+                                            ?.split(' ')
+                                            .map((e, i) => /* i === 0 ? e.slice(0, 5) : */ e[0])
+                                            .join('.')
+                                            .trim())(
+                                        data.teacherName /* || teachers?.find((e) => e.id === data.teacherId)?.name */,
+                                    ) || data.teacherId}
+                                    {']'}
+                                </span>
+                            )
+                          : data.scheduleFor === 'audience'
+                            ? data.audienceName_ && (
+                                  <span style={{ fontSize: 10, fontWeight: 700, color: green['900'] }}>
+                                      {' '}
+                                      [{data.audienceName_}
+                                      {data.additionalAuditoryName && `/${data.additionalAuditoryName}`}]
+                                  </span>
+                              )
+                            : null}{' '}
                     {data.title}
                 </div>
                 {data.timeRange && <div className={dxClasses.text}>🕑 {data.timeRange}</div>}
@@ -392,14 +392,13 @@ const TitleCellComponent = () => <AllDayPanel.TitleCell getMessage={(e) => (e ==
 
 const getFlexibleSpace =
     (scheduleFor: ScheduleFor) =>
-    ({ ...props }: Toolbar.FlexibleSpaceProps) =>
-        (
-            <StyledToolbarFlexibleSpace {...props} className={dxClasses.flexibleSpace}>
-                <LessonFilter />
-                <LessonTypeSelector />
-                <GroupGroupingControl scheduleFor={scheduleFor} />
-            </StyledToolbarFlexibleSpace>
-        );
+    ({ ...props }: Toolbar.FlexibleSpaceProps) => (
+        <StyledToolbarFlexibleSpace {...props} className={dxClasses.flexibleSpace}>
+            <LessonFilter />
+            <LessonTypeSelector />
+            <GroupGroupingControl scheduleFor={scheduleFor} />
+        </StyledToolbarFlexibleSpace>
+    );
 
 const getResources = (scheduleFor: ScheduleFor, selectedItems: (number | string)[] = []) => {
     const resources: Resource[] = [];
@@ -512,8 +511,8 @@ const SchedulerContainer: React.FC<MaterialSchedulerProps> = (props) => {
                         ...(scheduleFor === 'group'
                             ? isComparing && { group: data.itemKey as string }
                             : scheduleFor === 'teacher'
-                            ? { teacherId: isComparing ? e.teacherId : undefined }
-                            : isComparing && { audienceName_: e.auditoryName as string }),
+                              ? { teacherId: isComparing ? e.teacherId : undefined }
+                              : isComparing && { audienceName_: e.auditoryName as string }),
                     };
                 }),
             ),
@@ -554,8 +553,8 @@ const SchedulerContainer: React.FC<MaterialSchedulerProps> = (props) => {
             ? scheduleFor === 'group'
                 ? 'group'
                 : scheduleFor === 'teacher'
-                ? 'teacherId'
-                : 'auditoryName'
+                  ? 'teacherId'
+                  : 'auditoryName'
             : 'typeArr';
     const hasGroupingGroups = selectedItems.length > 1 && groupingGroups;
 

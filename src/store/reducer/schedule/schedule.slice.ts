@@ -92,8 +92,8 @@ export const scheduleSlice = createSlice({
                 scheduleFor === 'group'
                     ? STORE_ALLOW_MULTIPLE_GROUP_KEY
                     : scheduleFor === 'teacher'
-                    ? STORE_ALLOW_MULTIPLE_TEACHERS_KEY
-                    : STORE_ALLOW_MULTIPLE_AUDIENCES_KEY,
+                      ? STORE_ALLOW_MULTIPLE_TEACHERS_KEY
+                      : STORE_ALLOW_MULTIPLE_AUDIENCES_KEY,
                 allowed,
             );
         },
