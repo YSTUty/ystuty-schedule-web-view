@@ -67,7 +67,7 @@ export const useScheduleLoader = (props: { scheduleFor: ScheduleFor | null }) =>
                                     ...lesson,
                                     start: lesson.startAt!,
                                     end: lesson.endAt!,
-                                    title: lesson.lessonName,
+                                    title: lesson.lessonName || '...',
                                     typeArr: (Object.values(LessonFlags) as LessonFlags[]).filter(
                                         (e) => (lesson.type & e) === e && e !== LessonFlags.None,
                                     ),

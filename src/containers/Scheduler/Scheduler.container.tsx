@@ -167,6 +167,9 @@ const AppointmentContent = ({ data, ...restProps }: AppointmentContentProps) => 
     if (data.isStream) {
         title += `• В потоке\n`;
     }
+    if (data.subInfo) {
+        title += `• Есть доп. инфа...\n`;
+    }
     if (data.isDistant) {
         title += `• Дистант 📡\n`;
     }
@@ -235,6 +238,11 @@ const AppointmentContent = ({ data, ...restProps }: AppointmentContentProps) => 
                 )}
                 {data.isDivision && <div className={classNames(dxClasses.text, dxClasses.content)}>• По П/Г</div>}
                 {data.isStream && <div className={classNames(dxClasses.text, dxClasses.content)}>• В потоке</div>}
+                {data.subInfo && (
+                    <div className={classNames(dxClasses.text, dxClasses.content)}>
+                        • <b>Есть доп. инфа...</b>
+                    </div>
+                )}
             </div>
         </StyledAppointmentsAppointmentContent>
     );
@@ -354,9 +362,17 @@ const AppointmentTooltipContent = ({ children, appointmentData, ...restProps }: 
                 </StyledGrid>
                 <Grid item xs={10}>
                     <span>
-                        <i>
-                            <b>{appointmentData.subInfo}</b>
-                        </i>
+                        {appointmentData.subInfo.startsWith('http') ? (
+                            <a href={appointmentData.subInfo} target="_blank" rel="noopener noreferrer">
+                                <i>
+                                    <b>{appointmentData.subInfo}</b>
+                                </i>
+                            </a>
+                        ) : (
+                            <i>
+                                <b>{appointmentData.subInfo}</b>
+                            </i>
+                        )}
                     </span>
                 </Grid>
             </Grid>
