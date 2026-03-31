@@ -1,5 +1,6 @@
 import React from 'react';
 import store2 from 'store2';
+import { AppVersion } from '../utils/app-version';
 
 const checkNewDomain = () =>
     fetch('https://ystuty.web.app/dom-view.json', { method: 'POST' })
@@ -43,13 +44,19 @@ export const apiCheckAppVersion = async () => {
             throw new Error(`HTTP Error: ${response.status}`);
         }
 
-        const data = await response.json();
+        const data:
+            | AppVersion
+            | {
+                  /** @deprecated */
+                  v: string;
+              } = await response.json();
         const appVersion = store2.get('appVersion');
 
-        console.log('[VersionChecker] Current:', appVersion, 'New:', data.v);
+        const pubVer = 'v' in data ? data.v : data.version;
+        console.log('[VersionChecker] Current:', appVersion, 'New:', pubVer);
 
-        if (data.v && data.v !== appVersion) {
-            store2.set('appVersion', data.v);
+        if (pubVer !== appVersion) {
+            store2.set('appVersion', pubVer);
             setTimeout(() => window.location.reload(), RELOAD_DELAY_MS);
             return true;
         }

@@ -60,7 +60,7 @@ const PWAInstructionComponent = () => {
             <div className={styles.Caption}>
                 <div className={styles.CaptionText}>
                     {userOS === 'ios' ? <AppleIcon /> : <AndroidIcon />}
-                    {formatMessage({ id: 'pwa.h1' }, { device: userOS, version: appVersion.v })}
+                    {formatMessage({ id: 'pwa.h1' }, { device: userOS, version: appVersion.version })}
                 </div>
                 <button type="button" className={styles.btnLeft} onClick={onClickCallback}>
                     <LeftIcon />

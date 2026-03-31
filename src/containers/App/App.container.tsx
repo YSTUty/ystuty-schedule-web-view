@@ -24,7 +24,7 @@ const AppContainer = () => {
 
     React.useEffect(() => {
         // pwaUtils.checkPWA();
-        store2.set('appVersion', appVersion.v);
+        store2.set('appVersion', appVersion.version);
     }, []);
 
     // if (pathname === '/pwa') {

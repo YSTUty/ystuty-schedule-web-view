@@ -1,5 +1,7 @@
 import preval from 'preval.macro';
 
-const appVersion: { v: string } = preval`module.exports = require('../../public/version.json');`;
+export type AppVersion = { version: string };
+
+const appVersion: AppVersion = preval`module.exports = require('../../public/version.json');`;
 
 export default appVersion;

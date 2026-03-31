@@ -14,7 +14,7 @@ const StyledDate = styled('div')(() => ({
 
 const VersionComponent = () => (
     <div style={{ fontSize: '0.6rem', color: '#9e9e9e' }}>
-        Beta [{appVersion.v}]
+        Beta [{appVersion.version}]
         <StyledDate>
             {' ('}
             <FormattedDate
