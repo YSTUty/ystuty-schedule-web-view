@@ -1,38 +1,51 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-# Load `.env` file
-#export $(grep -v '^#' .env | xargs)
+# Load `.env.local` file
+get_env_var() {
+  local var_name=$1
 
-X_BUILD_DIR=$(grep ^X_BUILD_DIR= .env | cut -d '=' -f2)
-X_SERVER=$(grep ^X_SERVER= .env | cut -d '=' -f2)
-X_DESTINATION=$(grep ^X_DESTINATION= .env | cut -d '=' -f2)
+  local value=$(grep -E "^${var_name}=" .env.production 2>/dev/null | cut -d '=' -f2-)
 
-SERVER=${X_SERVER:-"./dist"}
+  if [ -z "$value" ]; then
+    value=$(grep -E "^${var_name}=" .env.local 2>/dev/null | cut -d '=' -f2-)
+  fi
+
+  if [ -z "$value" ]; then
+    value=$(grep -E "^${var_name}=" .env 2>/dev/null | cut -d '=' -f2-)
+  fi
+
+  echo "$value"
+}
+
+X_BUILD_DIR=$(get_env_var X_BUILD_DIR)
+X_SERVER=$(get_env_var X_SERVER)
+X_DESTINATION=$(get_env_var X_DESTINATION)
+
+SERVER=${X_SERVER:-"localhost"}
 DESTINATION=${X_DESTINATION:-"/var/www/html"}
-# LOCAL_BUILD_DIR="./dist"
-LOCAL_BUILD_DIR=${X_BUILD_DIR:-"./dist"}
+LOCAL_BUILD_DIR=${X_BUILD_DIR:-"./build"}
+
+DESTINATION=${DESTINATION%/}
 
 # Check exists dir dist
 if [ ! -d "$LOCAL_BUILD_DIR" ]; then
-  echo "Failed: folder ($LOCAL_BUILD_DIR) not found. Run: yarn build."
+  echo "Failed: folder ($LOCAL_BUILD_DIR) not found. Run: npm run build."
   exit 1
 fi
 
-echo "Deploy starting..."
+echo "Deploying to $SERVER:$DESTINATION ..."
 
 # Copy files
 echo "Copying files..."
-# rsync -avz --delete "$LOCAL_BUILD_DIR/" "$SERVER:$DESTINATION" || { echo "Failed to copy files!"; exit 1; }
-# rsync -avz -e 'ssh' "$LOCAL_BUILD_DIR/" "$SERVER:$DESTINATION" || { echo "Failed to copy files!"; exit 1; }
-scp -r "$LOCAL_BUILD_DIR" "$SERVER:$DESTINATION" || { echo "Failed to copy files!"; exit 1; }
+scp -r "$LOCAL_BUILD_DIR"/. "$SERVER:$DESTINATION" || { echo "Failed to copy files!"; exit 1; }
 
-# # Set permissions
-# echo "Setting permissions..."
-# ssh $SERVER << EOF
-#   echo "Going to $DESTINATION..."
-#   cd $DESTINATION
-#   echo "Setting permissions for files..."
-#   chmod -R 755 .
-# EOF
+# Upload version.json
+VERSION=$(node -p "require('./package.json').version")
+VERSION_FILE="$(mktemp)-version.json"
+
+echo "Update public version to [$VERSION]"
+printf '{"version":"%s"}\n' "$VERSION" > "$VERSION_FILE"
+scp "$VERSION_FILE" "$SERVER:$DESTINATION/version.json" || { echo "Failed to copy version.json!"; exit 1; }
+rm -f "$VERSION_FILE"
 
 echo "Deploy completed! $(date '+%H:%M:%S')"

@@ -16,7 +16,7 @@
     "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,json,css,scss}\"",
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
-    "deploy": "yarn build && ./deploy.sh",
+    "deploy": "npm run build && bash ./deploy.sh",
     "test": "node scripts/test.js",
     "prepare": "husky install",
     "release": "standard-version",
