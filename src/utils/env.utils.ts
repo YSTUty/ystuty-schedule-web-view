@@ -22,7 +22,9 @@ function getApiPath() {
 
     const apiPathFromUrl = new URLSearchParams(window.location.search).get('apiPath');
     const apiPathFromStorage = localStorage.getItem(apiPath_key);
-    const apiPathFromEnv = process.env.REACT_APP_API_URL;
+    const apiPathFromEnvMain = process.env.REACT_APP_API_URL;
+    const apiPathFromEnvForInternal = process.env.REACT_APP_API_URL_INTERNAL;
+    const apiPathFromEnv = window.location.hostname.endsWith('.ystu') ? apiPathFromEnvForInternal : apiPathFromEnvMain;
     const apiPathFromWindow = `//${window.location.host}/api`;
 
     const apiPath = apiPathFromUrl || apiPathFromStorage || apiPathFromEnv || apiPathFromWindow;
