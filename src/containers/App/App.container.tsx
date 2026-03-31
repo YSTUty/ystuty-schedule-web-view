@@ -3,38 +3,38 @@ import { useLocation } from 'react-router';
 import { useNetworkState } from 'react-use';
 import store2 from 'store2';
 
-import LazyLoadComponent from '../../components/LazyLoad.component';
+// import LazyLoadComponent from '../../components/LazyLoad.component';
 import { AlertMe } from '../../components/AlertMe.component';
 import Copyright from '../../components/Copyright.component';
 import { Routes } from '../../Routes';
 
 import { history } from '../../store';
-import * as envUtils from '../../utils/env.utils';
-import * as pwaUtils from '../../utils/pwa.utils';
+// import * as envUtils from '../../utils/env.utils';
+// import * as pwaUtils from '../../utils/pwa.utils';
 import WithVersionCheckerConnect from '../../shared/WithVersionChecker.util';
 import appVersion from '../../utils/app-version';
 
-const PWAInstructionComponent = LazyLoadComponent(
-    React.lazy(() => import('../PWAInstruction/PWAInstruction.component')),
-);
+// const PWAInstructionComponent = LazyLoadComponent(
+//     React.lazy(() => import('../PWAInstruction/PWAInstruction.component')),
+// );
 
 const AppContainer = () => {
     const { pathname, hash } = useLocation();
     const state = useNetworkState();
 
     React.useEffect(() => {
-        pwaUtils.checkPWA();
+        // pwaUtils.checkPWA();
         store2.set('appVersion', appVersion.v);
     }, []);
 
-    if (pathname === '/pwa') {
-        if (window.location.hostname === envUtils.pwaHostname) {
-            return <PWAInstructionComponent />;
-        } else {
-            window.location.href = `https://${envUtils.pwaHostname}`;
-            return;
-        }
-    }
+    // if (pathname === '/pwa') {
+    //     if (window.location.hostname === envUtils.pwaHostname) {
+    //         return <PWAInstructionComponent />;
+    //     } else {
+    //         window.location.href = `https://${envUtils.pwaHostname}`;
+    //         return;
+    //     }
+    // }
 
     // TODO: Переделать наоборот из hash в href
     const regexpGroup = /^\/(g\/?|group\/)(?<groupName>[А-я]{2,5}-[0-9А-я()]{2,8})?$/i;
