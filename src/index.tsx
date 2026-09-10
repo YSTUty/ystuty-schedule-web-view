@@ -19,9 +19,9 @@ import ServiceWorkerProvider from './shared/ServiceWorker.provider';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
 
-if (process.env.NODE_ENV === 'production' && process.env.REACT_APP_SENTRY_DSN) {
+if (import.meta.env.PROD && import.meta.env.VITE_SENTRY_DSN) {
     Sentry.init({
-        dsn: process.env.REACT_APP_SENTRY_DSN,
+        dsn: import.meta.env.VITE_SENTRY_DSN,
         integrations: [Sentry.browserTracingIntegration(), Sentry.replayIntegration()],
         // Tracing
         tracesSampleRate: 1.0, //  Capture 100% of the transactions
@@ -53,11 +53,6 @@ ReactDOM.render(
     </React.StrictMode>,
     document.getElementById('root'),
 );
-
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://cra.link/PWA
-serviceWorkerRegistration.register();
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

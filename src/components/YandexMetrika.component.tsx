@@ -2,7 +2,7 @@ import * as React from 'react';
 import { YMInitializer } from '@appigram/react-yandex-metrika';
 
 export const YandexMetrika = () => {
-    const YM_ID = Number(process.env.REACT_APP_YM_ID);
+    const YM_ID = Number(import.meta.env.VITE_YM_ID);
 
     const [utmFixed, setUtmFixed] = React.useState(false);
 

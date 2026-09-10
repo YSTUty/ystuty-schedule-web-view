@@ -21,7 +21,7 @@ import SchoolIcon from '@mui/icons-material/School';
 import AudienceIcon from '@mui/icons-material/DoorSliding';
 import TelegramIcon from '@mui/icons-material/Telegram';
 import SupportAgentIcon from '@mui/icons-material/SupportAgentSharp';
-import { ReactComponent as VkSvg } from '../../assets/img/vk-logo.svg';
+import VkSvg from '../../assets/img/vk-logo.svg?react';
 
 import VK, { Like } from '../../components/VK';
 import { ThemeModeButton } from '../../components/ThemeMode.component';

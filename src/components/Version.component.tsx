@@ -1,9 +1,8 @@
 import styled from '@mui/styled-engine';
-import preval from 'preval.macro';
 import { FormattedDate } from 'react-intl';
 import appVersion from '../utils/app-version';
 
-const buildTimestamp: number = preval`module.exports = Date.now();`;
+const buildTimestamp = __BUILD_TIMESTAMP__;
 
 const StyledDate = styled('div')(() => ({
     display: 'inline',

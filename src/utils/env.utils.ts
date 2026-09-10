@@ -1,20 +1,20 @@
 export const apiPath = getApiPath();
 
-export const linkYSTUty = process.env.REACT_APP_LINK_YSTUTY;
-export const linkToGitHub = process.env.REACT_APP_LINK_2GH;
-export const linkToVK = process.env.REACT_APP_LINK_2VK;
-export const linkToICS = process.env.REACT_APP_LINK_2ICS;
-export const linkToSupport = process.env.REACT_APP_LINK_SUPPORT;
+export const linkYSTUty = import.meta.env.VITE_LINK_YSTUTY;
+export const linkToGitHub = import.meta.env.VITE_LINK_2GH;
+export const linkToVK = import.meta.env.VITE_LINK_2VK;
+export const linkToICS = import.meta.env.VITE_LINK_2ICS;
+export const linkToSupport = import.meta.env.VITE_LINK_SUPPORT;
 
-export const pwaHostname = process.env.REACT_APP_PWA_HOST;
-export const pwaHostnameOld = process.env.REACT_APP_PWA_HOST_OLD;
-export const telegramUsername = process.env.REACT_APP_TELEGRAM_USERNAME;
-export const telegramBotName = process.env.REACT_APP_TELEGRAM_BOT_NAME;
-export const vkBotGroupName = process.env.REACT_APP_VK_BOT_GROUP_NAME;
+export const pwaHostname = import.meta.env.VITE_PWA_HOST;
+export const pwaHostnameOld = import.meta.env.VITE_PWA_HOST_OLD;
+export const telegramUsername = import.meta.env.VITE_TELEGRAM_USERNAME;
+export const telegramBotName = import.meta.env.VITE_TELEGRAM_BOT_NAME;
+export const vkBotGroupName = import.meta.env.VITE_VK_BOT_GROUP_NAME;
 
 export const vkWidgetsApiId =
-    process.env.REACT_APP_VK_WIDGETS_API_ID && !isNaN(+process.env.REACT_APP_VK_WIDGETS_API_ID)
-        ? +process.env.REACT_APP_VK_WIDGETS_API_ID
+    import.meta.env.VITE_VK_WIDGETS_API_ID && !isNaN(+import.meta.env.VITE_VK_WIDGETS_API_ID)
+        ? +import.meta.env.VITE_VK_WIDGETS_API_ID
         : undefined;
 
 function getApiPath() {
@@ -22,8 +22,8 @@ function getApiPath() {
 
     const apiPathFromUrl = new URLSearchParams(window.location.search).get('apiPath');
     const apiPathFromStorage = localStorage.getItem(apiPath_key);
-    const apiPathFromEnvMain = process.env.REACT_APP_API_URL;
-    const apiPathFromEnvForInternal = process.env.REACT_APP_API_URL_INTERNAL;
+    const apiPathFromEnvMain = import.meta.env.VITE_API_URL;
+    const apiPathFromEnvForInternal = import.meta.env.VITE_API_URL_INTERNAL;
     const apiPathFromEnv = window.location.hostname.endsWith('.ystu') ? apiPathFromEnvForInternal : apiPathFromEnvMain;
     const apiPathFromWindow = `//${window.location.host}/api`;
 

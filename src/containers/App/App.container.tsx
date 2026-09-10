@@ -49,7 +49,7 @@ const AppContainer = () => {
 
     return (
         <>
-            {process.env.NODE_ENV === 'development' && !state.online && <pre>{JSON.stringify(state, null, 2)}</pre>}
+            {import.meta.env.DEV && !state.online && <pre>{JSON.stringify(state, null, 2)}</pre>}
             <AlertMe />
             <Routes />
             <Copyright />

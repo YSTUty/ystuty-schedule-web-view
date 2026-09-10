@@ -37,7 +37,7 @@ const PWAInstructionComponent = () => {
     });
 
     const onClickCallback = React.useCallback(() => {
-        window.location.href = `https://${process.env.REACT_APP_MAIN_HOST}`;
+        window.location.href = `https://${import.meta.env.VITE_MAIN_HOST}`;
     }, []);
 
     const handleOnClickInstall = React.useCallback(() => {
