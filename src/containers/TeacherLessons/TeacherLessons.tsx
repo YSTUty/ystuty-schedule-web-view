@@ -1,95 +1,101 @@
 import React from 'react';
 import { useIntl } from 'react-intl';
 
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import Paper from '@mui/material/Paper';
-import Container from '@mui/material/Container';
-import Toolbar from '@mui/material/Toolbar';
-import FormControl from '@mui/material/FormControl';
 import AppBar from '@mui/material/AppBar';
+import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
 import Divider from '@mui/material/Divider';
-
+import FormControl from '@mui/material/FormControl';
+import Paper from '@mui/material/Paper';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
 import HomeIcon from '@mui/icons-material/Home';
 
-import VK, { Like } from '../../components/VK';
-import { ThemeModeButton } from '../../components/ThemeMode.component';
-import NavLinkComponent from '../../components/NavLink.component';
-import { SelectTeacherComponent } from '../../components/SelectTeacher.component';
+import NavLinkComponent from '@components/NavLink.component';
+import { SelectTeacherComponent } from '@components/SelectTeacher.component';
+import { ThemeModeButton } from '@components/ThemeMode.component';
+import VK, { Like } from '@components/VK';
+import * as envUtils from '@/utils/env.utils';
+import { useScheduleLoader } from '@/pages/ScheduleView/scheduleLoader.hook';
 import TeacherLessonsTable from './TeacherLessonsTable';
-import { useScheduleLoader } from '../../pages/ScheduleView/scheduleLoader.hook';
-
-import * as envUtils from '../../utils/env.utils';
 
 const TeacherLessons = () => {
-    useScheduleLoader({ scheduleFor: 'teacher' });
-    const allowMultipleTeachersRef = React.useRef<(state?: any) => void>(() => {});
-    const { formatMessage } = useIntl();
+  useScheduleLoader({ scheduleFor: 'teacher' });
+  const allowMultipleTeachersRef = React.useRef<(state?: any) => void>(
+    () => {},
+  );
+  const { formatMessage } = useIntl();
 
-    return (
-        <>
-            <AppBar
-                position="absolute"
-                color="default"
-                elevation={5}
-                sx={{
-                    position: 'relative',
-                    borderBottom: (t) => `1px solid ${t.palette.divider}`,
-                }}
-            >
-                <Toolbar>
-                    <Typography variant="h6" color="inherit" noWrap sx={{ mr: 2 }}>
-                        {formatMessage({ id: 'schedule.teacher' })}
-                    </Typography>
-                    {envUtils.vkWidgetsApiId && (
-                        <>
-                            <Divider orientation="vertical" flexItem />
-                            <FormControl sx={{ ml: 2 }}>
-                                <VK apiId={envUtils.vkWidgetsApiId} options={{ version: 168, onlyWidgets: true }}>
-                                    <Like
-                                        elementId="vk_like"
-                                        options={{ type: 'mini', height: 24, verb: 0 }}
-                                        pageId="app"
-                                        onLike={(num) => {}}
-                                        onUnlike={(num) => {}}
-                                        onShare={(num) => {}}
-                                        onUnshare={(num) => {}}
-                                    />
-                                </VK>
-                            </FormControl>
-                        </>
-                    )}
+  return (
+    <>
+      <AppBar
+        position="absolute"
+        color="default"
+        elevation={5}
+        sx={{
+          position: 'relative',
+          borderBottom: (t) => `1px solid ${t.palette.divider}`,
+        }}>
+        <Toolbar>
+          <Typography variant="h6" color="inherit" noWrap sx={{ mr: 2 }}>
+            {formatMessage({ id: 'schedule.teacher' })}
+          </Typography>
+          {envUtils.vkWidgetsApiId && (
+            <>
+              <Divider orientation="vertical" flexItem />
+              <FormControl sx={{ ml: 2 }}>
+                <VK
+                  apiId={envUtils.vkWidgetsApiId}
+                  options={{ version: 168, onlyWidgets: true }}>
+                  <Like
+                    elementId="vk_like"
+                    options={{ type: 'mini', height: 24, verb: 0 }}
+                    pageId="app"
+                    onLike={(num) => {}}
+                    onUnlike={(num) => {}}
+                    onShare={(num) => {}}
+                    onUnshare={(num) => {}}
+                  />
+                </VK>
+              </FormControl>
+            </>
+          )}
 
-                    <Divider orientation="vertical" flexItem />
-                    <FormControl sx={{ mx: 1 }}>
-                        <NavLinkComponent to="/" style={{ color: 'inherit' }} title={formatMessage({ id: 'to_home' })}>
-                            <HomeIcon />
-                        </NavLinkComponent>
-                    </FormControl>
-                    <Typography sx={{ flex: 1 }}></Typography>
+          <Divider orientation="vertical" flexItem />
+          <FormControl sx={{ mx: 1 }}>
+            <NavLinkComponent
+              to="/"
+              style={{ color: 'inherit' }}
+              title={formatMessage({ id: 'to_home' })}>
+              <HomeIcon />
+            </NavLinkComponent>
+          </FormControl>
+          <Typography sx={{ flex: 1 }}></Typography>
 
-                    <Divider orientation="vertical" flexItem />
-                    <FormControl sx={{ mx: 1 }}>
-                        <ThemeModeButton />
-                    </FormControl>
-                </Toolbar>
-            </AppBar>
+          <Divider orientation="vertical" flexItem />
+          <FormControl sx={{ mx: 1 }}>
+            <ThemeModeButton />
+          </FormControl>
+        </Toolbar>
+      </AppBar>
 
-            <Box component="main" sx={{ mt: 4, mb: 4 }}>
-                <Container component="main" /* maxWidth="md" */ sx={{ mb: 4 }}>
-                    <Paper sx={{ my: { xs: 3, md: 6 }, p: { xs: 2, md: 3 } }}>
-                        <Typography component="h1" variant="h6" align="center">
-                            Нагрузка преподавателя
-                        </Typography>
-                        <Box sx={{ mt: 2 }}>
-                            <SelectTeacherComponent allowMultipleRef={allowMultipleTeachersRef} />
-                        </Box>
-                    </Paper>
-                </Container>
-                <TeacherLessonsTable />
+      <Box component="main" sx={{ mt: 4, mb: 4 }}>
+        <Container component="main" /* maxWidth="md" */ sx={{ mb: 4 }}>
+          <Paper sx={{ my: { xs: 3, md: 6 }, p: { xs: 2, md: 3 } }}>
+            <Typography component="h1" variant="h6" align="center">
+              Нагрузка преподавателя
+            </Typography>
+            <Box sx={{ mt: 2 }}>
+              <SelectTeacherComponent
+                allowMultipleRef={allowMultipleTeachersRef}
+              />
             </Box>
-        </>
-    );
+          </Paper>
+        </Container>
+        <TeacherLessonsTable />
+      </Box>
+    </>
+  );
 };
 
 export default TeacherLessons;

@@ -1,31 +1,33 @@
-import styled from '@mui/styled-engine';
 import { FormattedDate } from 'react-intl';
-import appVersion from '../utils/app-version';
+
+import styled from '@mui/styled-engine';
+
+import appVersion from '@/utils/app-version';
 
 const buildTimestamp = __BUILD_TIMESTAMP__;
 
 const StyledDate = styled('div')(() => ({
-    display: 'inline',
-    '@media (max-width: 540px)': {
-        display: 'none',
-    },
+  display: 'inline',
+  '@media (max-width: 540px)': {
+    display: 'none',
+  },
 }));
 
 const VersionComponent = () => (
-    <div style={{ fontSize: '0.6rem', color: '#9e9e9e' }}>
-        Beta [{appVersion.version}]
-        <StyledDate>
-            {' ('}
-            <FormattedDate
-                month="2-digit"
-                day="2-digit"
-                hour="2-digit"
-                minute="2-digit"
-                value={new Date(buildTimestamp)}
-            />
-            )
-        </StyledDate>
-    </div>
+  <div style={{ fontSize: '0.6rem', color: '#9e9e9e' }}>
+    Beta [{appVersion.version}]
+    <StyledDate>
+      {' ('}
+      <FormattedDate
+        month="2-digit"
+        day="2-digit"
+        hour="2-digit"
+        minute="2-digit"
+        value={new Date(buildTimestamp)}
+      />
+      )
+    </StyledDate>
+  </div>
 );
 
 export default VersionComponent;

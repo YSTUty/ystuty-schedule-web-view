@@ -2,56 +2,61 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { Router } from 'react-router';
+
 import * as Sentry from '@sentry/react';
+
 import './utils/hawk.util';
+
 import store, { history } from './store';
 
 import 'react-toastify/dist/ReactToastify.css';
 import './index.css';
 
-import AppContainer from './containers/App/App.container';
+import * as serviceWorkerRegistration from './serviceWorkerRegistration';
+import LoadingUpdatesComponent from './components/LoadingUpdates.component';
+import LocalizerComponent from './components/Localizer.component';
 import { ThemeModeProvider } from './components/ThemeMode.component';
 import { YandexMetrika } from './components/YandexMetrika.component';
-import LocalizerComponent from './components/Localizer.component';
-import LoadingUpdatesComponent from './components/LoadingUpdates.component';
-
-import ServiceWorkerProvider from './shared/ServiceWorker.provider';
-import * as serviceWorkerRegistration from './serviceWorkerRegistration';
+import AppContainer from './containers/App/App.container';
 import reportWebVitals from './reportWebVitals';
+import ServiceWorkerProvider from './shared/ServiceWorker.provider';
 
 if (!isDev && import.meta.env.VITE_SENTRY_DSN) {
-    Sentry.init({
-        dsn: import.meta.env.VITE_SENTRY_DSN,
-        integrations: [Sentry.browserTracingIntegration(), Sentry.replayIntegration()],
-        // Tracing
-        tracesSampleRate: 1.0, //  Capture 100% of the transactions
-        // // Set 'tracePropagationTargets' to control for which URLs distributed tracing should be enabled
-        // tracePropagationTargets: ['localhost', /^https:\/\/[a-z0-9_\-]+\.ystuty\.ru/],
-        // Session Replay
-        replaysSessionSampleRate: 0.1, // This sets the sample rate at 10%. You may want to change it to 100% while in development and then sample at a lower rate in production.
-        replaysOnErrorSampleRate: 1.0, // If you're not already sampling the entire session, change the sample rate to 100% when sampling sessions where errors occur.
-    });
+  Sentry.init({
+    dsn: import.meta.env.VITE_SENTRY_DSN,
+    integrations: [
+      Sentry.browserTracingIntegration(),
+      Sentry.replayIntegration(),
+    ],
+    // Tracing
+    tracesSampleRate: 1.0, //  Capture 100% of the transactions
+    // // Set 'tracePropagationTargets' to control for which URLs distributed tracing should be enabled
+    // tracePropagationTargets: ['localhost', /^https:\/\/[a-z0-9_\-]+\.ystuty\.ru/],
+    // Session Replay
+    replaysSessionSampleRate: 0.1, // This sets the sample rate at 10%. You may want to change it to 100% while in development and then sample at a lower rate in production.
+    replaysOnErrorSampleRate: 1.0, // If you're not already sampling the entire session, change the sample rate to 100% when sampling sessions where errors occur.
+  });
 }
 
 ReactDOM.render(
-    <React.StrictMode>
-        <Provider store={store}>
-            <LocalizerComponent>
-                <ThemeModeProvider>
-                    {/* <ToastContainer /> */}
-                    <Router history={history}>
-                        <ServiceWorkerProvider>
-                            <LoadingUpdatesComponent>
-                                <AppContainer />
-                            </LoadingUpdatesComponent>
-                        </ServiceWorkerProvider>
-                    </Router>
-                </ThemeModeProvider>
-                <YandexMetrika />
-            </LocalizerComponent>
-        </Provider>
-    </React.StrictMode>,
-    document.getElementById('root'),
+  <React.StrictMode>
+    <Provider store={store}>
+      <LocalizerComponent>
+        <ThemeModeProvider>
+          {/* <ToastContainer /> */}
+          <Router history={history}>
+            <ServiceWorkerProvider>
+              <LoadingUpdatesComponent>
+                <AppContainer />
+              </LoadingUpdatesComponent>
+            </ServiceWorkerProvider>
+          </Router>
+        </ThemeModeProvider>
+        <YandexMetrika />
+      </LocalizerComponent>
+    </Provider>
+  </React.StrictMode>,
+  document.getElementById('root'),
 );
 
 // If you want to start measuring performance in your app, pass a function
