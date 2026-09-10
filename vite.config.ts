@@ -39,7 +39,7 @@ export default ({ mode }: { mode: string }) => {
   const allEnv = loadEnv(mode, appRoot, '');
   const env = loadEnv(mode, appRoot, 'VITE_');
 
-  const isDev = mode !== 'production';
+  const isDev = process.env.NODE_ENV !== 'production';
   const hawkToken = env.VITE_HAWK_TOKEN;
   const commitHash = getGitCommitHash();
   const buildDate = formatBuildDate();

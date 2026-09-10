@@ -19,7 +19,7 @@ import ServiceWorkerProvider from './shared/ServiceWorker.provider';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
 
-if (import.meta.env.PROD && import.meta.env.VITE_SENTRY_DSN) {
+if (!isDev && import.meta.env.VITE_SENTRY_DSN) {
     Sentry.init({
         dsn: import.meta.env.VITE_SENTRY_DSN,
         integrations: [Sentry.browserTracingIntegration(), Sentry.replayIntegration()],

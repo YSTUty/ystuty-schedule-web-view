@@ -389,7 +389,7 @@ const AppointmentTooltipContent = ({ children, appointmentData, ...restProps }: 
                 </Grid>
             </Grid>
         )}
-        {!!1 && import.meta.env.DEV && (
+        {!!1 && isDev && (
             <Grid container alignItems="center">
                 <StyledGrid item xs={2} className={dxClasses.textCenter}>
                     <StyledIcon className={dxClasses.icon}>
