@@ -19,7 +19,7 @@ export type ResponseError = {
   error: string;
   message: string;
   validation?: ValidationItem[];
-  payload?: any;
+  payload?: unknown;
 };
 
 export const useApi = () => {
@@ -32,7 +32,7 @@ export const useApi = () => {
     {},
   );
   const controllers = React.useRef<Record<string, AbortController>>({});
-  const nodeTimeouts = React.useRef<NodeJS.Timeout[]>([]);
+  const nodeTimeouts = React.useRef<ReturnType<typeof setTimeout>[]>([]);
   const isFetchingRef = React.useRef(isFetching);
 
   const isFetchingAny = React.useMemo(
@@ -40,7 +40,7 @@ export const useApi = () => {
     [isFetching],
   );
 
-  function apiFetch<T = any>(
+  function apiFetch<T = unknown>(
     path: string,
     init?: RequestInit,
     params: {
@@ -94,7 +94,7 @@ export const useApi = () => {
             error: string;
             message: string;
             validation?: ValidationItem[];
-            payload?: any;
+            payload?: unknown;
           };
         }
       | { data: T }
@@ -213,9 +213,13 @@ export const useApi = () => {
         })
         .then(resolve)
         .catch((err) => {
-          if (err.name !== 'AbortError' && err !== 'Canceled fetch') {
-            reject(err);
+          if (err.name === 'AbortError' || err === 'Canceled fetch') {
+            // Отменённый запрос не должен оставлять вызывающий код в ожидании.
+            resolve(null);
+            return;
           }
+
+          reject(err);
         })
         .finally(() => {
           setIsFetching((e) => ({ ...e, [fKey]: false }));

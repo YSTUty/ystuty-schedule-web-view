@@ -5,7 +5,7 @@ const localeModules = import.meta.glob<{ default: Record<string, string> }>(
   '../assets/locale/*.json',
 );
 
-const LocalizerComponent = ({ children }: any) => {
+const LocalizerComponent = ({ children }: React.PropsWithChildren<{}>) => {
   // const { language } = useSelector((state) => state);
   const language = 'ru';
   const [messages, setMessages] = React.useState<Record<string, string>>();

@@ -24,10 +24,10 @@ const StyledLoadingUpdate = styled('div')(() => ({
   whiteSpace: 'pre-line',
 }));
 
-const Loading = (props: any) => {
+const Loading = ({ children }: React.PropsWithChildren<{}>) => {
   return (
     <StyledLoadingUpdate>
-      {props.children && props.children}
+      {children}
       <StyledLinearProgress />
     </StyledLoadingUpdate>
   );

@@ -36,7 +36,9 @@ export const ThemeModeButton = () => {
   );
 };
 
-export const ThemeModeProvider = (props: { children: any }) => {
+export const ThemeModeProvider = ({
+  children,
+}: React.PropsWithChildren<{}>) => {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const [mode, setMode] = React.useState<'light' | 'dark'>(
     LAST_THEME_MODE || 'light',
@@ -65,7 +67,10 @@ export const ThemeModeProvider = (props: { children: any }) => {
     () => createTheme({ palette: { mode, primary } }),
     [mode],
   );
-  const emotionCache = createCache({ key: 'css', speedy: false });
+  const emotionCache = React.useMemo(
+    () => createCache({ key: 'css', speedy: false }),
+    [],
+  );
 
   return (
     <ThemeModeContext.Provider value={colorMode}>
@@ -79,7 +84,7 @@ export const ThemeModeProvider = (props: { children: any }) => {
         <CacheProvider value={emotionCache}>
           <CssBaseline />
 
-          {props.children}
+          {children}
         </CacheProvider>
       </ThemeProvider>
     </ThemeModeContext.Provider>

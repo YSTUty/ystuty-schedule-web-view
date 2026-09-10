@@ -9,8 +9,8 @@ import DialogTitle from '@mui/material/DialogTitle';
 import { useServiceWorker } from '@/shared/ServiceWorker.provider';
 import LoadingComponent from './Loading.component';
 
-const LoadingUpdates = ({ children }: any) => {
-  const timer = React.useRef<any>(null);
+const LoadingUpdates = ({ children }: React.PropsWithChildren<{}>) => {
+  const timer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const [open, setOpen] = React.useState(false);
   const [showLoading, setShowLoading] = React.useState(false);
 
@@ -18,7 +18,9 @@ const LoadingUpdates = ({ children }: any) => {
   const { formatMessage } = useIntl();
 
   const startUpdate = React.useCallback(() => {
-    clearTimeout(timer.current);
+    if (timer.current !== null) {
+      clearTimeout(timer.current);
+    }
     setShowLoading(true);
     updateAssets();
     timer.current = setTimeout(() => {
@@ -39,7 +41,9 @@ const LoadingUpdates = ({ children }: any) => {
 
   React.useEffect(
     () => () => {
-      clearTimeout(timer.current);
+      if (timer.current !== null) {
+        clearTimeout(timer.current);
+      }
     },
     [],
   );

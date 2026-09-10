@@ -6,11 +6,16 @@ import { useHash, useNetworkState } from 'react-use';
 import store2 from 'store2';
 import classNames from 'clsx';
 
-import { autocompleteClasses } from '@mui/material/Autocomplete';
-import Popper, { PopperProps } from '@mui/material/Popper';
-import { styled } from '@mui/material/styles';
 import TextField from '@mui/material/TextField';
 
+import {
+  AllowMultipleRef,
+  areSameScheduleSelections,
+  limitScheduleSelections,
+  ScheduleSelectorPopper,
+  shouldIgnoreAutocompleteRemoval,
+  shouldRefreshScheduleOptions,
+} from '@components/ScheduleSelector.shared';
 import { IInstituteGroupsData } from '@/interfaces/ystuty.types';
 import { useApi } from '@/shared/api.hook';
 import alertSlice from '@/store/reducer/alert/alert.slice';
@@ -23,19 +28,8 @@ import { StyledAutocomplete } from './StylePulseAnimation.component';
 // const STORE_CACHED_INSTITUTES_KEY_OLD = 'CACHED_INSTITUTES';
 const STORE_CACHED_INSTITUTES_KEY = 'CACHED_V3_INSTITUTES::';
 
-const StyledPopper = styled(Popper)({
-  [`& .${autocompleteClasses.listbox}`]: {
-    '& ul': { margin: 0 },
-    '& li': { margin: 0 },
-  },
-});
-
-const MyPopper = (props: PopperProps) => (
-  <StyledPopper {...props} style={{ width: 350 }} />
-);
-
 export const SelectGroupComponent = (props: {
-  allowMultipleRef: React.MutableRefObject<(state?: any) => void>;
+  allowMultipleRef: AllowMultipleRef;
 }) => {
   const { allowMultipleRef } = props;
   const dispatch = useDispatch();
@@ -135,11 +129,7 @@ export const SelectGroupComponent = (props: {
           ? value
           : value.split(',');
       value = value.filter(Boolean);
-      const maxGroups = 4 - 1;
-      const values =
-        value.length > maxGroups
-          ? [value[0], ...value.slice(-maxGroups)]
-          : value;
+      const values = limitScheduleSelections(value.filter(Boolean));
 
       if (
         values.length !== selected.length ||
@@ -207,19 +197,13 @@ export const SelectGroupComponent = (props: {
 
   // On location hash changed
   React.useEffect(() => {
-    if (
-      defaultValues.some((e, i) => selected[i] !== e) ||
-      defaultValues.length !== selected.length
-    ) {
+    if (!areSameScheduleSelections(defaultValues, selected)) {
       fixSelected(defaultValues);
     }
   }, [defaultValues]);
 
   React.useEffect(() => {
-    if (
-      online !== previousOnline ||
-      (since && Date.now() - since.getTime() > 2 * 60e3)
-    ) {
+    if (shouldRefreshScheduleOptions({ online, previousOnline, since })) {
       loadGroupsList();
     }
   }, [online, previousOnline, since]);
@@ -286,14 +270,10 @@ export const SelectGroupComponent = (props: {
           )}
         />
       )}
-      PopperComponent={MyPopper}
+      PopperComponent={ScheduleSelectorPopper}
       value={value}
       onChange={(event, newValue, reason) => {
-        if (
-          event.type === 'keydown' &&
-          (event as React.KeyboardEvent).key === 'Backspace' &&
-          reason === 'removeOption'
-        ) {
+        if (shouldIgnoreAutocompleteRemoval(event, reason)) {
           return;
         }
         onChangeValues(newValue as string[]);

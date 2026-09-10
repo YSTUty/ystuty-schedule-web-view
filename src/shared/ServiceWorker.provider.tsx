@@ -7,7 +7,7 @@ const ServiceWorkerContext = React.createContext<{
   updateAssets: () => void;
 } | null>(null);
 
-const ServiceWorkerProvider = ({ children }: any) => {
+const ServiceWorkerProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const [waitingServiceWorker, setWaitingServiceWorker] =
     React.useState<ServiceWorker | null>(null);
   const [isUpdateAvailable, setUpdateAvailable] = React.useState(false);
@@ -31,18 +31,18 @@ const ServiceWorkerProvider = ({ children }: any) => {
     // on all the open tabs of our application, so that we don't leave
     // any tab in an incosistent state
 
-    waitingServiceWorker?.addEventListener(
-      'statechange',
-      (
-        event: Event & {
-          target: (Partial<ServiceWorker> & EventTarget) | null;
-        },
-      ) => {
-        if (event.target && event.target.state === 'activated') {
-          window.location.reload();
-        }
-      },
-    );
+    const waitingWorker = waitingServiceWorker;
+    const handleStateChange = (event: Event) => {
+      if ((event.target as ServiceWorker | null)?.state === 'activated') {
+        window.location.reload();
+      }
+    };
+
+    waitingWorker?.addEventListener('statechange', handleStateChange);
+
+    return () => {
+      waitingWorker?.removeEventListener('statechange', handleStateChange);
+    };
   }, [waitingServiceWorker]);
 
   const value = React.useMemo(
