@@ -35,17 +35,14 @@ fi
 
 echo "Deploying to $SERVER:$DESTINATION ..."
 
+# Версия создаётся в артефакте непосредственно перед публикацией.
+VERSION=$(node -p "require('./package.json').version")
+VERSION_FILE="$LOCAL_BUILD_DIR/version.json"
+printf '{"version":"%s"}\n' "$VERSION" > "$VERSION_FILE"
+echo "Update public version to [$VERSION]"
+
 # Copy files
 echo "Copying files..."
 scp -r "$LOCAL_BUILD_DIR"/. "$SERVER:$DESTINATION" || { echo "Failed to copy files!"; exit 1; }
-
-# Upload version.json
-VERSION=$(node -p "require('./package.json').version")
-VERSION_FILE="$(mktemp)-version.json"
-
-echo "Update public version to [$VERSION]"
-printf '{"version":"%s"}\n' "$VERSION" > "$VERSION_FILE"
-scp "$VERSION_FILE" "$SERVER:$DESTINATION/version.json" || { echo "Failed to copy version.json!"; exit 1; }
-rm -f "$VERSION_FILE"
 
 echo "Deploy completed! $(date '+%H:%M:%S')"
