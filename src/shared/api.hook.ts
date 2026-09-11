@@ -6,22 +6,21 @@ import { toast } from 'react-toastify';
 
 import { history /* , useAppSelector */ } from '@/store';
 import { apiPath } from '@/utils';
+import {
+  getResponseError,
+  getRetryAfterSeconds,
+  getUnexpectedResponseMessage,
+  isAbortError,
+} from './api.response.utils';
+import type { ApiFetchParams, ApiFetchResult } from './api.types';
 import { buildApiUrl } from './api.utils';
 
-export type ValidationItem = {
-  children: ValidationItem[];
-  constraints: Record<string, string>;
-  isDate: string;
-  property: string;
-};
-
-export type ResponseError = {
-  code: number;
-  error: string;
-  message: string;
-  validation?: ValidationItem[];
-  payload?: unknown;
-};
+export type {
+  ApiFetchParams,
+  ApiFetchResult,
+  ResponseError,
+  ValidationItem,
+} from './api.types';
 
 export const useApi = () => {
   // const { accessToken } = useAppSelector((e) => e.app);
@@ -62,17 +61,8 @@ export const useApi = () => {
   function apiFetch<T = unknown>(
     path: string,
     init?: RequestInit,
-    params: {
-      fKey?: string;
-      returnResponse?: boolean;
-      checkError?: boolean;
-      noAlert?: boolean;
-      noRenavigate?: boolean;
-      setError?: (error: string) => void;
-      handleError?: (error: ResponseError) => boolean | void;
-      handleRateLimit?: false | ((timeout: number) => boolean | void);
-    } = {},
-  ) {
+    params: ApiFetchParams = {},
+  ): Promise<ApiFetchResult<T>> {
     const {
       fKey = path,
       noRenavigate,
@@ -97,149 +87,122 @@ export const useApi = () => {
 
     const controller = new AbortController();
 
-    const promise = new Promise<
-      | {
-          error: {
-            code: number;
-            error: string;
-            message: string;
-            validation?: ValidationItem[];
-            payload?: unknown;
-          };
+    if (!isMountedRef.current || isFetchingRef.current[fKey]) {
+      return Promise.resolve(null);
+    }
+
+    updateFetchingState(fKey, true);
+    controllers.current[fKey] = controller;
+
+    const reportUnexpectedResponse = (response: Response) => {
+      const message = getUnexpectedResponseMessage(response, formatMessage);
+
+      if (setError) {
+        setError(message);
+        return null;
+      }
+
+      throw message;
+    };
+
+    return fetch(buildApiUrl(apiPath, path), {
+      method: 'GET',
+      ...init,
+      signal: controller.signal,
+      headers: {
+        'Content-Type': 'application/json',
+        // Authorization: `Bearer ${accessToken}`,
+        ...init?.headers,
+      },
+    })
+      .then(async (response) => {
+        if (returnResponse) {
+          return response;
         }
-      | { data: T }
-      | Response
-      | null
-    >((resolve, reject) =>
-      Promise.resolve()
-        .then(() => {
-          if (!isMountedRef.current || isFetchingRef.current[fKey]) {
-            return null;
-          }
-          updateFetchingState(fKey, true);
-          controllers.current[fKey] = controller;
-          return true;
-        })
-        .then(
-          (allow) =>
-            allow &&
-            fetch(buildApiUrl(apiPath, path), {
-              method: 'GET',
-              ...init,
-              signal: controller.signal,
-              headers: {
-                'Content-Type': 'application/json',
-                // Authorization: `Bearer ${accessToken}`,
-                ...init?.headers,
-              },
-            }),
-        )
-        .then(async (response) => {
-          if (!response || returnResponse) {
-            return response;
-          }
 
-          try {
-            const data = (await response.json()) as T;
-            if (response.ok) {
-              return { data };
-            }
+        let data: T;
+        try {
+          data = (await response.json()) as T;
+        } catch {
+          return reportUnexpectedResponse(response);
+        }
 
-            if (!setError && !checkError) {
-              reject(data);
-              return null;
-            }
+        if (response.ok) {
+          return { data };
+        }
 
-            const { error } = data as { error?: ResponseError };
-            if (!error) {
-              throw new Error('Failed get error data');
-            }
-            if (error.message || error.code) {
-              if (error.code === 503) {
-                let msg =
-                  error.message !== 'Service Unavailable'
-                    ? error.message
-                    : formatMessage({ id: 't.api.service_unavailable' });
-                setError?.(msg);
+        if (!setError && !checkError) {
+          throw data;
+        }
 
-                if (!noAlert) {
-                  const delay = 2e3;
-                  const timeout = setTimeout(() => alert(msg), delay + 10);
-                  nodeTimeouts.current.push(timeout);
-                  await new Promise((r) => setTimeout(r, delay));
-                }
+        const error = getResponseError(data);
+        if (!error) {
+          return reportUnexpectedResponse(response);
+        }
 
-                if (pathname !== '/' && !noRenavigate) {
-                  history.replace('/');
-                }
-                return { error };
-              }
-              if (error.code === 429) {
-                let retryAfter = Number(response.headers.get('Retry-After'));
-                (handleRateLimit && handleRateLimit(retryAfter)) ||
-                  setError?.(
-                    formatMessage(
-                      { id: 't.api.rate_limit.retry' },
-                      { retryAfter },
-                    ),
-                  );
-              } else if (
-                /* error.code === 403 || */ error.message === 'Token is revoked'
-              ) {
-                history.replace('/auth/logout');
-                return null;
-              } else {
-                let msg =
-                  error.message || formatMessage({ id: 't.api.server_error' });
-                // const { validation } = error;
-                // TODO: `validation` ?
-                setError?.(msg);
-                handleError?.(error);
-                return { error };
-              }
-            } else if (!response.ok) {
-              throw new Error(formatMessage({ id: 't.api.response_not_ok' }));
-            } else {
-              throw new Error(formatMessage({ id: 't.api.whats_wrong' }));
-            }
-            return null;
-          } catch (err) {
-            let msg = 'Failed parse json';
-            if (!response.ok) {
-              if (response.status === 500) {
-                msg = formatMessage({ id: 't.api.server_unavailable' });
-              } else {
-                msg = formatMessage({ id: 't.api.server_error' });
-              }
-            }
+        if (error.code === 503) {
+          const message =
+            error.message !== 'Service Unavailable'
+              ? error.message
+              : formatMessage({ id: 't.api.service_unavailable' });
+          setError?.(message);
 
-            if (!setError) {
-              reject(msg);
-            } else {
-              setError(msg);
-            }
-            return null;
-          }
-        })
-        .then(resolve)
-        .catch((err) => {
-          if (err.name === 'AbortError' || err === 'Canceled fetch') {
-            // Отменённый запрос не должен оставлять вызывающий код в ожидании.
-            resolve(null);
-            return;
+          if (!noAlert) {
+            const delay = 2e3;
+            const timeout = setTimeout(() => alert(message), delay + 10);
+            nodeTimeouts.current.push(timeout);
+            await new Promise((resolve) => setTimeout(resolve, delay));
           }
 
-          reject(err);
-        })
-        .finally(() => {
-          if (controllers.current[fKey] === controller) {
-            delete controllers.current[fKey];
-            updateFetchingState(fKey, false);
+          if (pathname !== '/' && !noRenavigate) {
+            history.replace('/');
           }
-        }),
-    );
+          return { error };
+        }
 
-    return promise;
+        if (error.code === 429) {
+          const retryAfter = getRetryAfterSeconds(
+            response.headers.get('Retry-After'),
+          );
+          const isHandled =
+            typeof handleRateLimit === 'function' &&
+            handleRateLimit(retryAfter);
+
+          if (!isHandled) {
+            setError?.(
+              formatMessage({ id: 't.api.rate_limit.retry' }, { retryAfter }),
+            );
+          }
+          return null;
+        }
+
+        if (/* error.code === 403 || */ error.message === 'Token is revoked') {
+          history.replace('/auth/logout');
+          return null;
+        }
+
+        const message =
+          error.message || formatMessage({ id: 't.api.server_error' });
+        // const { validation } = error;
+        // TODO: `validation` ?
+        setError?.(message);
+        handleError?.(error);
+        return { error };
+      })
+      .catch((error: unknown) => {
+        if (isAbortError(error)) {
+          // Отменённый запрос не должен оставлять вызывающий код в ожидании.
+          return null;
+        }
+
+        throw error;
+      })
+      .finally(() => {
+        if (controllers.current[fKey] === controller) {
+          delete controllers.current[fKey];
+          updateFetchingState(fKey, false);
+        }
+      });
   }
 
   React.useEffect(() => {
