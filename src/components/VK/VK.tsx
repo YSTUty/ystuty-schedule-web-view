@@ -21,12 +21,25 @@ const VK: React.FC<Props> = ({ onApiAvailable, apiId, options, children }) => {
   const [vk, setVK] = React.useState<any>(null);
 
   React.useEffect(() => {
+    let isMounted = true;
+
     if (isDOMReady) {
-      new VKApi(apiId!, options).load().then((api) => {
-        onApiAvailable?.(api);
-        setVK(api);
-      });
+      new VKApi(apiId!, options)
+        .load()
+        .then((api) => {
+          if (!isMounted) {
+            return;
+          }
+
+          onApiAvailable?.(api);
+          setVK(api);
+        })
+        .catch(() => {});
     }
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   if (!vk) {

@@ -13,12 +13,23 @@ export const STORE_ALLOW_MULTIPLE_GROUP_KEY = 'allowMultipleGroup';
 export const STORE_ALLOW_MULTIPLE_TEACHERS_KEY = 'allowMultipleTeachers';
 export const STORE_ALLOW_MULTIPLE_AUDIENCES_KEY = 'allowMultipleAudiences';
 
-export const getLastGroups = () =>
-  store2.get(STORE_GROUP_NAME_KEY, []) as string[];
+/** Возвращает сохранённый массив и сбрасывает несовместимое legacy-значение. */
+function getStoredItems<T>(key: string): T[] {
+  const items = store2.get(key, []) as unknown;
+
+  if (Array.isArray(items)) {
+    return items as T[];
+  }
+
+  store2.remove(key);
+  return [];
+}
+
+export const getLastGroups = () => getStoredItems<string>(STORE_GROUP_NAME_KEY);
 export const getLastTeachers = () =>
-  store2.get(STORE_TEACHER_NAME_KEY, []) as number[];
+  getStoredItems<number>(STORE_TEACHER_NAME_KEY);
 export const getLastAudiences = () =>
-  store2.get(STORE_AUDIENCE_NAME_KEY, []) as number[];
+  getStoredItems<number>(STORE_AUDIENCE_NAME_KEY);
 
 export const DEFAULT_ALLOW_MULTIPLE_GROUP = !!store2.get(
   STORE_ALLOW_MULTIPLE_GROUP_KEY,

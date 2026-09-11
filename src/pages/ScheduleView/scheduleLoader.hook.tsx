@@ -34,9 +34,12 @@ export const useScheduleLoader = (props: {
 
   // const { online } = useNetworkState();
   const dispatch = useDispatch();
-  const selectedItems = useSelector((state) =>
+  const selectedItemsState = useSelector((state) =>
     !scheduleFor ? [] : state.schedule.selectedItems[scheduleFor],
   );
+  const selectedItems: (string | number)[] = Array.isArray(selectedItemsState)
+    ? selectedItemsState
+    : [];
 
   const [fetchApi, isFetching, isFetchings, abortControllers] = useApi();
   const [isCached, setIsCached] = React.useState(false);
