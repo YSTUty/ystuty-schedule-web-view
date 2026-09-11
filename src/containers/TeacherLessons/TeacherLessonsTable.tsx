@@ -1,5 +1,4 @@
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 
 import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
@@ -20,6 +19,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 
 import * as lessonsUtils from '@/utils/lessons.utils';
 import { LessonData, LessonFlags } from '@/interfaces/schedule';
+import { useDispatch, useSelector } from '@/store';
 import scheduleSlice from '@/store/reducer/schedule/schedule.slice';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({

@@ -1,5 +1,4 @@
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { useDebounce } from 'react-use';
 import classNames from 'clsx';
 
@@ -9,14 +8,16 @@ import { styled } from '@mui/material/styles';
 import TextField from '@mui/material/TextField';
 
 import { StyledAutocomplete } from '@components/StylePulseAnimation.component';
+import { useDispatch, useSelector } from '@/store';
 import audiencerSlice from '@/store/reducer/audiencer/audiencer.slice';
 
+// MUI 5.10 не выводит корректный тип styled(Popper) с актуальными React 18 types.
 const StyledPopper = styled(Popper)({
   [`& .${autocompleteClasses.listbox}`]: {
     '& ul': { margin: 0 },
     '& li': { margin: 0 },
   },
-});
+}) as unknown as React.ComponentType<PopperProps>;
 
 const MyPopper = (props: PopperProps) => (
   <StyledPopper {...props} style={{ width: 350 }} />

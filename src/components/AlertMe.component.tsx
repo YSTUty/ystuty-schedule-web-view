@@ -1,4 +1,3 @@
-import { useDispatch, useSelector } from 'react-redux';
 import { TransitionGroup } from 'react-transition-group';
 
 import Alert from '@mui/material/Alert';
@@ -8,6 +7,7 @@ import List from '@mui/material/List';
 import ToggleButton from '@mui/material/ToggleButton';
 import AnnouncementIcon from '@mui/icons-material/Announcement';
 
+import { useDispatch, useSelector } from '@/store';
 import alertSlice from '@/store/reducer/alert/alert.slice';
 
 export const AlertMe = () => {

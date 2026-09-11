@@ -1,5 +1,4 @@
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import classNames from 'clsx';
 import dayjs from 'dayjs';
 
@@ -49,6 +48,7 @@ import { getTeachers } from '@components/SelectTeacher.component';
 import * as lessonsUtils from '@/utils/lessons.utils';
 import { LessonData, LessonFlags, WeekParityType } from '@/interfaces/schedule';
 import { ScheduleFor } from '@/interfaces/ystuty.types';
+import { useDispatch, useSelector } from '@/store';
 import scheduleSlice from '@/store/reducer/schedule/schedule.slice';
 import {
   DayScaleCell,
@@ -95,6 +95,14 @@ type AppointmentContentProps = Appointments.AppointmentContentProps & {
 type AppointmentTooltipContentProps = AppointmentTooltip.ContentProps & {
   appointmentData: AppointmentModel;
 };
+
+/**
+ * В dx-react-scheduler 3.0.5 children не отражены в типе material-компонента,
+ * хотя библиотека использует их для подключения плагинов Scheduler.
+ */
+const SchedulerWithPlugins = Scheduler as React.ComponentType<
+  React.PropsWithChildren<React.ComponentProps<typeof Scheduler>>
+>;
 
 const Appointment = ({ data, ...restProps }: AppointmentProps) => (
   <StyledAppointmentsAppointment
@@ -659,7 +667,7 @@ const SchedulerContainer: React.FC<MaterialSchedulerProps> = (props) => {
 
   return (
     <Paper style={{ height: 'calc(100vh - 56px)' }}>
-      <Scheduler locale="ru" data={dataMemo} firstDayOfWeek={1}>
+      <SchedulerWithPlugins locale="ru" data={dataMemo} firstDayOfWeek={1}>
         <ViewState />
         {hasGroupingGroups && (
           <GroupingState
@@ -719,7 +727,7 @@ const SchedulerContainer: React.FC<MaterialSchedulerProps> = (props) => {
 
         {hasGroupingGroups && <IntegratedGrouping />}
         {hasGroupingGroups && <GroupingPanel />}
-      </Scheduler>
+      </SchedulerWithPlugins>
     </Paper>
   );
 };

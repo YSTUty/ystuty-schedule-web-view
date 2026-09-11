@@ -1,8 +1,7 @@
-import { useDispatch, useSelector } from 'react-redux';
-
 import { styled } from '@mui/material/styles';
 import TextField from '@mui/material/TextField';
 
+import { useDispatch, useSelector } from '@/store';
 import scheduleSlice from '@/store/reducer/schedule/schedule.slice';
 
 const PREFIX = 'LF';

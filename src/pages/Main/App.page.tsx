@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { useSelector } from 'react-redux';
 
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -26,6 +25,7 @@ import { ThemeModeButton } from '@components/ThemeMode.component';
 import VK, { Like } from '@components/VK';
 import * as envUtils from '@/utils/env.utils';
 import VkSvg from '@/assets/img/vk-logo.svg?react';
+import { useSelector } from '@/store';
 
 const MainPage = () => {
   const selectedGroups = useSelector(

@@ -1,10 +1,10 @@
 import React from 'react';
-import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
 import store2 from 'store2';
 
 import { AccumulativeSchedule, IAudienceData } from '@/interfaces/ystuty.types';
 import { useApi } from '@/shared/api.hook';
+import { useDispatch } from '@/store';
 import alertSlice from '@/store/reducer/alert/alert.slice';
 import audiencerSlice from '@/store/reducer/audiencer/audiencer.slice';
 

@@ -1,5 +1,4 @@
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { useDebounce } from 'react-use';
 import store2 from 'store2';
@@ -7,6 +6,7 @@ import store2 from 'store2';
 import { LessonData, LessonFlags, OneWeekDto } from '@/interfaces/schedule';
 import { ITeacherData, ScheduleFor } from '@/interfaces/ystuty.types';
 import { useApi } from '@/shared/api.hook';
+import { useDispatch, useSelector } from '@/store';
 import alertSlice from '@/store/reducer/alert/alert.slice';
 import scheduleSlice from '@/store/reducer/schedule/schedule.slice';
 

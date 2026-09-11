@@ -1,5 +1,4 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
 import dayjs, { Dayjs } from 'dayjs';
 
 import Box from '@mui/material/Box';
@@ -20,6 +19,7 @@ import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import * as audiencerUtils from '@/utils/audiencer.utils';
 import * as lessonsUtils from '@/utils/lessons.utils';
 import { AudienceLesson } from '@/interfaces/ystuty.types';
+import { useSelector } from '@/store';
 import { FilterContext } from './Filter.provider';
 
 dayjs.extend(isSameOrBefore);

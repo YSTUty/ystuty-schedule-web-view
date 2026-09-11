@@ -18,7 +18,7 @@ const NavLinkComponent = React.forwardRef<
   }
 
   const onClick = React.useCallback(
-    (e) => {
+    (e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>) => {
       if (isDisabled) {
         e.preventDefault();
         e.stopPropagation();

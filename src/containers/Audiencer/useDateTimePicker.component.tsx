@@ -1,7 +1,8 @@
 import * as React from 'react';
-import { useSelector } from 'react-redux';
 import { useDebounce } from 'react-use';
 import dayjs, { Dayjs } from 'dayjs';
+
+import { useSelector } from '@/store';
 
 import 'dayjs/locale/ru';
 

@@ -1,11 +1,10 @@
-import { useDispatch, useSelector } from 'react-redux';
-
 import { styled } from '@mui/material';
 import Collapse from '@mui/material/Collapse';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 
 import { ScheduleFor } from '@/interfaces/ystuty.types';
+import { useDispatch, useSelector } from '@/store';
 import scheduleSlice from '@/store/reducer/schedule/schedule.slice';
 
 const StyledToggleButtonGroup = styled(ToggleButtonGroup)(() => ({

@@ -1,5 +1,5 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
 
 import * as Sentry from '@sentry/react';
 
@@ -37,24 +37,25 @@ if (!rootElement) {
   throw new Error('Root element "#root" was not found');
 }
 
+const root = createRoot(rootElement);
+
 try {
   initializeMonitoring();
   prepareHostPlatform();
 
-  ReactDOM.render(
-    <React.StrictMode>
+  root.render(
+    <StrictMode>
       <ErrorBoundary>
         <AppRoot />
       </ErrorBoundary>
-    </React.StrictMode>,
-    rootElement,
+    </StrictMode>,
   );
 } catch (error) {
   const startupError =
     error instanceof Error ? error : new Error('Failed to start application');
   hawk?.captureError(startupError);
 
-  ReactDOM.render(<EnvUnsupported error={startupError} />, rootElement);
+  root.render(<EnvUnsupported error={startupError} />);
 }
 
 // If you want to start measuring performance in your app, pass a function

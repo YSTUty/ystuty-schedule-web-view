@@ -1,4 +1,3 @@
-import { useDispatch, useSelector } from 'react-redux';
 import classNames from 'clsx';
 
 import Button from '@mui/material/Button';
@@ -6,6 +5,7 @@ import ButtonGroup from '@mui/material/ButtonGroup';
 import { styled } from '@mui/material/styles';
 
 import { LessonFlags } from '@/interfaces/schedule';
+import { useDispatch, useSelector } from '@/store';
 import audiencerSlice from '@/store/reducer/audiencer/audiencer.slice';
 import scheduleSlice from '@/store/reducer/schedule/schedule.slice';
 
