@@ -3,10 +3,12 @@ import classNames from 'clsx';
 import dayjs from 'dayjs';
 
 import {
+  Color,
   GroupingState,
   IntegratedGrouping,
   Resource,
   SchedulerDateTime,
+  ValidResourceInstance,
   ViewState,
 } from '@devexpress/dx-react-scheduler';
 import {
@@ -27,9 +29,12 @@ import {
   WeekView,
 } from '@devexpress/dx-react-scheduler-material-ui';
 
+import Box from '@mui/material/Box';
 import { blue, green, red, teal, yellow } from '@mui/material/colors';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import LessonIcon from '@mui/icons-material/BookRounded';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import StreamGroupsIcon from '@mui/icons-material/Groups';
@@ -56,8 +61,6 @@ import {
   getTimeTableCell,
   StyledAppointmentsAppointment,
   StyledAppointmentsAppointmentContent,
-  StyledGrid,
-  StyledIcon,
   StyledToolbarFlexibleSpace,
   ToolbarWithLoading,
 } from './dx.components';
@@ -94,7 +97,56 @@ type AppointmentContentProps = Appointments.AppointmentContentProps & {
 
 type AppointmentTooltipContentProps = AppointmentTooltip.ContentProps & {
   appointmentData: AppointmentModel;
+  /**
+   * Свойство передаётся AppointmentTooltip в рантайме, но отсутствует в
+   * декларации ContentProps пакета dx-react-scheduler 3.0.5.
+   */
+  appointmentResources?: ValidResourceInstance[];
 };
+
+type TooltipRowProps = {
+  children: React.ReactNode;
+  color?: string;
+  icon: React.ReactNode;
+};
+
+const timeFormatOptions = {
+  hour: '2-digit',
+  minute: '2-digit',
+} as const;
+
+const dateFormatOptions = {
+  day: 'numeric',
+  month: 'long',
+  weekday: 'long',
+} as const;
+
+const getTooltipResourceColor = (color?: string | Color) => {
+  if (typeof color === 'string') {
+    return color;
+  }
+
+  return color?.[300] ?? green[300];
+};
+
+const TooltipRow = ({ children, color, icon }: TooltipRowProps) => (
+  <Grid container sx={{ alignItems: 'center', pb: 1.25 }}>
+    <Grid
+      size={2}
+      sx={{
+        color: color ?? 'action.active',
+        display: 'flex',
+        justifyContent: 'center',
+      }}>
+      {icon}
+    </Grid>
+    <Grid size={10}>
+      <Typography component="div" variant="body2">
+        {children}
+      </Typography>
+    </Grid>
+  </Grid>
+);
 
 /**
  * В dx-react-scheduler 3.0.5 children не отражены в типе material-компонента,
@@ -294,174 +346,149 @@ const AppointmentContent = ({
 const AppointmentTooltipContent = ({
   children,
   appointmentData,
-  ...restProps
+  appointmentResources = [],
+  formatDate,
+  recurringIconComponent: RecurringIcon,
 }: AppointmentTooltipContentProps) => (
-  <AppointmentTooltip.Content {...restProps} appointmentData={appointmentData}>
-    {appointmentData.isDistant && (
-      <Grid container alignItems="center" color={red[800]}>
-        <StyledGrid item xs={2} className={dxClasses.textCenter}>
-          <OnlinePredictionIcon />
-        </StyledGrid>
-        <Grid item xs={10}>
-          Дистант
-        </Grid>
+  <Box sx={{ bgcolor: 'background.paper', lineHeight: 1.4, p: 2 }}>
+    <Grid container sx={{ alignItems: 'flex-start', pb: 2 }}>
+      <Grid
+        size={2}
+        sx={{ display: 'flex', justifyContent: 'center', pt: 0.25 }}>
+        <Box sx={{ height: 36, position: 'relative', width: 36 }}>
+          <Box
+            sx={{
+              bgcolor: getTooltipResourceColor(appointmentResources[0]?.color),
+              borderRadius: '50%',
+              height: '100%',
+              width: '100%',
+            }}
+          />
+          {appointmentData.rRule && (
+            <Box
+              sx={{
+                color: 'background.paper',
+                inset: 0,
+                position: 'absolute',
+              }}>
+              <RecurringIcon />
+            </Box>
+          )}
+        </Box>
       </Grid>
+      <Grid size={10}>
+        <Typography sx={{ fontWeight: 500, lineHeight: 1.25 }}>
+          {appointmentData.title}
+        </Typography>
+        <Typography color="text.secondary" variant="body2">
+          {formatDate(appointmentData.startDate, dateFormatOptions)}
+        </Typography>
+      </Grid>
+    </Grid>
+
+    <TooltipRow icon={<AccessTimeIcon />}>
+      <Typography variant="body2">
+        {formatDate(appointmentData.startDate, timeFormatOptions)} –{' '}
+        {formatDate(appointmentData.endDate, timeFormatOptions)}
+      </Typography>
+    </TooltipRow>
+
+    {appointmentResources.map((resource) => (
+      <TooltipRow
+        icon={
+          <Box
+            sx={{
+              bgcolor: getTooltipResourceColor(resource.color),
+              borderRadius: '50%',
+              height: 12,
+              width: 12,
+            }}
+          />
+        }
+        key={`${resource.fieldName}_${resource.id}`}>
+        {resource.text}
+      </TooltipRow>
+    ))}
+
+    {appointmentData.isDistant && (
+      <TooltipRow color={red[800]} icon={<OnlinePredictionIcon />}>
+        Дистант
+      </TooltipRow>
     )}
     {appointmentData.auditoryName && (
-      <Grid container alignItems="center">
-        <StyledGrid item xs={2} className={dxClasses.textCenter}>
-          <StyledIcon className={dxClasses.icon}>
-            <RoomIcon />
-          </StyledIcon>
-        </StyledGrid>
-        <Grid item xs={10}>
-          <span>
-            <b>{appointmentData.auditoryName}</b>
-          </span>
-        </Grid>
-      </Grid>
+      <TooltipRow icon={<RoomIcon />}>
+        <b>{appointmentData.auditoryName}</b>
+      </TooltipRow>
     )}
     {appointmentData.duration > 2 && (
-      <Grid container alignItems="center">
-        <StyledGrid item xs={2} className={dxClasses.textCenter}>
-          <StyledIcon className={dxClasses.icon}>
-            <TimeIcon />
-          </StyledIcon>
-        </StyledGrid>
-        <Grid item xs={10}>
-          <span>
-            Продолжительность: <b>{appointmentData.duration} ч</b>
-          </span>
-        </Grid>
-      </Grid>
+      <TooltipRow icon={<TimeIcon />}>
+        Продолжительность: <b>{appointmentData.duration} ч</b>
+      </TooltipRow>
     )}
     {appointmentData.type !== 0 && (
-      <Grid container alignItems="center">
-        <StyledGrid item xs={2} className={dxClasses.textCenter}>
-          <StyledIcon className={dxClasses.icon}>
-            <LessonIcon />
-          </StyledIcon>
-        </StyledGrid>
-        <Grid item xs={10}>
-          Вид занятий:{' '}
-          <b>
-            {lessonsUtils.getLessonTypeStrArr(appointmentData.type).join(', ')}
-          </b>
-        </Grid>
-      </Grid>
+      <TooltipRow icon={<LessonIcon />}>
+        Вид занятий:{' '}
+        <b>
+          {lessonsUtils.getLessonTypeStrArr(appointmentData.type).join(', ')}
+        </b>
+      </TooltipRow>
     )}
     {appointmentData.isStream && (
-      <Grid container alignItems="center">
-        <StyledGrid item xs={2} className={dxClasses.textCenter}>
-          <StyledIcon className={dxClasses.icon}>
-            <StreamGroupsIcon />
-          </StyledIcon>
-        </StyledGrid>
-        <Grid item xs={10}>
-          В потоке
-        </Grid>
-      </Grid>
+      <TooltipRow icon={<StreamGroupsIcon />}>В потоке</TooltipRow>
     )}
     {appointmentData.isDivision && (
-      <Grid container alignItems="center">
-        <StyledGrid item xs={2} className={dxClasses.textCenter}>
-          <StyledIcon className={dxClasses.icon}>
-            <DivisionGroupsIcon />
-          </StyledIcon>
-        </StyledGrid>
-        <Grid item xs={10}>
-          По П/Г
-        </Grid>
-      </Grid>
+      <TooltipRow icon={<DivisionGroupsIcon />}>По П/Г</TooltipRow>
     )}
     {appointmentData.scheduleFor !== 'teacher' &&
       appointmentData.teacherName && (
-        <Grid container alignItems="center">
-          <StyledGrid item xs={2} className={dxClasses.textCenter}>
-            <StyledIcon className={dxClasses.icon}>
-              <TeacherIcon />
-            </StyledIcon>
-          </StyledGrid>
-          <Grid item xs={10}>
-            <span>
-              {appointmentData.teacherName}
-              {appointmentData.additionalTeacherName &&
-                `/${appointmentData.additionalTeacherName}`}
-            </span>
-          </Grid>
-        </Grid>
+        <TooltipRow icon={<TeacherIcon />}>
+          {appointmentData.teacherName}
+          {appointmentData.additionalTeacherName &&
+            `/${appointmentData.additionalTeacherName}`}
+        </TooltipRow>
       )}
     {appointmentData.groups &&
       (appointmentData.scheduleFor !== 'group' ||
         appointmentData.groups.length > 1) &&
       appointmentData.groups.length > 0 && (
-        <Grid container alignItems="center">
-          <StyledGrid item xs={2} className={dxClasses.textCenter}>
-            <StyledIcon className={dxClasses.icon}>
-              <GroupsIcon />
-            </StyledIcon>
-          </StyledGrid>
-          <Grid item xs={10}>
-            <span>{appointmentData.groups!.join(', ')}</span>
-          </Grid>
-        </Grid>
+        <TooltipRow icon={<GroupsIcon />}>
+          {appointmentData.groups.join(', ')}
+        </TooltipRow>
       )}
     {appointmentData.subInfo && (
-      <Grid container alignItems="center">
-        <StyledGrid item xs={2} className={dxClasses.textCenter}>
-          <StyledIcon className={dxClasses.icon}>
-            <InfoIcon />
-          </StyledIcon>
-        </StyledGrid>
-        <Grid item xs={10}>
-          <span>
-            {appointmentData.subInfo.startsWith('http') ? (
-              <a
-                href={appointmentData.subInfo}
-                target="_blank"
-                rel="noopener noreferrer">
-                <i>
-                  <b>{appointmentData.subInfo}</b>
-                </i>
-              </a>
-            ) : (
-              <i>
-                <b>{appointmentData.subInfo}</b>
-              </i>
-            )}
-          </span>
-        </Grid>
-      </Grid>
+      <TooltipRow icon={<InfoIcon />}>
+        {appointmentData.subInfo.startsWith('http') ? (
+          <a
+            href={appointmentData.subInfo}
+            target="_blank"
+            rel="noopener noreferrer">
+            <i>
+              <b>{appointmentData.subInfo}</b>
+            </i>
+          </a>
+        ) : (
+          <i>
+            <b>{appointmentData.subInfo}</b>
+          </i>
+        )}
+      </TooltipRow>
     )}
     {appointmentData.parity !== WeekParityType.CUSTOM && (
-      <Grid container alignItems="center">
-        <StyledGrid item xs={2} className={dxClasses.textCenter}>
-          <StyledIcon className={dxClasses.icon}>
-            <CalendarTodayIcon />
-          </StyledIcon>
-        </StyledGrid>
-        <Grid item xs={10}>
-          Только на{' '}
-          <b>
-            {appointmentData.parity === WeekParityType.EVEN ? '' : 'не'}четной
-          </b>{' '}
-          неделе
-        </Grid>
-      </Grid>
+      <TooltipRow icon={<CalendarTodayIcon />}>
+        Только на{' '}
+        <b>
+          {appointmentData.parity === WeekParityType.EVEN ? '' : 'не'}четной
+        </b>{' '}
+        неделе
+      </TooltipRow>
     )}
-    {!!1 && isDev && (
-      <Grid container alignItems="center">
-        <StyledGrid item xs={2} className={dxClasses.textCenter}>
-          <StyledIcon className={dxClasses.icon}>
-            <InfoIcon />
-          </StyledIcon>
-        </StyledGrid>
-        <Grid item xs={10}>
-          <code>{JSON.stringify(appointmentData)}</code>
-        </Grid>
-      </Grid>
+    {!1 && isDev && (
+      <TooltipRow icon={<InfoIcon />}>
+        <code>{JSON.stringify(appointmentData)}</code>
+      </TooltipRow>
     )}
-  </AppointmentTooltip.Content>
+    {children}
+  </Box>
 );
 
 const TitleCellComponent = () => (

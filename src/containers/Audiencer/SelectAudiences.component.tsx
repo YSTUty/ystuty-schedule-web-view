@@ -11,13 +11,12 @@ import { StyledAutocomplete } from '@components/StylePulseAnimation.component';
 import { useDispatch, useSelector } from '@/store';
 import audiencerSlice from '@/store/reducer/audiencer/audiencer.slice';
 
-// MUI 5.10 не выводит корректный тип styled(Popper) с актуальными React 18 types.
 const StyledPopper = styled(Popper)({
   [`& .${autocompleteClasses.listbox}`]: {
     '& ul': { margin: 0 },
     '& li': { margin: 0 },
   },
-}) as unknown as React.ComponentType<PopperProps>;
+});
 
 const MyPopper = (props: PopperProps) => (
   <StyledPopper {...props} style={{ width: 350 }} />
@@ -99,7 +98,7 @@ export const SelectAudiencesComponent = (props: { withDebounce?: boolean }) => {
           )}
         />
       )}
-      PopperComponent={MyPopper}
+      slots={{ popper: MyPopper }}
       value={selected}
       onChange={(event, newValue, reason) => {
         if (

@@ -13,7 +13,7 @@ import Stack from '@mui/material/Stack';
 import ToggleButton from '@mui/material/ToggleButton';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import Grid from '@mui/material/Unstable_Grid2';
+import Grid from '@mui/material/Grid';
 import ColoringIcon from '@mui/icons-material/ColorLensSharp';
 import HomeIcon from '@mui/icons-material/Home';
 
@@ -141,10 +141,10 @@ const Audiencer = () => {
               </Typography>
 
               <Grid container spacing={2} sx={{ mt: 1 }}>
-                <Grid xs={12}>
+                <Grid size={12}>
                   <Paper elevation={3} sx={{ p: 1 }}>
-                    <Grid spacing={2}>
-                      <Grid xs={12} spacing={3}>
+                    <Grid container spacing={2}>
+                      <Grid size={12}>
                         <SelectAudiencesComponent withDebounce />
                       </Grid>
                       <Divider
@@ -154,28 +154,28 @@ const Audiencer = () => {
                         flexItem>
                         Используются оба фильтра в виде списка ↑ и строки ↓
                       </Divider>
-                      <Grid xs={12} spacing={3}>
+                      <Grid size={12}>
                         <Stack spacing={2}>
                           <FiltersList />
                         </Stack>
                       </Grid>
-                      <Grid xs={12} spacing={3}>
+                      <Grid size={12}>
                         <LessonTypeSelector isAudiencer />
                       </Grid>
                     </Grid>
                   </Paper>
                 </Grid>
 
-                <Grid xs={12} md={8}>
+                <Grid size={{ xs: 12, md: 8 }}>
                   <Grid container spacing={2}>
-                    <Grid xs={12} spacing={3}>
+                    <Grid size={12}>
                       <Paper elevation={3} sx={{ p: 1 }}>
                         <Stack spacing={3} direction="row">
                           <DatePickerComponent />
                         </Stack>
                       </Paper>
                     </Grid>
-                    <Grid xs={12} spacing={3}>
+                    <Grid size={12}>
                       <Paper elevation={3} sx={{ p: 1 }}>
                         <Stack spacing={3} direction="row">
                           <TimePickerComponent />
@@ -184,9 +184,9 @@ const Audiencer = () => {
                     </Grid>
                   </Grid>
                 </Grid>
-                <Grid xs={12} md={4}>
+                <Grid size={{ xs: 12, md: 4 }}>
                   <Grid container spacing={2}>
-                    <Grid xs={12} spacing={3}>
+                    <Grid size={12}>
                       <Stack spacing={2}>
                         <ToggleButton
                           value="check"

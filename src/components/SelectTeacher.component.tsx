@@ -257,7 +257,7 @@ export const SelectTeacherComponent = (props: {
             '...')(teachers)}
         />
       )}
-      PopperComponent={ScheduleSelectorPopper}
+      slots={{ popper: ScheduleSelectorPopper }}
       value={value}
       onChange={(event, newValue, reason) => {
         if (shouldIgnoreAutocompleteRemoval(event, reason)) {

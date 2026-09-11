@@ -1,6 +1,6 @@
 import { FormattedDate } from 'react-intl';
 
-import styled from '@mui/styled-engine';
+import { styled } from '@mui/material/styles';
 
 import appVersion from '@/utils/app-version';
 

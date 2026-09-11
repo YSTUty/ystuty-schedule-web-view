@@ -6,7 +6,6 @@ import { useSelector } from '@/store';
 
 import 'dayjs/locale/ru';
 
-import TextField from '@mui/material/TextField';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -51,26 +50,26 @@ export const useDatePickerComponent = () => {
 
   const component = () => {
     return (
-      <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={'ru'}>
+      <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ru">
         <DatePicker
           views={['day']}
           minDate={minDate}
           maxDate={maxDate}
-          inputFormat="DD.MM.YYYY"
+          format="DD.MM.YYYY"
           label="От"
           value={value1}
           onChange={(val) => setValue1(val)}
-          renderInput={(params) => <TextField {...params} />}
+          slotProps={{ textField: { size: 'small' } }}
         />
         <DatePicker
           views={['day']}
           minDate={minDate}
           maxDate={maxDate}
-          inputFormat="DD.MM.YYYY"
+          format="DD.MM.YYYY"
           label="До"
           value={value2}
           onChange={(val) => setValue2(val)}
-          renderInput={(params) => <TextField {...params} />}
+          slotProps={{ textField: { size: 'small' } }}
         />
       </LocalizationProvider>
     );
@@ -97,26 +96,24 @@ export const useTimePickerComponent = () => {
 
   const component = () => {
     return (
-      <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={'ru'}>
+      <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ru">
         <TimePicker
           minTime={dayjs('07:00', 'HH:mm')}
           maxTime={dayjs('22:00', 'HH:mm')}
-          inputFormat="HH:mm"
-          mask="__:__"
+          format="HH:mm"
           label="От"
           value={value1}
           onChange={(val) => setValue1(val)}
-          renderInput={(params) => <TextField {...params} />}
+          slotProps={{ textField: { size: 'small' } }}
         />
         <TimePicker
           minTime={dayjs('07:00', 'HH:mm')}
           maxTime={dayjs('22:00', 'HH:mm')}
-          inputFormat="HH:mm"
-          mask="__:__"
+          format="HH:mm"
           label="До"
           value={value2}
           onChange={(val) => setValue2(val)}
-          renderInput={(params) => <TextField {...params} />}
+          slotProps={{ textField: { size: 'small' } }}
         />
       </LocalizationProvider>
     );

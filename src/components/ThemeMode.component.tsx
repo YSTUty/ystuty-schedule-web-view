@@ -2,10 +2,9 @@ import React from 'react';
 import { ToastContainer } from 'react-toastify';
 import store2 from 'store2';
 
-import { blue as primary } from '@mui/material/colors';
 import CssBaseline from '@mui/material/CssBaseline';
 import IconButton from '@mui/material/IconButton';
-import { createTheme, ThemeProvider, useTheme } from '@mui/material/styles';
+import { ThemeProvider, useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
@@ -17,6 +16,7 @@ import {
   type ThemeMode,
   toThemeMode,
 } from '@/utils/theme-mode.util';
+import { createAppTheme } from '@/utils/app-theme.util';
 
 const LAST_THEME_MODE = toThemeMode(store2.get(THEME_MODE_STORAGE_KEY, null));
 
@@ -69,7 +69,7 @@ export const ThemeModeProvider = ({
   }, [mode]);
 
   const theme = React.useMemo(
-    () => createTheme({ palette: { mode, primary } }),
+    () => createAppTheme(mode),
     [mode],
   );
   const emotionCache = React.useMemo(

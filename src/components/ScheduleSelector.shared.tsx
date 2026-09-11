@@ -18,13 +18,12 @@ type ScheduleOptionsRefreshParams = {
   since?: Date;
 };
 
-// MUI 5.10 не выводит корректный тип styled(Popper) с актуальными React 18 types.
 const StyledScheduleSelectorPopper = styled(Popper)({
   [`& .${autocompleteClasses.listbox}`]: {
     '& ul': { margin: 0 },
     '& li': { margin: 0 },
   },
-}) as unknown as React.ComponentType<PopperProps>;
+});
 
 /** Общий Popper для селекторов группы, преподавателя и аудитории. */
 export const ScheduleSelectorPopper = (props: PopperProps) => (

@@ -9,11 +9,11 @@ import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { ThemeProvider } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import CloudOffIcon from '@mui/icons-material/CloudOff';
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutlineRounded';
 import RefreshIcon from '@mui/icons-material/Refresh';
 
 import {
@@ -21,6 +21,7 @@ import {
   type ThemeMode,
   toThemeMode,
 } from '@/utils/theme-mode.util';
+import { createAppTheme } from '@/utils/app-theme.util';
 
 type EnvUnsupportedProps = {
   error?: Error;
@@ -63,7 +64,7 @@ const EnvUnsupported = ({ error }: EnvUnsupportedProps) => {
     prefersDarkMode,
   );
   const theme = React.useMemo(
-    () => createTheme({ palette: { mode: themeMode } }),
+    () => createAppTheme(themeMode),
     [themeMode],
   );
   const state = getEnvUnsupportedState(error, online);
@@ -99,7 +100,7 @@ const EnvUnsupported = ({ error }: EnvUnsupportedProps) => {
         <Paper
           elevation={4}
           sx={{ maxWidth: 520, p: { xs: 3, sm: 4 }, width: '100%' }}>
-          <Stack spacing={3} alignItems="center">
+          <Stack spacing={3} sx={{ alignItems: 'center' }}>
             <Avatar
               sx={{
                 bgcolor: isOffline ? 'warning.main' : 'error.main',
@@ -109,7 +110,7 @@ const EnvUnsupported = ({ error }: EnvUnsupportedProps) => {
               {isOffline ? <CloudOffIcon /> : <ErrorOutlineIcon />}
             </Avatar>
 
-            <Box textAlign="center">
+            <Box sx={{ textAlign: 'center' }}>
               <Typography component="h1" variant="h5" gutterBottom>
                 {title}
               </Typography>

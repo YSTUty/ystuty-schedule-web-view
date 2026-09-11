@@ -105,12 +105,6 @@ export default ({ mode }: { mode: string }) => {
       alias: {
         '@components': path.resolve(appRoot, 'src/components'),
         '@': path.resolve(appRoot, 'src'),
-        // Пакет MUI 5 поставляет CommonJS-файлы для deep import, которые некорректно
-        // обрабатываются Rolldown в Vite 8. Используем ESM-версии иконок напрямую.
-        '@mui/icons-material': path.resolve(
-          appRoot,
-          'node_modules/@mui/icons-material/esm',
-        ),
       },
     },
     server: {
