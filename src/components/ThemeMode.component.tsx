@@ -12,11 +12,13 @@ import Brightness7Icon from '@mui/icons-material/Brightness7';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
 
-const STORE_THEME_MODE_KEY = 'themeMode';
-const LAST_THEME_MODE = store2.get(STORE_THEME_MODE_KEY, null) as
-  | 'light'
-  | 'dark'
-  | null;
+import {
+  THEME_MODE_STORAGE_KEY,
+  type ThemeMode,
+  toThemeMode,
+} from '@/utils/theme-mode.util';
+
+const LAST_THEME_MODE = toThemeMode(store2.get(THEME_MODE_STORAGE_KEY, null));
 
 export const ThemeModeContext = React.createContext({
   toggleColorMode: () => {},
@@ -40,17 +42,15 @@ export const ThemeModeProvider = ({
   children,
 }: React.PropsWithChildren<{}>) => {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
-  const [mode, setMode] = React.useState<'light' | 'dark'>(
-    LAST_THEME_MODE || 'light',
-  );
+  const [mode, setMode] = React.useState<ThemeMode>(LAST_THEME_MODE || 'light');
   const colorMode = React.useMemo(
     () => ({
       toggleColorMode: () => {
         setMode((prevMode) => {
           const newMode = prevMode === 'light' ? 'dark' : 'light';
-          store2.set(STORE_THEME_MODE_KEY, newMode);
+          store2.set(THEME_MODE_STORAGE_KEY, newMode);
           if (prefersDarkMode && prevMode !== 'dark') {
-            store2.remove(STORE_THEME_MODE_KEY);
+            store2.remove(THEME_MODE_STORAGE_KEY);
           }
           return newMode;
         });
@@ -62,6 +62,11 @@ export const ThemeModeProvider = ({
   React.useEffect(() => {
     !LAST_THEME_MODE && setMode(prefersDarkMode ? 'dark' : 'light');
   }, [prefersDarkMode]);
+
+  React.useEffect(() => {
+    document.documentElement.dataset.themeMode = mode;
+    document.documentElement.style.colorScheme = mode;
+  }, [mode]);
 
   const theme = React.useMemo(
     () => createTheme({ palette: { mode, primary } }),
