@@ -1,7 +1,6 @@
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 
 import { configureStore } from '@reduxjs/toolkit';
-import { createBrowserHistory } from 'history';
 import { combineReducers } from 'redux';
 
 import alertSlice from './reducer/alert/alert.slice';
@@ -13,8 +12,6 @@ export const reducer = combineReducers({
   alert: alertSlice.reducer,
   audiencer: audiencerSlice.reducer,
 });
-
-export const history = createBrowserHistory();
 
 const store = configureStore({ reducer });
 export default store;

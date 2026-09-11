@@ -2,7 +2,6 @@ import AddToHomeScreenIcon from '@mui/icons-material/AddToHomeScreen';
 import IosShareIcon from '@mui/icons-material/IosShare';
 import MenuIcon from '@mui/icons-material/Menu';
 
-import { history } from '@/store/index';
 import * as deviceUtils from './device.utils';
 import * as envUtils from './env.utils';
 
@@ -60,6 +59,6 @@ export const checkPWA = () => {
       window.location.hostname === envUtils.pwaHostnameOld) &&
     window.location.pathname !== '/pwa'
   ) {
-    history.push('/pwa');
+    window.location.assign('/pwa');
   }
 };

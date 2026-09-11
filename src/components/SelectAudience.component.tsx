@@ -1,7 +1,8 @@
 import React from 'react';
 import { useIntl } from 'react-intl';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { useHash, useNetworkState } from 'react-use';
+import { useNetworkState } from 'react-use';
 import store2 from 'store2';
 import classNames from 'clsx';
 
@@ -17,6 +18,10 @@ import {
 } from '@components/ScheduleSelector.shared';
 import { IAudienceData } from '@/interfaces/ystuty.types';
 import { useApi } from '@/shared/api.hook';
+import {
+  buildSchedulePath,
+  getScheduleSelectionFromPathname,
+} from '@/shared/schedule-routing.utils';
 import { useDispatch, useSelector } from '@/store';
 import alertSlice from '@/store/reducer/alert/alert.slice';
 import scheduleSlice, {
@@ -42,16 +47,17 @@ export const SelectAudienceComponent = (props: {
   );
 
   const { online, previous: previousOnline, since } = useNetworkState();
-  const [hash, setHash] = useHash();
+  const { pathname, search, hash } = useLocation();
+  const navigate = useNavigate();
   const defaultValues = React.useMemo(() => {
     const lastValues = getLastAudiences();
-    const defaultHash = decodeURI(hash.slice(1));
-    let values: (string | number)[] = defaultHash
-      .split(',')
-      .filter((e) => e.length > 0);
+    let values: (string | number)[] = getScheduleSelectionFromPathname(
+      pathname,
+      'audience',
+    );
     values = values.length > 0 ? values : lastValues;
     return values;
-  }, [hash]);
+  }, [pathname]);
 
   const [audiences, setAudiences] = React.useState<IAudienceData[]>([]);
   const [isCached, setIsCached] = React.useState(false);
@@ -154,12 +160,16 @@ export const SelectAudienceComponent = (props: {
           }),
         );
         if (values.length > 0) {
-          setHash(values.join(','));
+          navigate({
+            pathname: buildSchedulePath('audience', values),
+            search,
+            hash,
+          });
           store2.set(STORE_AUDIENCE_NAME_KEY, values);
         }
       }
     },
-    [dispatch, setHash, selected],
+    [dispatch, hash, navigate, search, selected],
   );
 
   const fixSelected = React.useCallback(
@@ -214,7 +224,7 @@ export const SelectAudienceComponent = (props: {
     }
   }, [audiences]);
 
-  // On location hash changed
+  // Синхронизируем выбор с URL при переходах по ссылкам и кнопкам браузера.
   React.useEffect(() => {
     if (!areSameScheduleSelections(defaultValues, selected)) {
       fixSelected(defaultValues);

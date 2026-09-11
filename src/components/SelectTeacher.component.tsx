@@ -1,7 +1,8 @@
 import React from 'react';
 import { useIntl } from 'react-intl';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { useHash, useNetworkState } from 'react-use';
+import { useNetworkState } from 'react-use';
 import store2 from 'store2';
 import classNames from 'clsx';
 
@@ -17,6 +18,10 @@ import {
 } from '@components/ScheduleSelector.shared';
 import { ITeacherData } from '@/interfaces/ystuty.types';
 import { useApi } from '@/shared/api.hook';
+import {
+  buildSchedulePath,
+  getScheduleSelectionFromPathname,
+} from '@/shared/schedule-routing.utils';
 import { useDispatch, useSelector } from '@/store';
 import alertSlice from '@/store/reducer/alert/alert.slice';
 import scheduleSlice, {
@@ -46,7 +51,8 @@ export const SelectTeacherComponent = (props: {
   ) as number[];
   const { online, previous: previousOnline, since } = useNetworkState();
 
-  const [hash, setHash] = useHash();
+  const { pathname, search, hash } = useLocation();
+  const navigate = useNavigate();
 
   const [teachers, setTeachers] = React.useState<ITeacherData[]>([]);
   const [fetchApi, isFetching] = useApi();
@@ -58,10 +64,12 @@ export const SelectTeacherComponent = (props: {
       e
         ?.split(',')
         .map<number>((e) => Number(e))
-        .filter((e) => e /* .id */ > 0) || [])(decodeURI(hash.slice(1)));
+        .filter((e) => e /* .id */ > 0) || [])(
+      getScheduleSelectionFromPathname(pathname, 'teacher').join(','),
+    );
     values = values.length > 0 ? values : teacherIds;
     return values;
-  }, [hash]);
+  }, [pathname]);
 
   const applyTeachers = React.useCallback(
     (items: ITeacherData[] | null) => {
@@ -137,12 +145,16 @@ export const SelectTeacherComponent = (props: {
           }),
         );
         if (values.length > 0) {
-          setHash(values.join(','));
+          navigate({
+            pathname: buildSchedulePath('teacher', values),
+            search,
+            hash,
+          });
           store2.set(STORE_TEACHER_NAME_KEY, values);
         }
       }
     },
-    [dispatch, setHash, selected],
+    [dispatch, hash, navigate, search, selected],
   );
 
   const fixSelected = React.useCallback(
@@ -187,7 +199,7 @@ export const SelectTeacherComponent = (props: {
     }
   }, [teachers]);
 
-  // On location hash changed
+  // Синхронизируем выбор с URL при переходах по ссылкам и кнопкам браузера.
   React.useEffect(() => {
     if (!areSameScheduleSelections(defaultValues, selected)) {
       fixSelected(defaultValues);

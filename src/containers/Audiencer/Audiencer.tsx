@@ -1,6 +1,6 @@
 import React from 'react';
 import { useIntl } from 'react-intl';
-import { Route, useLocation } from 'react-router';
+import { Route, Routes, useLocation } from 'react-router-dom';
 import store2 from 'store2';
 
 import AppBar from '@mui/material/AppBar';
@@ -205,24 +205,35 @@ const Audiencer = () => {
             </Paper>
           </Container>
 
-          <Route exact path="/audience">
-            <AudiencerTable
-              filterDateTime={{ date1, date2, time1, time2 }}
-              isColoring={isColoring}
+          <Routes>
+            <Route
+              path="/audience"
+              element={
+                <AudiencerTable
+                  filterDateTime={{ date1, date2, time1, time2 }}
+                  isColoring={isColoring}
+                />
+              }
             />
-          </Route>
-          <Route exact path="/audience/month">
-            <AudiencerMonther
-              filterDateTime={{ date1, date2, time1, time2 }}
-              isColoring={isColoring}
+            <Route
+              path="/audience/month"
+              element={
+                <AudiencerMonther
+                  filterDateTime={{ date1, date2, time1, time2 }}
+                  isColoring={isColoring}
+                />
+              }
             />
-          </Route>
-          <Route exact path="/audience/combined">
-            <AudiencerCombinedTable
-              filterDateTime={{ date1, date2, time1, time2 }}
-              isColoring={isColoring}
+            <Route
+              path="/audience/combined"
+              element={
+                <AudiencerCombinedTable
+                  filterDateTime={{ date1, date2, time1, time2 }}
+                  isColoring={isColoring}
+                />
+              }
             />
-          </Route>
+          </Routes>
         </Box>
       </FiltersProvider>
     </>

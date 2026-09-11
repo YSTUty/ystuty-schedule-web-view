@@ -1,6 +1,5 @@
 import React from 'react';
-
-import { history } from '@/store';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const NavLinkComponent = React.forwardRef<
   HTMLAnchorElement | HTMLButtonElement,
@@ -13,6 +12,9 @@ const NavLinkComponent = React.forwardRef<
   }
 >((props, ref) => {
   let { to, href, children, isDisabled, tag, ...otherProps } = props;
+  const location = useLocation();
+  const navigate = useNavigate();
+
   if (!to && href) {
     to = href;
   }
@@ -28,12 +30,17 @@ const NavLinkComponent = React.forwardRef<
       if (!e.ctrlKey && !e.metaKey) {
         e.preventDefault();
         e.stopPropagation();
-        if (to !== window.location.pathname) {
-          history.push(to!);
+        if (to && to !== location.pathname) {
+          // Параметры host-приложения могут находиться в search или hash.
+          navigate({
+            pathname: to,
+            search: location.search,
+            hash: location.hash,
+          });
         }
       }
     },
-    [isDisabled, to],
+    [isDisabled, location.pathname, navigate, to],
   );
 
   return 'button' === tag ? (

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useLocation } from 'react-router';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useNetworkState } from 'react-use';
 import store2 from 'store2';
 
@@ -10,7 +10,10 @@ import { Routes } from '@/Routes';
 // import * as envUtils from '../../utils/env.utils';
 // import * as pwaUtils from '../../utils/pwa.utils';
 import WithVersionCheckerConnect from '@/shared/WithVersionChecker.util';
-import { history } from '@/store';
+import {
+  getLegacySchedulePath,
+  normalizePathname,
+} from '@/shared/schedule-routing.utils';
 import appVersion from '@/utils/app-version';
 
 // const PWAInstructionComponent = LazyLoadComponent(
@@ -18,7 +21,7 @@ import appVersion from '@/utils/app-version';
 // );
 
 const AppContainer = () => {
-  const { pathname, hash } = useLocation();
+  const location = useLocation();
   const state = useNetworkState();
 
   React.useEffect(() => {
@@ -35,21 +38,23 @@ const AppContainer = () => {
   //     }
   // }
 
-  // TODO: Переделать наоборот из hash в href
-  const regexpGroup =
-    /^\/(g\/?|group\/)(?<groupName>[А-я]{2,5}-[0-9А-я()]{2,8})?$/i;
-  const groupRes = pathname.match(regexpGroup);
-
-  // * Short paths
-  if (
-    (pathname === '/' && hash.length > 1) /* for compatibility support */ ||
-    groupRes
-  ) {
-    history.push(
-      `/group${groupRes?.groups?.groupName ? `#${groupRes.groups.groupName}` : window.location.hash}`,
+  const normalizedPathname = normalizePathname(location.pathname);
+  if (normalizedPathname !== location.pathname) {
+    return (
+      <Navigate
+        replace
+        to={{
+          pathname: normalizedPathname,
+          search: location.search,
+          hash: location.hash,
+        }}
+      />
     );
-  } else if (/^\/t\/?$/i.test(pathname)) {
-    history.push(`/teacher${window.location.hash}`);
+  }
+
+  const legacySchedulePath = getLegacySchedulePath(location);
+  if (legacySchedulePath) {
+    return <Navigate replace to={legacySchedulePath} />;
   }
 
   return (

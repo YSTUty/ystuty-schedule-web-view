@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { useIntl } from 'react-intl';
-import { useLocation } from 'react-router';
+import { useLocation, useNavigate } from 'react-router-dom';
 // import { useNetworkState } from 'react-use';
 import { toast } from 'react-toastify';
 
-import { history /* , useAppSelector */ } from '@/store';
+// import { useAppSelector } from '@/store';
 import { apiPath } from '@/utils';
 import {
   getResponseError,
@@ -24,7 +24,8 @@ export type {
 
 export const useApi = () => {
   // const { accessToken } = useAppSelector((e) => e.app);
-  const { pathname } = useLocation();
+  const location = useLocation();
+  const navigate = useNavigate();
   const { formatMessage } = useIntl();
   // const { online } = useNetworkState();
 
@@ -154,8 +155,15 @@ export const useApi = () => {
             await new Promise((resolve) => setTimeout(resolve, delay));
           }
 
-          if (pathname !== '/' && !noRenavigate) {
-            history.replace('/');
+          if (location.pathname !== '/' && !noRenavigate) {
+            navigate(
+              {
+                pathname: '/',
+                search: location.search,
+                hash: location.hash,
+              },
+              { replace: true },
+            );
           }
           return { error };
         }
@@ -177,7 +185,14 @@ export const useApi = () => {
         }
 
         if (/* error.code === 403 || */ error.message === 'Token is revoked') {
-          history.replace('/auth/logout');
+          navigate(
+            {
+              pathname: '/auth/logout',
+              search: location.search,
+              hash: location.hash,
+            },
+            { replace: true },
+          );
           return null;
         }
 

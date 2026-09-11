@@ -1,7 +1,8 @@
 import React from 'react';
 import { useIntl } from 'react-intl';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { useHash, useNetworkState } from 'react-use';
+import { useNetworkState } from 'react-use';
 import store2 from 'store2';
 import classNames from 'clsx';
 
@@ -17,6 +18,10 @@ import {
 } from '@components/ScheduleSelector.shared';
 import { IInstituteGroupsData } from '@/interfaces/ystuty.types';
 import { useApi } from '@/shared/api.hook';
+import {
+  buildSchedulePath,
+  getScheduleSelectionFromPathname,
+} from '@/shared/schedule-routing.utils';
 import { useDispatch, useSelector } from '@/store';
 import alertSlice from '@/store/reducer/alert/alert.slice';
 import scheduleSlice, {
@@ -43,14 +48,14 @@ export const SelectGroupComponent = (props: {
   ) as string[];
 
   const { online, previous: previousOnline, since } = useNetworkState();
-  const [hash, setHash] = useHash();
+  const { pathname, search, hash } = useLocation();
+  const navigate = useNavigate();
   const defaultValues = React.useMemo(() => {
     const groupNames = getLastGroups();
-    const defaultHash = decodeURI(hash.slice(1));
-    let values = defaultHash.split(',').filter((e) => e.length > 0);
+    let values = getScheduleSelectionFromPathname(pathname, 'group');
     values = values.length > 0 ? values : groupNames;
     return values;
-  }, [hash]);
+  }, [pathname]);
   const [institutes, setInstitutes] = React.useState<
     { name: string; groups: string[] }[]
   >([
@@ -142,12 +147,16 @@ export const SelectGroupComponent = (props: {
           }),
         );
         if (values.length > 0) {
-          setHash(values.join(','));
+          navigate({
+            pathname: buildSchedulePath('group', values),
+            search,
+            hash,
+          });
           store2.set(STORE_GROUP_NAME_KEY, values);
         }
       }
     },
-    [dispatch, setHash, selected],
+    [dispatch, hash, navigate, search, selected],
   );
 
   const fixSelected = React.useCallback(
@@ -195,7 +204,7 @@ export const SelectGroupComponent = (props: {
     }
   }, [institutes]);
 
-  // On location hash changed
+  // Синхронизируем выбор с URL при переходах по ссылкам и кнопкам браузера.
   React.useEffect(() => {
     if (!areSameScheduleSelections(defaultValues, selected)) {
       fixSelected(defaultValues);
