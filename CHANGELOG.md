@@ -2,6 +2,46 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://www.conventionalcommits.org/) for commit guidelines.
 
+## [0.3.4](https://github.com/YSTUty/ystuty-viewer-frontend/compare/v0.3.3...v0.3.4) (2026-09-11)
+
+### 🧹 Chore
+
+* **app:** disable check pwa instruction ([b60b22e](https://github.com/YSTUty/ystuty-viewer-frontend/commit/b60b22e9485ad56625b10525bb3ecfa2f41486ee))
+* **deploy:** update script ([7ed247b](https://github.com/YSTUty/ystuty-viewer-frontend/commit/7ed247bbff21ed94d2596e50929b28c6923da976))
+* **env:** add internal api url ([cf8aa9b](https://github.com/YSTUty/ystuty-viewer-frontend/commit/cf8aa9bd1c3025863137e843e3c82124064511db))
+* **prettier:** format ([9d381c2](https://github.com/YSTUty/ystuty-viewer-frontend/commit/9d381c29150107de42d12df49f05cdd1f4580383))
+* **tsconfig:** up `target` to `es2019` ([9cf2b01](https://github.com/YSTUty/ystuty-viewer-frontend/commit/9cf2b01fa1534d18dc855ae760c22931cf300251))
+* **types:** enforce stricter ts checks ([52ea8cc](https://github.com/YSTUty/ystuty-viewer-frontend/commit/52ea8ccd8cf590bf5e9dd662b0999be784956627))
+* **version.json:** rename field `v` to `version` ([d87dd91](https://github.com/YSTUty/ystuty-viewer-frontend/commit/d87dd91002b41c018ec8ffa96e3edefccacda188))
+
+### 🚀 Features
+
+* **scheduler:** show `subInfo` flag and render link in tooltip ([e728039](https://github.com/YSTUty/ystuty-viewer-frontend/commit/e72803969138f7dad9d45a6f1b320910ccd137d1))
+
+### 🐛 Bug Fixes
+
+* **api:** guard endpoint urls and request cleanup ([d48f080](https://github.com/YSTUty/ystuty-viewer-frontend/commit/d48f08056ba5749c5ed745bfc0e1f1ab6320aa07))
+* **api:** prevent stale api endpoint overrides ([1566b12](https://github.com/YSTUty/ystuty-viewer-frontend/commit/1566b12d15830d97553aabbef493e3678e066cee))
+* **app:** guard persisted selections and vk init ([8563f3e](https://github.com/YSTUty/ystuty-viewer-frontend/commit/8563f3e44f53d3d030ee086159b43663a3b34aa2))
+* **vite:** resolve mui icons from esm modules ([21e3cf9](https://github.com/YSTUty/ystuty-viewer-frontend/commit/21e3cf94319efe0f35d1cc5430a67d4bb151c569))
+
+### 🔧 Code Refactoring
+
+* **api:** simplify response error handling ([d6dac00](https://github.com/YSTUty/ystuty-viewer-frontend/commit/d6dac00f0f8e37de3df890ef8078bc660d21e1a0))
+* **app:** consolidate shared ui behavior ([d582f3a](https://github.com/YSTUty/ystuty-viewer-frontend/commit/d582f3a47456f136a1fd865de4c9e884c45009b1))
+* **app:** modernize routing and mui ([630aeca](https://github.com/YSTUty/ystuty-viewer-frontend/commit/630aeca8de28be68b4618d03c996c26748db3d07))
+* **bootstrap:** separate app startup and provider tree ([40cf709](https://github.com/YSTUty/ystuty-viewer-frontend/commit/40cf709f142290706d5a539eae309186aae0b56d))
+* **react:** migrate app to version 18 ([dc565ac](https://github.com/YSTUty/ystuty-viewer-frontend/commit/dc565ac014cd809e242e32b9388c043b92f5c8af))
+* **router:** migrate routes to v6 ([ba273bc](https://github.com/YSTUty/ystuty-viewer-frontend/commit/ba273bc10f006830e26ded436b9ef89fdeead3a5))
+* **vite:** standardize tooling and module imports ([add67d8](https://github.com/YSTUty/ystuty-viewer-frontend/commit/add67d801f5d8a6084973de472988c3a1e786b52))
+
+### 🔨 Build System
+
+* **release:** migrate to release-it ([91803f1](https://github.com/YSTUty/ystuty-viewer-frontend/commit/91803f1febdc3d33e0da6624b55e1ee340cdd211))
+* **tooling:** enhance vite workflow and version checks ([04bc00a](https://github.com/YSTUty/ystuty-viewer-frontend/commit/04bc00a2bafa3205b267eb71ff8cafac9f0ddeb0))
+* **vite:** migrate app from webpack to vite ([a8df041](https://github.com/YSTUty/ystuty-viewer-frontend/commit/a8df0419a245781c81b16fda10879516a6bdf297))
+* **vite:** refine build configuration and deployment versioning ([341efa9](https://github.com/YSTUty/ystuty-viewer-frontend/commit/341efa94b0788f78df862813a985dc7d3271c638))
+
 ### [0.3.3](https://github.com/YSTUty/ystuty-schedule-web-view/compare/v0.3.2...v0.3.3) (2025-04-03)
 
 
