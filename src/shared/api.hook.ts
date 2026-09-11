@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 
 import { history /* , useAppSelector */ } from '@/store';
 import { apiPath } from '@/utils';
+import { buildApiUrl } from './api.utils';
 
 export type ValidationItem = {
   children: ValidationItem[];
@@ -34,11 +35,29 @@ export const useApi = () => {
   const controllers = React.useRef<Record<string, AbortController>>({});
   const nodeTimeouts = React.useRef<ReturnType<typeof setTimeout>[]>([]);
   const isFetchingRef = React.useRef(isFetching);
+  const isMountedRef = React.useRef(false);
 
   const isFetchingAny = React.useMemo(
     () => Object.values(isFetching).some(Boolean),
     [isFetching],
   );
+
+  /** Синхронно блокирует повторный запрос до следующего React-рендера. */
+  function updateFetchingState(fKey: string, value: boolean) {
+    const nextIsFetching = { ...isFetchingRef.current };
+
+    if (value) {
+      nextIsFetching[fKey] = true;
+    } else {
+      delete nextIsFetching[fKey];
+    }
+
+    isFetchingRef.current = nextIsFetching;
+
+    if (isMountedRef.current) {
+      setIsFetching(nextIsFetching);
+    }
+  }
 
   function apiFetch<T = unknown>(
     path: string,
@@ -78,11 +97,6 @@ export const useApi = () => {
 
     const controller = new AbortController();
 
-    if (!isFetching[fKey]) {
-      // if (!isFetchingRef.current[fkey]) {
-      controllers.current[fKey] = controller;
-    }
-
     const promise = new Promise<
       | {
           error: {
@@ -99,17 +113,17 @@ export const useApi = () => {
     >((resolve, reject) =>
       Promise.resolve()
         .then(() => {
-          if (isFetchingRef.current[fKey]) {
+          if (!isMountedRef.current || isFetchingRef.current[fKey]) {
             return null;
           }
-          setIsFetching((e) => ({ ...e, [fKey]: true }));
+          updateFetchingState(fKey, true);
           controllers.current[fKey] = controller;
           return true;
         })
         .then(
           (allow) =>
             allow &&
-            fetch(`${apiPath}/${path}`, {
+            fetch(buildApiUrl(apiPath, path), {
               method: 'GET',
               ...init,
               signal: controller.signal,
@@ -218,9 +232,10 @@ export const useApi = () => {
           reject(err);
         })
         .finally(() => {
-          setIsFetching((e) => ({ ...e, [fKey]: false }));
-          // setIsFetching(({ [fKey]: _del, ...rest }) => rest);
-          delete controllers.current[fKey];
+          if (controllers.current[fKey] === controller) {
+            delete controllers.current[fKey];
+            updateFetchingState(fKey, false);
+          }
         }),
     );
 
@@ -228,18 +243,20 @@ export const useApi = () => {
   }
 
   React.useEffect(() => {
+    isMountedRef.current = true;
+
     return () => {
-      Object.values(controllers.current).map((c) => c.abort('Canceled fetch'));
-      setIsFetching({});
+      isMountedRef.current = false;
+      Object.values(controllers.current).forEach((controller) =>
+        controller.abort('Canceled fetch'),
+      );
+      isFetchingRef.current = {};
       for (const nodeTimeout of nodeTimeouts.current) {
         clearTimeout(nodeTimeout);
       }
+      nodeTimeouts.current = [];
     };
-  }, [controllers]);
-
-  React.useEffect(() => {
-    isFetchingRef.current = isFetching;
-  }, [isFetching]);
+  }, []);
 
   return [apiFetch, isFetchingAny, isFetching, controllers] as const;
 };
