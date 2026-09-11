@@ -9,6 +9,7 @@ import './index.css';
 import AppRoot from '@/AppRoot';
 import EnvUnsupported from '@/components/EnvUnsupported.component';
 import ErrorBoundary from '@/components/ErrorBoundary.component';
+import { restoreGitHubPagesPath } from '@/shared/github-pages-routing.utils';
 import reportWebVitals from './reportWebVitals';
 import { hawk } from './utils/hawk.util';
 import { prepareHostPlatform } from './utils/platform.util';
@@ -40,6 +41,7 @@ if (!rootElement) {
 const root = createRoot(rootElement);
 
 try {
+  restoreGitHubPagesPath();
   initializeMonitoring();
   prepareHostPlatform();
 
