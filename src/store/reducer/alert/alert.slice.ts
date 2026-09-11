@@ -31,7 +31,7 @@ export const alertSlice = createSlice({
       });
     },
     removeByIndex: (state, action: PayloadAction<number>) => {
-      state.alerts = state.alerts.filter((e, i) => i !== action.payload);
+      state.alerts = state.alerts.filter((_, i) => i !== action.payload);
     },
     clear: (state) => {
       state.alerts = [];

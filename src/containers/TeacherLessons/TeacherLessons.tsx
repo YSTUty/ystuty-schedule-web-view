@@ -51,10 +51,10 @@ const TeacherLessons = () => {
                     elementId="vk_like"
                     options={{ type: 'mini', height: 24, verb: 0 }}
                     pageId="app"
-                    onLike={(num) => {}}
-                    onUnlike={(num) => {}}
-                    onShare={(num) => {}}
-                    onUnshare={(num) => {}}
+                    onLike={() => {}}
+                    onUnlike={() => {}}
+                    onShare={() => {}}
+                    onUnshare={() => {}}
                   />
                 </VK>
               </FormControl>

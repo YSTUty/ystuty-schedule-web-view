@@ -29,7 +29,7 @@ const GroupGroupingControl: React.FC<GroupGroupingControlProps> = (props) => {
     (state) => state.schedule.selectedItems[scheduleFor],
   );
 
-  const handleChange = (event: React.MouseEvent<HTMLElement>, val: string) => {
+  const handleChange = (_event: React.MouseEvent<HTMLElement>, val: string) => {
     switch (val) {
       case 'isGroupByDate':
         dispatch(scheduleSlice.actions.onGroupOrderToggle());

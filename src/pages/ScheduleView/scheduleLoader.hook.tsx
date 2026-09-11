@@ -1,5 +1,4 @@
 import React from 'react';
-import { useIntl } from 'react-intl';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { useDebounce } from 'react-use';
@@ -10,7 +9,6 @@ import { ITeacherData, ScheduleFor } from '@/interfaces/ystuty.types';
 import { useApi } from '@/shared/api.hook';
 import alertSlice from '@/store/reducer/alert/alert.slice';
 import scheduleSlice from '@/store/reducer/schedule/schedule.slice';
-import { delay } from '@/utils';
 
 export const useScheduleLoader = (props: {
   scheduleFor: ScheduleFor | null;
@@ -36,7 +34,6 @@ export const useScheduleLoader = (props: {
 
   // const { online } = useNetworkState();
   const dispatch = useDispatch();
-  const { formatMessage } = useIntl();
   const selectedItems = useSelector((state) =>
     !scheduleFor ? [] : state.schedule.selectedItems[scheduleFor],
   );
@@ -118,7 +115,6 @@ export const useScheduleLoader = (props: {
           {},
           {
             fKey: `${scheduleFor}/${itemKey}`,
-            fKeySub: `${scheduleFor}`,
             setError: (error) =>
               dispatch(
                 alertSlice.actions.add({

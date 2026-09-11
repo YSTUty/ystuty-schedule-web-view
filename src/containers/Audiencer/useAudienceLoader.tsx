@@ -1,5 +1,4 @@
 import React from 'react';
-import { useIntl } from 'react-intl';
 import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
 import store2 from 'store2';
@@ -13,7 +12,6 @@ const STORE_CACHED_ACCUMULATIVE_KEY = 'STORE_CACHED_ACCUMULATIVE_KEY';
 
 const useAudienceLoader = () => {
   const dispatch = useDispatch();
-  const { formatMessage } = useIntl();
   const [fetchApi, , isFetchings] = useApi();
 
   // const [audiences, setAudiences] = React.useState<IAudienceData[]>([]);

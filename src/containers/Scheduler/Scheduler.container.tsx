@@ -208,7 +208,7 @@ const AppointmentContent = ({
                     {((e?: string) =>
                       e
                         ?.split(' ')
-                        .map((e, i) => /* i === 0 ? e.slice(0, 5) : */ e[0])
+                        .map((e) => /* i === 0 ? e.slice(0, 5) : */ e[0])
                         .join('.')
                         .trim())(
                       data.teacherName /* || teachers?.find((e) => e.id === data.teacherId)?.name */,
@@ -498,7 +498,7 @@ const getResources = (
           ((e?: string) =>
             e
               ?.split(' ')
-              .map((e, i) => /* i === 0 ? e.slice(0, 5) : */ e[0])
+              .map((e) => /* i === 0 ? e.slice(0, 5) : */ e[0])
               .join('.')
               .trim())(teachers?.find((e) => e.id === (id as number))?.name) ||
           `#${id}`,

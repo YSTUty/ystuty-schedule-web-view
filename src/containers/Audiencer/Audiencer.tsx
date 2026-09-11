@@ -3,7 +3,6 @@ import { useIntl } from 'react-intl';
 import { Route, useLocation } from 'react-router';
 import store2 from 'store2';
 
-import { styled } from '@mui/material';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
@@ -83,10 +82,10 @@ const Audiencer = () => {
                     elementId="vk_like"
                     options={{ type: 'mini', height: 24, verb: 0 }}
                     pageId="app"
-                    onLike={(num) => {}}
-                    onUnlike={(num) => {}}
-                    onShare={(num) => {}}
-                    onUnshare={(num) => {}}
+                    onLike={() => {}}
+                    onUnlike={() => {}}
+                    onShare={() => {}}
+                    onUnshare={() => {}}
                   />
                 </VK>
               </FormControl>

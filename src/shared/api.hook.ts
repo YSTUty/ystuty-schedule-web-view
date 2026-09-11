@@ -45,7 +45,6 @@ export const useApi = () => {
     init?: RequestInit,
     params: {
       fKey?: string;
-      fKeySub?: string;
       returnResponse?: boolean;
       checkError?: boolean;
       noAlert?: boolean;
@@ -57,7 +56,6 @@ export const useApi = () => {
   ) {
     const {
       fKey = path,
-      fKeySub = path,
       noRenavigate,
       checkError,
       noAlert,
@@ -71,9 +69,7 @@ export const useApi = () => {
         (
           toast.warning(
             formatMessage({ id: 't.api.rate_limit.retry' }, { retryAfter }),
-            {
-              autoClose: Math.max(2, retryAfter) * 1e3,
-            },
+            { autoClose: Math.max(2, retryAfter) * 1e3 },
           ),
           true
         ),

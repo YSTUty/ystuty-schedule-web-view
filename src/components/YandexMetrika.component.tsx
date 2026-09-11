@@ -30,7 +30,7 @@ export const YandexMetrika = () => {
   }, [utmFixed]);
 
   React.useEffect(() => {
-    let timeout: NodeJS.Timeout | null = null;
+    let timeout: ReturnType<typeof setTimeout> | null = null;
     const handleReinit = () => {
       removeUTMs();
     };

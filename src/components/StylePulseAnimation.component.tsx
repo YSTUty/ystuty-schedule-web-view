@@ -3,7 +3,7 @@ import { styled } from '@mui/material/styles';
 
 // export const StyledPulseAnumation = (Component: any) =>
 
-export const StyledAutocomplete = styled(Autocomplete)((theme) => ({
+export const StyledAutocomplete = styled(Autocomplete)(() => ({
   ['&.pulsation']: {
     transform: 'scale(1)',
     transition: 'all .2s ease-in-out',

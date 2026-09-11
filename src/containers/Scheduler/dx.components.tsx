@@ -1,4 +1,3 @@
-import React from 'react';
 import classNames from 'clsx';
 
 import {
@@ -75,7 +74,7 @@ export const StyledAppointmentsAppointment = styled(Appointments.Appointment)(
 
 export const StyledAppointmentsAppointmentContent = styled(
   Appointments.AppointmentContent,
-)(({ theme: { palette } }) => ({
+)(() => ({
   [`& .${classes.text}`]: {
     overflow: 'hidden',
     textOverflow: 'ellipsis',

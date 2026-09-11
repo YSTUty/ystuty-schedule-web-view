@@ -141,7 +141,7 @@ const AudiencerMonther = (props: {
   };
   isColoring: boolean;
 }) => {
-  const { filterDateTime, isColoring } = props;
+  const { filterDateTime } = props;
 
   const { accumulatives, selectedAudiences, lessonTypes } = useSelector(
     (state) => state.audiencer,

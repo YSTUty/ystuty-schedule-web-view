@@ -12,7 +12,6 @@ import store, { history } from './store';
 import 'react-toastify/dist/ReactToastify.css';
 import './index.css';
 
-import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import LoadingUpdatesComponent from './components/LoadingUpdates.component';
 import LocalizerComponent from './components/Localizer.component';
 import { ThemeModeProvider } from './components/ThemeMode.component';

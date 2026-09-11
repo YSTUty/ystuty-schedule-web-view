@@ -20,7 +20,7 @@
     "preview": "vite preview",
     "deploy": "npm run build && bash ./deploy.sh",
     "analyze": "ANALYZE=true vite build",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && tsc --project tsconfig.node.json --noEmit",
     "typecheck:watch": "tsc --noEmit --watch",
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest --passWithNoTests",
