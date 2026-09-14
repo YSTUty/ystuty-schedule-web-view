@@ -22,6 +22,7 @@ import {
   type AppThemePalette,
 } from '@/utils/app-theme.util';
 import { isTelegramMiniApp } from '@/shared/telegram/telegram.sdk';
+import { resolveTelegramThemePalette } from '@/utils/telegram-theme.util';
 
 const LAST_THEME_MODE = toThemeMode(store2.get(THEME_MODE_STORAGE_KEY, null));
 
@@ -63,6 +64,18 @@ export const ThemeModeProvider = ({
     textSecondary: useSignal(themeParams.hintColor),
   };
   const usesTelegramTheme = isTelegramMiniApp();
+  const acceptedTelegramPaletteRef = React.useRef<AppThemePalette>();
+  const appTelegramPalette = usesTelegramTheme
+    ? resolveTelegramThemePalette(
+        acceptedTelegramPaletteRef.current,
+        telegramPalette,
+      )
+    : undefined;
+
+  if (usesTelegramTheme) {
+    acceptedTelegramPaletteRef.current = appTelegramPalette;
+  }
+
   const [mode, setMode] = React.useState<ThemeMode>(() =>
     usesTelegramTheme
       ? telegramThemeIsDark
@@ -100,8 +113,8 @@ export const ThemeModeProvider = ({
   }, [mode]);
 
   const theme = React.useMemo(
-    () => createAppTheme(mode, usesTelegramTheme ? telegramPalette : undefined),
-    [mode, telegramPalette, usesTelegramTheme],
+    () => createAppTheme(mode, appTelegramPalette),
+    [appTelegramPalette, mode],
   );
   const emotionCache = React.useMemo(
     () => createCache({ key: 'css', speedy: false }),
