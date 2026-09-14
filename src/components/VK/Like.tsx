@@ -22,7 +22,6 @@ export type Props = {
   onUnshare?: (quantity: number) => void;
 };
 
-const __safe__likes: Record<any, any> = {};
 const Like: React.FC<Props> = ({
   elementId,
   options,
@@ -33,12 +32,14 @@ const Like: React.FC<Props> = ({
   onUnshare,
 }) => {
   const vk = React.useContext(VKContext);
+  const elementRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
-    // fix twice render by StrictMode
-    if (!(elementId in __safe__likes)) {
+    const element = elementRef.current;
+
+    if (element && !element.dataset.vkLikeInitialized) {
       vk.Widgets.Like(elementId, options, pageId || undefined);
-      // __safe__likes[elementId] = true;
+      element.dataset.vkLikeInitialized = 'true';
     }
 
     vk.Observer.subscribe('widgets.like.liked', (quantity: number) =>
@@ -60,9 +61,18 @@ const Like: React.FC<Props> = ({
       vk.Observer.unsubscribe('widgets.like.shared');
       vk.Observer.unsubscribe('widgets.like.unshared');
     };
-  }, []);
+  }, [
+    elementId,
+    onLike,
+    onShare,
+    onUnlike,
+    onUnshare,
+    options,
+    pageId,
+    vk,
+  ]);
 
-  return <div id={elementId} />;
+  return <div id={elementId} ref={elementRef} />;
 };
 
 Like.propTypes = {
