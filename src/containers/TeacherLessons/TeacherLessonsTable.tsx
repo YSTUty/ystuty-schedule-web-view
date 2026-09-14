@@ -194,6 +194,9 @@ const TeacherLessonsTable = (props: { academicPeriodId?: string }) => {
             }
 
             let lesson = acc[item.lessonName];
+            const lessonPairCount = lessonsUtils.getLessonPairCount(
+              item.duration,
+            );
 
             const allowedTypes = [
               LessonFlags.Lecture,
@@ -219,11 +222,11 @@ const TeacherLessonsTable = (props: { academicPeriodId?: string }) => {
               if (!(item.type in lesson.groups[group])) {
                 lesson.groups[group][item.type] = 0;
               }
-              lesson.groups[group][item.type]! += item.duration / 2;
+              lesson.groups[group][item.type]! += lessonPairCount;
 
               // TODO: поправить подсчет: какие типы пар считать в количество? (экзамен/зачт тоже считается, а НИР? а другие какие?)
               if (allowedTypes.some((e) => (item.type & e) === e)) {
-                lesson.lessonCount += item.duration / 2;
+                lesson.lessonCount += lessonPairCount;
               }
             }
 

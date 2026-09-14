@@ -21,6 +21,17 @@ export const getLessonTypeStrArr = (type: LessonFlags) => {
   return types;
 };
 
+/**
+ * Возвращает количество пар для нагрузки преподавателя.
+ *
+ * API передаёт экзамены и некоторые другие занятия на весь день без
+ * длительности. Такое занятие учитывается как одна пара, а не как ноль.
+ */
+export const getLessonPairCount = (duration: unknown): number =>
+  typeof duration === 'number' && Number.isFinite(duration) && duration > 0
+    ? duration / 2
+    : 1;
+
 export const getLessonColor = (type: LessonFlags) => {
   switch (type) {
     case type & LessonFlags.Lecture:
