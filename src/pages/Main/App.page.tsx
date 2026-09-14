@@ -56,8 +56,15 @@ const MainPage = () => {
           borderBottom: (t) => `1px solid ${t.palette.divider}`,
         }}>
         <Toolbar>
-          <Typography variant="h6" color="inherit" noWrap sx={{ mr: 2 }}>
-            [YSTUty] Расписание
+          <Typography
+            variant="h6"
+            color="inherit"
+            noWrap
+            sx={{ fontSize: { xs: '1rem', sm: '1.25rem' }, mr: { xs: 1, sm: 2 } }}>
+            <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
+              [YSTUty]{' '}
+            </Box>
+            Расписание
           </Typography>
           {envUtils.vkWidgetsApiId && (
             <>
