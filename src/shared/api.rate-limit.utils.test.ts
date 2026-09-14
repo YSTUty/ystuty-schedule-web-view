@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import {
   getApiRateLimitCooldownSeconds,
+  getApiRateLimitState,
   resetApiRateLimitCooldown,
   setApiRateLimitCooldown,
 } from './api.rate-limit.utils';
@@ -21,5 +22,15 @@ describe('api.rate-limit.utils', () => {
     setApiRateLimitCooldown(2, 1_000);
 
     expect(getApiRateLimitCooldownSeconds(3_000)).toBe(0);
+  });
+
+  it('keeps rate limit details for the user interface', () => {
+    setApiRateLimitCooldown({ limit: 5, remaining: 0, resetAfter: 8 }, 1_000);
+
+    expect(getApiRateLimitState()).toEqual({
+      expiresAt: 9_000,
+      limit: 5,
+      remaining: 0,
+    });
   });
 });

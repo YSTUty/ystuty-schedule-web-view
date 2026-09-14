@@ -5,6 +5,7 @@ import store2 from 'store2';
 
 // import LazyLoadComponent from '../../components/LazyLoad.component';
 import Copyright from '@components/Copyright.component';
+import RateLimitNotice from '@components/RateLimitNotice.component';
 import { SystemLog, SystemLogButton } from '@components/SystemLog.component';
 import { Routes } from '@/Routes';
 import {
@@ -61,6 +62,7 @@ const AppContainer = () => {
     <>
       {isDev && !state.online && <pre>{JSON.stringify(state, null, 2)}</pre>}
       <SystemLog />
+      <RateLimitNotice />
       <Routes />
       <Copyright />
       <SystemLogButton />

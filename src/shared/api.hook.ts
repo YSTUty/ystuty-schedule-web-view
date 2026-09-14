@@ -7,6 +7,7 @@ import { toast } from 'react-toastify';
 // import { useAppSelector } from '@/store';
 import { apiPath } from '@/utils';
 import {
+  clearApiRateLimitState,
   getApiRateLimitCooldownSeconds,
   setApiRateLimitCooldown,
 } from './api.rate-limit.utils';
@@ -105,7 +106,7 @@ export const useApi = () => {
 
     const reportRateLimit = (response: Response) => {
       const rateLimit = getRateLimitInfo(response.headers);
-      const isCooldownExtended = setApiRateLimitCooldown(rateLimit.resetAfter);
+      const isCooldownExtended = setApiRateLimitCooldown(rateLimit);
       const details = [
         rateLimit.limit !== undefined && `лимит: ${rateLimit.limit}`,
         rateLimit.remaining !== undefined && `осталось: ${rateLimit.remaining}`,
@@ -149,6 +150,10 @@ export const useApi = () => {
       .then(async (response) => {
         if (response.status === 429) {
           return reportRateLimit(response);
+        }
+
+        if (response.ok && getApiRateLimitCooldownSeconds() === 0) {
+          clearApiRateLimitState();
         }
 
         if (returnResponse) {
