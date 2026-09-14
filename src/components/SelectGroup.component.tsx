@@ -18,6 +18,10 @@ import {
 import { IInstituteGroupsData } from '@/interfaces/ystuty.types';
 import { useApi } from '@/shared/api.hook';
 import {
+  getCachedLookup,
+  setCachedLookup,
+} from '@/shared/schedule-cache.storage';
+import {
   buildSchedulePath,
   getScheduleSelectionFromPathname,
 } from '@/shared/schedule-routing.utils';
@@ -32,6 +36,7 @@ import { StyledAutocomplete } from './StylePulseAnimation.component';
 
 // const STORE_CACHED_INSTITUTES_KEY_OLD = 'CACHED_INSTITUTES';
 const STORE_CACHED_INSTITUTES_KEY = 'CACHED_V3_INSTITUTES::';
+const INSTITUTES_CACHE_KEY = 'actual-groups';
 
 export const SelectGroupComponent = (props: {
   allowMultipleRef: AllowMultipleRef;
@@ -65,23 +70,36 @@ export const SelectGroupComponent = (props: {
   const [isCached, setIsCached] = React.useState(false);
 
   const applyInstitutes = React.useCallback(
-    (items: IInstituteGroupsData[] | null) => {
-      if (!items) {
-        items = store2.get(STORE_CACHED_INSTITUTES_KEY, null);
-        if (!items) {
-          return;
-        }
-        setIsCached(true);
-      } else if (items.length > 0) {
-        store2.set(STORE_CACHED_INSTITUTES_KEY, items);
-        setIsCached(false);
+    (items: IInstituteGroupsData[], isCache = false) => {
+      if (items.length > 0) {
+        setIsCached(isCache);
+        setInstitutes(items);
       }
-
-      // items.sort();
-      setInstitutes(items);
     },
     [setInstitutes, setIsCached],
   );
+
+  /** Временно читает старый LocalStorage-кэш, пока он не будет перенесён. */
+  const loadCachedInstitutes = React.useCallback(async () => {
+    const cachedItems =
+      await getCachedLookup<IInstituteGroupsData[]>(INSTITUTES_CACHE_KEY);
+    if (cachedItems) {
+      applyInstitutes(cachedItems, true);
+      return;
+    }
+
+    const legacyItems = store2.get(STORE_CACHED_INSTITUTES_KEY, null) as
+      | IInstituteGroupsData[]
+      | null;
+    if (!legacyItems) {
+      return;
+    }
+
+    applyInstitutes(legacyItems, true);
+    if (await setCachedLookup(INSTITUTES_CACHE_KEY, legacyItems)) {
+      store2.remove(STORE_CACHED_INSTITUTES_KEY);
+    }
+  }, [applyInstitutes]);
 
   const loadGroupsList = React.useCallback(async () => {
     if (isFetching) return;
@@ -106,13 +124,21 @@ export const SelectGroupComponent = (props: {
       );
 
       if (!response || 'error' in response || !('data' in response)) {
+        await loadCachedInstitutes();
         return;
       }
 
       applyInstitutes(response.data.items);
+      void setCachedLookup(INSTITUTES_CACHE_KEY, response.data.items).then(
+        (isStored) => {
+          if (isStored) {
+            store2.remove(STORE_CACHED_INSTITUTES_KEY);
+          }
+        },
+      );
     } catch (err) {
       // ??
-      applyInstitutes(null);
+      await loadCachedInstitutes();
       if (online) {
         dispatch(
           alertSlice.actions.add({
@@ -129,7 +155,7 @@ export const SelectGroupComponent = (props: {
         );
       }
     }
-  }, [applyInstitutes, online]);
+  }, [applyInstitutes, loadCachedInstitutes, online]);
 
   const onChangeValues = React.useCallback(
     (value: string | string[] | null) => {
