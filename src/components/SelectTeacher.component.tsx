@@ -19,8 +19,7 @@ import {
 import { ITeacherData } from '@/interfaces/ystuty.types';
 import { useApi } from '@/shared/api.hook';
 import {
-  buildSchedulePath,
-  getScheduleSelectionFromPathname,
+  getTeacherSelectionPathRoute,
 } from '@/shared/schedule-routing.utils';
 import { useDispatch, useSelector } from '@/store';
 import alertSlice from '@/store/reducer/alert/alert.slice';
@@ -60,13 +59,13 @@ export const SelectTeacherComponent = (props: {
 
   const defaultValues: number[] = React.useMemo(() => {
     const teacherIds = getLastTeachers();
-    let values = ((e) =>
-      e
-        ?.split(',')
-        .map<number>((e) => Number(e))
-        .filter((e) => e /* .id */ > 0) || [])(
-      getScheduleSelectionFromPathname(pathname, 'teacher').join(','),
-    );
+    const selectedTeacherIds =
+      getTeacherSelectionPathRoute(pathname).getSelectionFromPathname(
+        pathname,
+      );
+    let values = selectedTeacherIds
+      .map<number>((teacherId) => Number(teacherId))
+      .filter((teacherId) => teacherId > 0);
     values = values.length > 0 ? values : teacherIds;
     return values;
   }, [pathname]);
@@ -146,7 +145,7 @@ export const SelectTeacherComponent = (props: {
         );
         if (values.length > 0) {
           navigate({
-            pathname: buildSchedulePath('teacher', values),
+            pathname: getTeacherSelectionPathRoute(pathname).buildPath(values),
             search,
             hash,
           });
@@ -154,7 +153,7 @@ export const SelectTeacherComponent = (props: {
         }
       }
     },
-    [dispatch, hash, navigate, search, selected],
+    [dispatch, hash, navigate, pathname, search, selected],
   );
 
   const fixSelected = React.useCallback(

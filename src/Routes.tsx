@@ -33,7 +33,10 @@ export const Routes = () => {
       />
       {/* <Route path="/audience" component={Audiencer} /> */}
       <Route path="/audience/*" element={<Navigate replace to="/by_audience" />} />
-      <Route path="/teacher-lessons" element={<TeacherLessons />} />
+      <Route
+        path="/teacher-lessons/:selectedItems?"
+        element={<TeacherLessons />}
+      />
       <Route path="*" element={<NotFoundPage />} />
     </RouterRoutes>
   );
