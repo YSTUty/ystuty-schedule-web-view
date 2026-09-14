@@ -1,11 +1,11 @@
 import { useCallback, useState } from 'react';
 
-import { miniApp, themeParams, useSignal } from '@tma.js/sdk-react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
-import Typography from '@mui/material/Typography';
 import { useTheme } from '@mui/material/styles';
+import Typography from '@mui/material/Typography';
+import { miniApp, themeParams, useSignal } from '@tma.js/sdk-react';
 
 type ThemeValue = {
   label: string;
@@ -82,7 +82,10 @@ const TelegramThemeDebug = () => {
     { label: 'TG theme text_color', value: themeParamsValues.textColor },
     { label: 'Mini App bgColor', value: miniApp.bgColorRgb() },
     { label: 'Mini App headerColor', value: miniApp.headerColorRgb() },
-    { label: 'MUI background.default', value: theme.palette.background.default },
+    {
+      label: 'MUI background.default',
+      value: theme.palette.background.default,
+    },
     { label: 'MUI background.paper', value: theme.palette.background.paper },
     { label: 'MUI primary.main', value: theme.palette.primary.main },
     {

@@ -2,7 +2,6 @@ import React from 'react';
 import { ToastContainer } from 'react-toastify';
 import store2 from 'store2';
 
-import { themeParams, useSignal } from '@tma.js/sdk-react';
 import CssBaseline from '@mui/material/CssBaseline';
 import IconButton from '@mui/material/IconButton';
 import { ThemeProvider, useTheme } from '@mui/material/styles';
@@ -11,18 +10,16 @@ import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
+import { themeParams, useSignal } from '@tma.js/sdk-react';
 
+import { isTelegramMiniApp } from '@/shared/telegram/telegram.sdk';
+import { type AppThemePalette, createAppTheme } from '@/utils/app-theme.util';
+import { resolveTelegramThemePalette } from '@/utils/telegram-theme.util';
 import {
   THEME_MODE_STORAGE_KEY,
   type ThemeMode,
   toThemeMode,
 } from '@/utils/theme-mode.util';
-import {
-  createAppTheme,
-  type AppThemePalette,
-} from '@/utils/app-theme.util';
-import { isTelegramMiniApp } from '@/shared/telegram/telegram.sdk';
-import { resolveTelegramThemePalette } from '@/utils/telegram-theme.util';
 
 const LAST_THEME_MODE = toThemeMode(store2.get(THEME_MODE_STORAGE_KEY, null));
 

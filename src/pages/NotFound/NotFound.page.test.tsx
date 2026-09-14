@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
-
-import { render, screen } from '@testing-library/react';
 import { IntlProvider } from 'react-intl';
 import { MemoryRouter } from 'react-router-dom';
+
+import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
 import NotFoundPage from './NotFound.page';

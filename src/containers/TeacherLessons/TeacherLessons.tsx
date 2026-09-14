@@ -19,13 +19,13 @@ import NavLinkComponent from '@components/NavLink.component';
 import { SelectTeacherComponent } from '@components/SelectTeacher.component';
 import { ThemeModeButton } from '@components/ThemeMode.component';
 import VK, { Like } from '@components/VK';
+import * as envUtils from '@/utils/env.utils';
+import { useScheduleLoader } from '@/pages/ScheduleView/scheduleLoader.hook';
+import { useSelector } from '@/store';
 import {
   getAvailableAcademicPeriods,
   getDefaultAcademicPeriodId,
 } from '@/utils/academic-period.utils';
-import * as envUtils from '@/utils/env.utils';
-import { useScheduleLoader } from '@/pages/ScheduleView/scheduleLoader.hook';
-import { useSelector } from '@/store';
 import TeacherLessonsTable from './TeacherLessonsTable';
 
 const TeacherLessons = () => {
@@ -51,16 +51,13 @@ const TeacherLessons = () => {
     () => getDefaultAcademicPeriodId(availableAcademicPeriods),
     [availableAcademicPeriods],
   );
-  const academicPeriodId =
-    selectedAcademicPeriodId ?? defaultAcademicPeriodId;
+  const academicPeriodId = selectedAcademicPeriodId ?? defaultAcademicPeriodId;
 
   React.useEffect(() => {
     setSelectedAcademicPeriodId((currentPeriodId) => {
       if (
         currentPeriodId &&
-        availableAcademicPeriods.some(
-          (period) => period.id === currentPeriodId,
-        )
+        availableAcademicPeriods.some((period) => period.id === currentPeriodId)
       ) {
         return currentPeriodId;
       }

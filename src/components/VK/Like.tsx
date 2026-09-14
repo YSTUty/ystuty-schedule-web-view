@@ -61,16 +61,7 @@ const Like: React.FC<Props> = ({
       vk.Observer.unsubscribe('widgets.like.shared');
       vk.Observer.unsubscribe('widgets.like.unshared');
     };
-  }, [
-    elementId,
-    onLike,
-    onShare,
-    onUnlike,
-    onUnshare,
-    options,
-    pageId,
-    vk,
-  ]);
+  }, [elementId, onLike, onShare, onUnlike, onUnshare, options, pageId, vk]);
 
   return <div id={elementId} ref={elementRef} />;
 };

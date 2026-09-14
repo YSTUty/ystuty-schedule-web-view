@@ -134,9 +134,7 @@ export function getScheduleForFromPathname(
  * Хеши, не похожие на прежний формат выбора расписания, игнорируются:
  * они могут принадлежать хост-приложению Telegram или VK.
  */
-export function getLegacySchedulePath(
-  location: LegacyLocation,
-): string | null {
+export function getLegacySchedulePath(location: LegacyLocation): string | null {
   const { pathname, search } = location;
   const hashSelection = getLegacyHashValue(location.hash);
   const withSearch = (path: string) => `${path}${search}`;

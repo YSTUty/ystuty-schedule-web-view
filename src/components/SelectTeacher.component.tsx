@@ -18,9 +18,7 @@ import {
 } from '@components/ScheduleSelector.shared';
 import { ITeacherData } from '@/interfaces/ystuty.types';
 import { useApi } from '@/shared/api.hook';
-import {
-  getTeacherSelectionPathRoute,
-} from '@/shared/schedule-routing.utils';
+import { getTeacherSelectionPathRoute } from '@/shared/schedule-routing.utils';
 import { useDispatch, useSelector } from '@/store';
 import alertSlice from '@/store/reducer/alert/alert.slice';
 import scheduleSlice, {
@@ -60,9 +58,7 @@ export const SelectTeacherComponent = (props: {
   const defaultValues: number[] = React.useMemo(() => {
     const teacherIds = getLastTeachers();
     const selectedTeacherIds =
-      getTeacherSelectionPathRoute(pathname).getSelectionFromPathname(
-        pathname,
-      );
+      getTeacherSelectionPathRoute(pathname).getSelectionFromPathname(pathname);
     let values = selectedTeacherIds
       .map<number>((teacherId) => Number(teacherId))
       .filter((teacherId) => teacherId > 0);

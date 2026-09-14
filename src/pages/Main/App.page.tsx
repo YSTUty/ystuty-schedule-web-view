@@ -21,12 +21,12 @@ import TelegramIcon from '@mui/icons-material/Telegram';
 import { Buffer } from 'buffer';
 
 import NavLinkComponent from '@components/NavLink.component';
-import { ThemeModeButton } from '@components/ThemeMode.component';
 import TelegramThemeDebug from '@components/TelegramThemeDebug.component';
+import { ThemeModeButton } from '@components/ThemeMode.component';
 import VK, { Like } from '@components/VK';
-import { isTelegramMiniApp } from '@/shared/telegram/telegram.sdk';
 import * as envUtils from '@/utils/env.utils';
 import VkSvg from '@/assets/img/vk-logo.svg?react';
+import { isTelegramMiniApp } from '@/shared/telegram/telegram.sdk';
 import { useSelector } from '@/store';
 
 const MainPage = () => {
@@ -60,8 +60,13 @@ const MainPage = () => {
             variant="h6"
             color="inherit"
             noWrap
-            sx={{ fontSize: { xs: '1rem', sm: '1.25rem' }, mr: { xs: 1, sm: 2 } }}>
-            <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
+            sx={{
+              fontSize: { xs: '1rem', sm: '1.25rem' },
+              mr: { xs: 1, sm: 2 },
+            }}>
+            <Box
+              component="span"
+              sx={{ display: { xs: 'none', sm: 'inline' } }}>
               [YSTUty]{' '}
             </Box>
             Расписание

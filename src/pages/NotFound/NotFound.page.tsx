@@ -51,12 +51,21 @@ const NotFoundPage = () => (
       }}>
       <Paper
         elevation={4}
-        sx={{ maxWidth: 520, p: { xs: 3, sm: 4 }, textAlign: 'center', width: '100%' }}>
+        sx={{
+          maxWidth: 520,
+          p: { xs: 3, sm: 4 },
+          textAlign: 'center',
+          width: '100%',
+        }}>
         <Stack spacing={3}>
           <Typography
             aria-hidden
             color="primary"
-            sx={{ fontSize: { xs: '4rem', sm: '5rem' }, fontWeight: 700, lineHeight: 1 }}>
+            sx={{
+              fontSize: { xs: '4rem', sm: '5rem' },
+              fontWeight: 700,
+              lineHeight: 1,
+            }}>
             404
           </Typography>
           <Box>

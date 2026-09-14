@@ -19,20 +19,14 @@ export const Routes = () => {
   return (
     <RouterRoutes>
       <Route path="/" element={<App />} />
-      <Route
-        path="/group/:selectedItems?"
-        element={<Schedule />}
-      />
-      <Route
-        path="/teacher/:selectedItems?"
-        element={<Schedule />}
-      />
-      <Route
-        path="/by_audience/:selectedItems?"
-        element={<Schedule />}
-      />
+      <Route path="/group/:selectedItems?" element={<Schedule />} />
+      <Route path="/teacher/:selectedItems?" element={<Schedule />} />
+      <Route path="/by_audience/:selectedItems?" element={<Schedule />} />
       {/* <Route path="/audience" component={Audiencer} /> */}
-      <Route path="/audience/*" element={<Navigate replace to="/by_audience" />} />
+      <Route
+        path="/audience/*"
+        element={<Navigate replace to="/by_audience" />}
+      />
       <Route
         path="/teacher-lessons/:selectedItems?"
         element={<TeacherLessons />}

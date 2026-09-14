@@ -15,10 +15,7 @@ type AcademicPeriodDefinition = {
   year: number;
 };
 
-const periodLabels: Record<
-  AcademicPeriodType,
-  (year: number) => string
-> = {
+const periodLabels: Record<AcademicPeriodType, (year: number) => string> = {
   autumn: (year) => `Осенний семестр ${year}/${String(year + 1).slice(-2)}`,
   spring: (year) => `Весенний семестр ${year}`,
 };
@@ -113,9 +110,10 @@ export function getDefaultAcademicPeriodId(
 }
 
 /** Оставляет занятия выбранного учебного периода. */
-export function filterByAcademicPeriod<
-  T extends { startAt?: DateInput },
->(lessons: readonly T[], periodId: string | undefined): T[] {
+export function filterByAcademicPeriod<T extends { startAt?: DateInput }>(
+  lessons: readonly T[],
+  periodId: string | undefined,
+): T[] {
   if (!periodId) {
     return [...lessons];
   }

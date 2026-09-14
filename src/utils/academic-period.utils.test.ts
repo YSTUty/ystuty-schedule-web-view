@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest';
 
 import {
   filterByAcademicPeriod,
+  getAcademicPeriodForDate,
   getAvailableAcademicPeriods,
   getDefaultAcademicPeriodId,
-  getAcademicPeriodForDate,
 } from './academic-period.utils';
 
 describe('academic-period.utils', () => {
@@ -39,12 +39,12 @@ describe('academic-period.utils', () => {
       { startAt: '2026-03-01T12:00:00' },
     ]);
 
-    expect(
-      getDefaultAcademicPeriodId(periods, '2026-04-10T12:00:00'),
-    ).toBe('2026-spring');
-    expect(
-      getDefaultAcademicPeriodId(periods, '2026-09-10T12:00:00'),
-    ).toBe('2026-spring');
+    expect(getDefaultAcademicPeriodId(periods, '2026-04-10T12:00:00')).toBe(
+      '2026-spring',
+    );
+    expect(getDefaultAcademicPeriodId(periods, '2026-09-10T12:00:00')).toBe(
+      '2026-spring',
+    );
   });
 
   it('filters lessons by the selected period', () => {

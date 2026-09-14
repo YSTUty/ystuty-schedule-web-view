@@ -17,11 +17,11 @@ import Typography from '@mui/material/Typography';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 
-import { filterByAcademicPeriod } from '@/utils/academic-period.utils';
 import * as lessonsUtils from '@/utils/lessons.utils';
 import { LessonData, LessonFlags } from '@/interfaces/schedule';
 import { useDispatch, useSelector } from '@/store';
 import scheduleSlice from '@/store/reducer/schedule/schedule.slice';
+import { filterByAcademicPeriod } from '@/utils/academic-period.utils';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {

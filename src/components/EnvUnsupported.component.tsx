@@ -16,12 +16,12 @@ import CloudOffIcon from '@mui/icons-material/CloudOff';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutlineRounded';
 import RefreshIcon from '@mui/icons-material/Refresh';
 
+import { createAppTheme } from '@/utils/app-theme.util';
 import {
   THEME_MODE_STORAGE_KEY,
   type ThemeMode,
   toThemeMode,
 } from '@/utils/theme-mode.util';
-import { createAppTheme } from '@/utils/app-theme.util';
 
 type EnvUnsupportedProps = {
   error?: Error;
@@ -63,10 +63,7 @@ const EnvUnsupported = ({ error }: EnvUnsupportedProps) => {
     store2.get(THEME_MODE_STORAGE_KEY, null),
     prefersDarkMode,
   );
-  const theme = React.useMemo(
-    () => createAppTheme(themeMode),
-    [themeMode],
-  );
+  const theme = React.useMemo(() => createAppTheme(themeMode), [themeMode]);
   const state = getEnvUnsupportedState(error, online);
   const isOffline = state === 'offline';
   const isRuntimeError = state === 'runtime-error';

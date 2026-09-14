@@ -7,13 +7,13 @@ import store2 from 'store2';
 import { AlertMe } from '@components/AlertMe.component';
 import Copyright from '@components/Copyright.component';
 import { Routes } from '@/Routes';
-// import * as envUtils from '../../utils/env.utils';
-// import * as pwaUtils from '../../utils/pwa.utils';
-import WithVersionCheckerConnect from '@/shared/WithVersionChecker.util';
 import {
   getLegacySchedulePath,
   normalizePathname,
 } from '@/shared/schedule-routing.utils';
+// import * as envUtils from '../../utils/env.utils';
+// import * as pwaUtils from '../../utils/pwa.utils';
+import WithVersionCheckerConnect from '@/shared/WithVersionChecker.util';
 import appVersion from '@/utils/app-version';
 
 // const PWAInstructionComponent = LazyLoadComponent(
