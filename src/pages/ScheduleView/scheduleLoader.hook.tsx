@@ -5,6 +5,7 @@ import store2 from 'store2';
 import { LessonData, LessonFlags, OneWeekDto } from '@/interfaces/schedule';
 import { ITeacherData, ScheduleFor } from '@/interfaces/ystuty.types';
 import { useApi } from '@/shared/api.hook';
+import { notifyTelegramResult } from '@/shared/telegram/telegram.sdk';
 import { useDispatch, useSelector } from '@/store';
 import alertSlice from '@/store/reducer/alert/alert.slice';
 import scheduleSlice from '@/store/reducer/schedule/schedule.slice';
@@ -132,6 +133,7 @@ export const useScheduleLoader = (props: {
         }
 
         formatData(itemKey, response.data.items);
+        notifyTelegramResult('success');
       } catch (err) {
         // ??
         formatData(itemKey, null);
@@ -141,6 +143,7 @@ export const useScheduleLoader = (props: {
             severity: 'warning',
           }),
         );
+        notifyTelegramResult('warning');
         // if (online) {
         //     dispatch(
         //         alertSlice.actions.add({

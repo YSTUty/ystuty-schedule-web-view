@@ -17,6 +17,7 @@ import Typography from '@mui/material/Typography';
 import AnalyticsOutlinedIcon from '@mui/icons-material/AnalyticsOutlined';
 import CloseIcon from '@mui/icons-material/Close';
 
+import { notifyTelegramResult } from '@/shared/telegram/telegram.sdk';
 import { useDispatch, useSelector } from '@/store';
 import alertSlice, { IAlert } from '@/store/reducer/alert/alert.slice';
 
@@ -61,6 +62,9 @@ export const SystemLog = () => {
     for (const alert of alerts) {
       if (alert.id > lastToastIdRef.current) {
         showToast(alert);
+        if (alert.severity === 'error' || alert.severity === 'warning') {
+          notifyTelegramResult(alert.severity);
+        }
       }
     }
 

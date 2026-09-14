@@ -1,9 +1,12 @@
 import {
   backButton,
+  cloudStorage,
   hapticFeedback,
   init,
+  initData,
   isTMA,
   miniApp,
+  retrieveLaunchParams,
   swipeBehavior,
   themeParams,
   viewport,
@@ -47,7 +50,7 @@ export function initializeTelegramMiniApp(): boolean {
     backButton.mount.ifAvailable();
     // mainButton.mount.ifAvailable();
     // secondaryButton.mount.ifAvailable();
-    // initData.restore();
+    initData.restore();
 
     if (viewport.mount.isAvailable()) {
       void viewport
@@ -97,5 +100,107 @@ export function notifyTelegramMiniAppReady(): void {
 export function notifyTelegramSelectionChanged(): void {
   if (isTelegramMiniAppInitialized && hapticFeedback.isSupported()) {
     hapticFeedback.selectionChanged();
+  }
+}
+
+/** Добавляет мягкий отклик на нажатие, если Telegram-клиент его поддерживает. */
+export function notifyTelegramImpact(): void {
+  if (isTelegramMiniAppInitialized && hapticFeedback.isSupported()) {
+    hapticFeedback.impactOccurred('light');
+  }
+}
+
+/**
+ * Сообщает Telegram о результате пользовательского действия.
+ * Успешные загрузки ограничиваются интервалом, чтобы серия запросов не создавала
+ * навязчивую вибрацию при выборе нескольких групп.
+ */
+let lastSuccessHapticAt = 0;
+export function notifyTelegramResult(
+  type: 'success' | 'warning' | 'error',
+): void {
+  if (!isTelegramMiniAppInitialized || !hapticFeedback.isSupported()) {
+    return;
+  }
+
+  if (type === 'success') {
+    const now = Date.now();
+    if (now - lastSuccessHapticAt < 1_500) {
+      return;
+    }
+    lastSuccessHapticAt = now;
+  }
+
+  hapticFeedback.notificationOccurred(type);
+}
+
+/** Возвращает значение `startapp` после инициализации SDK Telegram. */
+export function getTelegramMiniAppStartParam(): string | undefined {
+  if (!isTelegramMiniAppInitialized) {
+    return undefined;
+  }
+
+  try {
+    const initDataStartParam = initData.startParam();
+    if (initDataStartParam) {
+      return initDataStartParam;
+    }
+  } catch {
+    // Telegram Desktop может открыть Mini App без initData.
+  }
+
+  /**
+   * Обычно Telegram переносит `startapp` в `tgWebAppStartParam`, но Telegram
+   * Desktop может оставить исходный параметр в query и не передать initData.
+   */
+  const searchParams = new URLSearchParams(window.location.search);
+  return (
+    getTelegramLaunchStartParam() ||
+    searchParams.get('tgWebAppStartParam') ||
+    searchParams.get('startapp') ||
+    undefined
+  );
+}
+
+/** Безопасно получает start-параметр из всех источников, известных TMA SDK. */
+function getTelegramLaunchStartParam(): string | undefined {
+  try {
+    return retrieveLaunchParams().tgWebAppStartParam;
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * Читает CloudStorage, когда Mini App и версия Telegram его поддерживают.
+ * При любой ошибке вызывающий код использует локальный fallback.
+ */
+export async function getTelegramStoredValue(
+  key: string,
+): Promise<string | null> {
+  if (!isTelegramMiniAppInitialized || !cloudStorage.isSupported()) {
+    return null;
+  }
+
+  try {
+    return (await cloudStorage.getItem(key)) || null;
+  } catch {
+    return null;
+  }
+}
+
+/** Сохраняет значение в CloudStorage без влияния на обычную веб-версию. */
+export async function saveTelegramStoredValue(
+  key: string,
+  value: string,
+): Promise<void> {
+  if (!isTelegramMiniAppInitialized || !cloudStorage.isSupported()) {
+    return;
+  }
+
+  try {
+    await cloudStorage.setItem(key, value);
+  } catch {
+    // CloudStorage не должен мешать приложению при старом Telegram-клиенте.
   }
 }

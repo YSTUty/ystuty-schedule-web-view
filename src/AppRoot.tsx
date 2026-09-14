@@ -8,6 +8,7 @@ import { YandexMetrika } from '@/components/YandexMetrika.component';
 import AppContainer from '@/containers/App/App.container';
 import ServiceWorkerProvider from '@/shared/ServiceWorker.provider';
 import TelegramBackButton from '@/shared/telegram/TelegramBackButton.component';
+import TelegramLastRoute from '@/shared/telegram/TelegramLastRoute.component';
 import store from '@/store';
 
 const AppRoot = () => (
@@ -16,6 +17,7 @@ const AppRoot = () => (
       <ThemeModeProvider>
         <BrowserRouter>
           <TelegramBackButton />
+          <TelegramLastRoute />
           <ServiceWorkerProvider>
             <LoadingUpdatesComponent>
               <AppContainer />

@@ -1,6 +1,8 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
+import { notifyTelegramImpact } from '@/shared/telegram/telegram.sdk';
+
 const NavLinkComponent = React.forwardRef<
   HTMLAnchorElement | HTMLButtonElement,
   {
@@ -32,6 +34,7 @@ const NavLinkComponent = React.forwardRef<
         e.stopPropagation();
         if (to && to !== location.pathname) {
           // Параметры host-приложения могут находиться в search или hash.
+          notifyTelegramImpact();
           navigate({
             pathname: to,
             search: location.search,

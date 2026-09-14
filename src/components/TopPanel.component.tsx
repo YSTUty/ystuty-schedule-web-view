@@ -14,6 +14,7 @@ import SchoolIcon from '@mui/icons-material/School';
 
 import * as envUtils from '@/utils/env.utils';
 import { ScheduleFor } from '@/interfaces/ystuty.types';
+import { notifyTelegramImpact } from '@/shared/telegram/telegram.sdk';
 import { useSelector } from '@/store';
 import NavLinkComponent from './NavLink.component';
 import { SelectAudienceComponent } from './SelectAudience.component';
@@ -40,6 +41,7 @@ const TopPanel: React.FC<TopPanelProps> = (props) => {
   const allowMultipleRef = React.useRef<(state?: any) => void>(() => {});
 
   const onChangeMultiple = React.useCallback(() => {
+    notifyTelegramImpact();
     allowMultipleRef.current(!allowedMultiple[scheduleFor!]);
   }, [allowedMultiple, scheduleFor, allowMultipleRef]);
 

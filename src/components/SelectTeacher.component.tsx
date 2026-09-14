@@ -18,6 +18,7 @@ import {
 import { ITeacherData } from '@/interfaces/ystuty.types';
 import { useApi } from '@/shared/api.hook';
 import { getTeacherSelectionPathRoute } from '@/shared/schedule-routing.utils';
+import { notifyTelegramSelectionChanged } from '@/shared/telegram/telegram.sdk';
 import { useDispatch, useSelector } from '@/store';
 import alertSlice from '@/store/reducer/alert/alert.slice';
 import scheduleSlice, {
@@ -137,6 +138,7 @@ export const SelectTeacherComponent = (props: {
         values.length !== selected.length ||
         values.some((e, i) => selected[i] !== e)
       ) {
+        notifyTelegramSelectionChanged();
         dispatch(
           scheduleSlice.actions.setSelectedItems({
             scheduleFor: 'teacher',
