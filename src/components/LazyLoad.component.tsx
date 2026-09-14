@@ -5,10 +5,13 @@ import LoadingComponent from './Loading.component';
 const LazyLoadComponent =
   <P extends object>(
     Component: React.ComponentType<P>,
-    showLoading = false,
+    showLoading = true,
   ): React.FC<P> =>
   (props) => (
-    <React.Suspense fallback={showLoading ? <LoadingComponent /> : null}>
+    <React.Suspense
+      fallback={
+        showLoading ? <LoadingComponent>Загрузка…</LoadingComponent> : null
+      }>
       <Component {...props} />
     </React.Suspense>
   );
