@@ -18,14 +18,27 @@ concurrency:
 env:
   PAGES_DOMAIN: ${{ vars.PAGES_DOMAIN || 'beta-view.ystuty.ru' }}
   VITE_API_URL: ${{ vars.VITE_API_URL || 'https://gg-api.ystuty.ru/s/schedule' }}
-  VITE_GENERATE_SOURCEMAP: 'false'
+  VITE_API_URL_INTERNAL: ${{ vars.VITE_API_URL_INTERNAL }}
+  # VITE_GENERATE_SOURCEMAP: 'false'
+  VITE_LINK_YSTUTY: ${{ vars.VITE_LINK_YSTUTY }}
+  VITE_LINK_2GH: ${{ vars.VITE_LINK_2GH }}
+  VITE_LINK_2VK: ${{ vars.VITE_LINK_2VK }}
+  VITE_LINK_2ICS: ${{ vars.VITE_LINK_2ICS }}
+  VITE_LINK_SUPPORT: ${{ vars.VITE_LINK_SUPPORT }}
   VITE_MAIN_HOST: ${{ vars.PAGES_DOMAIN || 'beta-view.ystuty.ru' }}
+  VITE_TELEGRAM_USERNAME: ${{ vars.VITE_TELEGRAM_USERNAME }}
+  VITE_TELEGRAM_BOT_NAME: ${{ vars.VITE_TELEGRAM_BOT_NAME }}
+  VITE_VK_BOT_GROUP_NAME: ${{ vars.VITE_VK_BOT_GROUP_NAME }}
+  VITE_VK_WIDGETS_API_ID: ${{ vars.VITE_VK_WIDGETS_API_ID }}
+  VITE_SENTRY_DSN: ${{ vars.VITE_SENTRY_DSN }}
+  VITE_YM_ID: ${{ vars.VITE_YM_ID }}
 
 jobs:
   build:
     runs-on: ubuntu-latest
     env:
       HUSKY: 0
+      VITE_HAWK_TOKEN: ${{ secrets.VITE_HAWK_TOKEN }}
 
     steps:
       - uses: actions/checkout@v7
