@@ -7,6 +7,14 @@ body > div {
   height: 100%;
 }
 
+html[data-telegram-mini-app='true'] {
+  background: var(--tg-bg-color, var(--tg-theme-bg-color));
+}
+
+html[data-telegram-mini-app='true'] body > div {
+  min-height: var(--tg-viewport-stable-height, 100%);
+}
+
 h2 {
   margin: 0;
   font-size: 16px;

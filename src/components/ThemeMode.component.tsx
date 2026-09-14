@@ -2,6 +2,7 @@ import React from 'react';
 import { ToastContainer } from 'react-toastify';
 import store2 from 'store2';
 
+import { themeParams, useSignal } from '@tma.js/sdk-react';
 import CssBaseline from '@mui/material/CssBaseline';
 import IconButton from '@mui/material/IconButton';
 import { ThemeProvider, useTheme } from '@mui/material/styles';
@@ -16,7 +17,11 @@ import {
   type ThemeMode,
   toThemeMode,
 } from '@/utils/theme-mode.util';
-import { createAppTheme } from '@/utils/app-theme.util';
+import {
+  createAppTheme,
+  type AppThemePalette,
+} from '@/utils/app-theme.util';
+import { isTelegramMiniApp } from '@/shared/telegram/telegram.sdk';
 
 const LAST_THEME_MODE = toThemeMode(store2.get(THEME_MODE_STORAGE_KEY, null));
 
@@ -27,6 +32,11 @@ export const ThemeModeContext = React.createContext({
 export const ThemeModeButton = () => {
   const theme = useTheme();
   const colorMode = React.useContext(ThemeModeContext);
+
+  if (isTelegramMiniApp()) {
+    return null;
+  }
+
   return (
     <IconButton onClick={colorMode.toggleColorMode} color="inherit">
       {theme.palette.mode === 'dark' ? (
@@ -42,7 +52,24 @@ export const ThemeModeProvider = ({
   children,
 }: React.PropsWithChildren<{}>) => {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
-  const [mode, setMode] = React.useState<ThemeMode>(LAST_THEME_MODE || 'light');
+  const telegramThemeIsDark = useSignal(themeParams.isDark);
+  const telegramPalette: AppThemePalette = {
+    backgroundDefault: useSignal(themeParams.bgColor),
+    backgroundPaper: useSignal(themeParams.secondaryBgColor),
+    divider: useSignal(themeParams.sectionSeparatorColor),
+    primary: useSignal(themeParams.buttonColor),
+    primaryContrastText: useSignal(themeParams.buttonTextColor),
+    textPrimary: useSignal(themeParams.textColor),
+    textSecondary: useSignal(themeParams.hintColor),
+  };
+  const usesTelegramTheme = isTelegramMiniApp();
+  const [mode, setMode] = React.useState<ThemeMode>(() =>
+    usesTelegramTheme
+      ? telegramThemeIsDark
+        ? 'dark'
+        : 'light'
+      : LAST_THEME_MODE || 'light',
+  );
   const colorMode = React.useMemo(
     () => ({
       toggleColorMode: () => {
@@ -60,8 +87,12 @@ export const ThemeModeProvider = ({
   );
 
   React.useEffect(() => {
-    !LAST_THEME_MODE && setMode(prefersDarkMode ? 'dark' : 'light');
-  }, [prefersDarkMode]);
+    if (usesTelegramTheme) {
+      setMode(telegramThemeIsDark ? 'dark' : 'light');
+    } else if (!LAST_THEME_MODE) {
+      setMode(prefersDarkMode ? 'dark' : 'light');
+    }
+  }, [prefersDarkMode, telegramThemeIsDark, usesTelegramTheme]);
 
   React.useEffect(() => {
     document.documentElement.dataset.themeMode = mode;
@@ -69,8 +100,8 @@ export const ThemeModeProvider = ({
   }, [mode]);
 
   const theme = React.useMemo(
-    () => createAppTheme(mode),
-    [mode],
+    () => createAppTheme(mode, usesTelegramTheme ? telegramPalette : undefined),
+    [mode, telegramPalette, usesTelegramTheme],
   );
   const emotionCache = React.useMemo(
     () => createCache({ key: 'css', speedy: false }),

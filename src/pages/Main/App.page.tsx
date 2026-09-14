@@ -22,7 +22,9 @@ import { Buffer } from 'buffer';
 
 import NavLinkComponent from '@components/NavLink.component';
 import { ThemeModeButton } from '@components/ThemeMode.component';
+import TelegramThemeDebug from '@components/TelegramThemeDebug.component';
 import VK, { Like } from '@components/VK';
+import { isTelegramMiniApp } from '@/shared/telegram/telegram.sdk';
 import * as envUtils from '@/utils/env.utils';
 import VkSvg from '@/assets/img/vk-logo.svg?react';
 import { useSelector } from '@/store';
@@ -244,6 +246,8 @@ const MainPage = () => {
                         </NavLinkComponent> */}
           </Typography>
         </Paper>
+
+        {isDev && isTelegramMiniApp() && <TelegramThemeDebug />}
       </Container>
     </>
   );

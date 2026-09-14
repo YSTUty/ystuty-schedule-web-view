@@ -110,6 +110,7 @@ export default ({ mode }: { mode: string }) => {
     server: {
       host: allEnv.HOST || '0.0.0.0',
       port: Number(allEnv.PORT) || 8006,
+      allowedHosts: true,
     },
     define: {
       isDev: JSON.stringify(isDev),

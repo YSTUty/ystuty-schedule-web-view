@@ -10,6 +10,10 @@ import AppRoot from '@/AppRoot';
 import EnvUnsupported from '@/components/EnvUnsupported.component';
 import ErrorBoundary from '@/components/ErrorBoundary.component';
 import { restoreGitHubPagesPath } from '@/shared/github-pages-routing.utils';
+import {
+  initializeTelegramMiniApp,
+  notifyTelegramMiniAppReady,
+} from '@/shared/telegram/telegram.sdk';
 import reportWebVitals from './reportWebVitals';
 import { hawk } from './utils/hawk.util';
 import { prepareHostPlatform } from './utils/platform.util';
@@ -44,6 +48,7 @@ try {
   restoreGitHubPagesPath();
   initializeMonitoring();
   prepareHostPlatform();
+  initializeTelegramMiniApp();
 
   root.render(
     <StrictMode>
@@ -52,6 +57,8 @@ try {
       </ErrorBoundary>
     </StrictMode>,
   );
+
+  requestAnimationFrame(notifyTelegramMiniAppReady);
 } catch (error) {
   const startupError =
     error instanceof Error ? error : new Error('Failed to start application');
