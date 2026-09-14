@@ -15,7 +15,6 @@ import SchoolIcon from '@mui/icons-material/School';
 import * as envUtils from '@/utils/env.utils';
 import { ScheduleFor } from '@/interfaces/ystuty.types';
 import { useSelector } from '@/store';
-import { AlertMeToggler } from './AlertMe.component';
 import NavLinkComponent from './NavLink.component';
 import { SelectAudienceComponent } from './SelectAudience.component';
 import { SelectGroupComponent } from './SelectGroup.component';
@@ -125,7 +124,6 @@ const TopPanel: React.FC<TopPanelProps> = (props) => {
                   }}>
                   <SchoolIcon />
                 </IconButton>
-                <AlertMeToggler />
               </FormControl>
             </>
           )}

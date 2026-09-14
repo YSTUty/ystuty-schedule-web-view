@@ -64,6 +64,64 @@ export function getRetryAfterSeconds(
     : Math.max(0, Math.ceil((retryAt - now) / 1e3));
 }
 
+export type RateLimitInfo = {
+  limit?: number;
+  remaining?: number;
+  resetAfter: number;
+};
+
+function getRateLimitNumber(value: string | null): number | undefined {
+  if (value === null) {
+    return undefined;
+  }
+
+  const number = Number(value);
+  return Number.isFinite(number) && number >= 0 ? number : undefined;
+}
+
+/**
+ * Возвращает время до сброса лимита. Поддерживает относительные секунды и
+ * Unix timestamp в секундах или миллисекундах.
+ */
+export function getRateLimitResetSeconds(
+  resetHeader: string | null,
+  now = Date.now(),
+): number | undefined {
+  const reset = getRateLimitNumber(resetHeader);
+
+  if (reset === undefined) {
+    return undefined;
+  }
+
+  if (reset > 1e11) {
+    return Math.max(0, Math.ceil((reset - now) / 1e3));
+  }
+
+  if (reset > 1e9) {
+    return Math.max(0, Math.ceil(reset - now / 1e3));
+  }
+
+  return Math.ceil(reset);
+}
+
+/** Читает стандартные и используемые Schedule API заголовки rate limit. */
+export function getRateLimitInfo(
+  headers: Headers,
+  now = Date.now(),
+): RateLimitInfo {
+  const retryAfter = headers.get('Retry-After');
+  const resetAfter =
+    (retryAfter ? getRetryAfterSeconds(retryAfter, now) : undefined) ??
+    getRateLimitResetSeconds(headers.get('X-RateLimit-Reset'), now) ??
+    1;
+
+  return {
+    limit: getRateLimitNumber(headers.get('X-RateLimit-Limit')),
+    remaining: getRateLimitNumber(headers.get('X-RateLimit-Remaining')),
+    resetAfter,
+  };
+}
+
 /** Возвращает понятное сообщение, если API ответил не JSON-ошибкой. */
 export function getUnexpectedResponseMessage(
   response: Response,

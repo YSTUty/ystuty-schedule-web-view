@@ -4,8 +4,8 @@ import { useNetworkState } from 'react-use';
 import store2 from 'store2';
 
 // import LazyLoadComponent from '../../components/LazyLoad.component';
-import { AlertMe } from '@components/AlertMe.component';
 import Copyright from '@components/Copyright.component';
+import { SystemLog, SystemLogButton } from '@components/SystemLog.component';
 import { Routes } from '@/Routes';
 import {
   getLegacySchedulePath,
@@ -60,9 +60,10 @@ const AppContainer = () => {
   return (
     <>
       {isDev && !state.online && <pre>{JSON.stringify(state, null, 2)}</pre>}
-      <AlertMe />
+      <SystemLog />
       <Routes />
       <Copyright />
+      <SystemLogButton />
     </>
   );
 };

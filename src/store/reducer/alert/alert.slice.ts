@@ -1,5 +1,3 @@
-import { toast } from 'react-toastify';
-
 import { AlertColor } from '@mui/material/Alert';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
@@ -8,12 +6,13 @@ export interface IAlert {
   id: number;
   severity: AlertColor;
   message: string;
+  createdAt: number;
 }
 
 const initialState = {
   alerts: [] as IAlert[],
-  show: true,
 };
+const MAX_ALERTS = 100;
 
 export const alertSlice = createSlice({
   name: 'alert',
@@ -24,20 +23,19 @@ export const alertSlice = createSlice({
       action: PayloadAction<{ severity: AlertColor; message: string }>,
     ) => {
       const { alerts } = state;
-      alerts.push({ id: ++iterId, ...action.payload });
+      alerts.push({ id: ++iterId, createdAt: Date.now(), ...action.payload });
 
-      toast[action.payload.severity](action.payload.message, {
-        autoClose: 8e3,
-      });
+      if (alerts.length > MAX_ALERTS) {
+        alerts.splice(0, alerts.length - MAX_ALERTS);
+      }
     },
-    removeByIndex: (state, action: PayloadAction<number>) => {
-      state.alerts = state.alerts.filter((_, i) => i !== action.payload);
+    remove: (state, action: PayloadAction<{ id: number }>) => {
+      state.alerts = state.alerts.filter(
+        (alert) => alert.id !== action.payload.id,
+      );
     },
     clear: (state) => {
       state.alerts = [];
-    },
-    toggle: (state, action: PayloadAction<boolean | undefined>) => {
-      state.show = action.payload ?? !state.show;
     },
   },
 });

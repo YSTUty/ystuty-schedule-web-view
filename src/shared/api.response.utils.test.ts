@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  getRateLimitInfo,
+  getRateLimitResetSeconds,
   getResponseError,
   getRetryAfterSeconds,
   isAbortError,
@@ -46,6 +48,29 @@ describe('getRetryAfterSeconds', () => {
 
   it('uses a safe fallback for an invalid header', () => {
     expect(getRetryAfterSeconds('invalid')).toBe(1);
+  });
+});
+
+describe('getRateLimitInfo', () => {
+  it('reads the Schedule API rate limit headers', () => {
+    const headers = new Headers({
+      'X-RateLimit-Limit': '5',
+      'X-RateLimit-Remaining': '0',
+      'X-RateLimit-Reset': '8',
+    });
+
+    expect(getRateLimitInfo(headers)).toEqual({
+      limit: 5,
+      remaining: 0,
+      resetAfter: 8,
+    });
+  });
+
+  it('supports Unix timestamps in seconds and milliseconds', () => {
+    const now = Date.UTC(2026, 8, 14, 12);
+
+    expect(getRateLimitResetSeconds('1789387210', now)).toBe(10);
+    expect(getRateLimitResetSeconds('1789387210000', now)).toBe(10);
   });
 });
 

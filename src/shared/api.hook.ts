@@ -7,8 +7,12 @@ import { toast } from 'react-toastify';
 // import { useAppSelector } from '@/store';
 import { apiPath } from '@/utils';
 import {
+  getApiRateLimitCooldownSeconds,
+  setApiRateLimitCooldown,
+} from './api.rate-limit.utils';
+import {
+  getRateLimitInfo,
   getResponseError,
-  getRetryAfterSeconds,
   getUnexpectedResponseMessage,
   isAbortError,
 } from './api.response.utils';
@@ -71,27 +75,20 @@ export const useApi = () => {
       noAlert,
       setError,
       handleError,
-      handleRateLimit = (retryAfter) =>
-        // toast.promise(delay(retryAfter * 1e3), {
-        //     pending: formatMessage({ id: 't.api.rate_limit.retry' }, { retryAfter }),
-        //     success: 'Можно повторить запрос',
-        // }),
-        (
-          toast.warning(
-            formatMessage({ id: 't.api.rate_limit.retry' }, { retryAfter }),
-            { autoClose: Math.max(2, retryAfter) * 1e3 },
-          ),
-          true
-        ),
+      handleRateLimit,
       returnResponse,
     } = params;
-
-    const controller = new AbortController();
 
     if (!isMountedRef.current || isFetchingRef.current[fKey]) {
       return Promise.resolve(null);
     }
 
+    // Один лимит API распространяется на параллельные загрузчики страницы.
+    if (getApiRateLimitCooldownSeconds() > 0) {
+      return Promise.resolve(null);
+    }
+
+    const controller = new AbortController();
     updateFetchingState(fKey, true);
     controllers.current[fKey] = controller;
 
@@ -106,6 +103,39 @@ export const useApi = () => {
       throw message;
     };
 
+    const reportRateLimit = (response: Response) => {
+      const rateLimit = getRateLimitInfo(response.headers);
+      const isCooldownExtended = setApiRateLimitCooldown(rateLimit.resetAfter);
+      const details = [
+        rateLimit.limit !== undefined && `лимит: ${rateLimit.limit}`,
+        rateLimit.remaining !== undefined && `осталось: ${rateLimit.remaining}`,
+      ]
+        .filter(Boolean)
+        .join(', ');
+      const baseMessage = formatMessage(
+        { id: 't.api.rate_limit.retry' },
+        { retryAfter: rateLimit.resetAfter },
+      );
+      const message = details ? `${baseMessage} (${details})` : baseMessage;
+
+      const isHandled =
+        typeof handleRateLimit === 'function' &&
+        handleRateLimit(rateLimit.resetAfter);
+
+      if (!isHandled && isCooldownExtended) {
+        if (setError) {
+          setError(message);
+        } else {
+          toast.warning(message, {
+            autoClose: Math.max(2, rateLimit.resetAfter) * 1e3,
+            toastId: 'api-rate-limit',
+          });
+        }
+      }
+
+      return null;
+    };
+
     return fetch(buildApiUrl(apiPath, path), {
       method: 'GET',
       ...init,
@@ -117,6 +147,10 @@ export const useApi = () => {
       },
     })
       .then(async (response) => {
+        if (response.status === 429) {
+          return reportRateLimit(response);
+        }
+
         if (returnResponse) {
           return response;
         }
@@ -166,22 +200,6 @@ export const useApi = () => {
             );
           }
           return { error };
-        }
-
-        if (error.code === 429) {
-          const retryAfter = getRetryAfterSeconds(
-            response.headers.get('Retry-After'),
-          );
-          const isHandled =
-            typeof handleRateLimit === 'function' &&
-            handleRateLimit(retryAfter);
-
-          if (!isHandled) {
-            setError?.(
-              formatMessage({ id: 't.api.rate_limit.retry' }, { retryAfter }),
-            );
-          }
-          return null;
         }
 
         if (/* error.code === 403 || */ error.message === 'Token is revoked') {

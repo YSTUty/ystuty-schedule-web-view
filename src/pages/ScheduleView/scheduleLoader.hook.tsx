@@ -1,5 +1,4 @@
 import React from 'react';
-import { toast } from 'react-toastify';
 import { useDebounce } from 'react-use';
 import store2 from 'store2';
 
@@ -136,7 +135,12 @@ export const useScheduleLoader = (props: {
       } catch (err) {
         // ??
         formatData(itemKey, null);
-        toast.warning('Ошибка загрузки актуального расписания');
+        dispatch(
+          alertSlice.actions.add({
+            message: 'Ошибка загрузки актуального расписания',
+            severity: 'warning',
+          }),
+        );
         // if (online) {
         //     dispatch(
         //         alertSlice.actions.add({

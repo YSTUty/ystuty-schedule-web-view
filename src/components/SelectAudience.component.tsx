@@ -1,7 +1,6 @@
 import React from 'react';
 import { useIntl } from 'react-intl';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
 import { useNetworkState } from 'react-use';
 import store2 from 'store2';
 import classNames from 'clsx';
@@ -134,7 +133,12 @@ export const SelectAudienceComponent = (props: {
           }),
         );
       } else {
-        toast.warning(formatMessage({ id: 't.api.offline.error' }));
+        dispatch(
+          alertSlice.actions.add({
+            message: formatMessage({ id: 't.api.offline.error' }),
+            severity: 'warning',
+          }),
+        );
       }
     }
   }, [applyAudiences, online]);

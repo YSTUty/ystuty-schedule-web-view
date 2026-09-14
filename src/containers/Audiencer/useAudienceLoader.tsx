@@ -1,5 +1,4 @@
 import React from 'react';
-import { toast } from 'react-toastify';
 import store2 from 'store2';
 
 import { AccumulativeSchedule, IAudienceData } from '@/interfaces/ystuty.types';
@@ -107,7 +106,12 @@ const useAudienceLoader = () => {
     } catch (err) {
       // ??
       applyAudiences(null);
-      toast.warning('Ошибка загрузки аудиторий');
+      dispatch(
+        alertSlice.actions.add({
+          message: 'Ошибка загрузки аудиторий',
+          severity: 'warning',
+        }),
+      );
     }
   }, [applyAudiences]);
 
@@ -135,11 +139,15 @@ const useAudienceLoader = () => {
       }
 
       applyAccumulative(response.data.items);
-    } catch (err) {
-      console.error(err);
+    } catch {
       // ??
       applyAccumulative(null);
-      toast.warning('Ошибка загрузки аудиторий #2');
+      dispatch(
+        alertSlice.actions.add({
+          message: 'Ошибка загрузки аудиторий #2',
+          severity: 'warning',
+        }),
+      );
     }
   }, [applyAccumulative]);
 
