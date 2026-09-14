@@ -238,7 +238,7 @@ export const SelectTeacherComponent = (props: {
         ['pulsation']: !value,
       })}
       multiple={isMultiple}
-      sx={{ minWidth: 200, maxWidth: 400 }}
+      sx={{ minWidth: 200, width: '100%' }}
       size="small"
       options={teachers.map((e) => e.id)}
       disableCloseOnSelect={isMultiple}

@@ -6,7 +6,11 @@ import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import Divider from '@mui/material/Divider';
 import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
 import Paper from '@mui/material/Paper';
+import Select from '@mui/material/Select';
+import Stack from '@mui/material/Stack';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import HomeIcon from '@mui/icons-material/Home';
@@ -15,8 +19,13 @@ import NavLinkComponent from '@components/NavLink.component';
 import { SelectTeacherComponent } from '@components/SelectTeacher.component';
 import { ThemeModeButton } from '@components/ThemeMode.component';
 import VK, { Like } from '@components/VK';
+import {
+  getAvailableAcademicPeriods,
+  getDefaultAcademicPeriodId,
+} from '@/utils/academic-period.utils';
 import * as envUtils from '@/utils/env.utils';
 import { useScheduleLoader } from '@/pages/ScheduleView/scheduleLoader.hook';
+import { useSelector } from '@/store';
 import TeacherLessonsTable from './TeacherLessonsTable';
 
 const TeacherLessons = () => {
@@ -25,6 +34,40 @@ const TeacherLessons = () => {
     () => {},
   );
   const { formatMessage } = useIntl();
+  const teacherScheduleData = useSelector(
+    (state) => state.schedule.scheduleData.teacher,
+  );
+  const [selectedAcademicPeriodId, setSelectedAcademicPeriodId] =
+    React.useState<string>();
+
+  const availableAcademicPeriods = React.useMemo(
+    () =>
+      getAvailableAcademicPeriods(
+        teacherScheduleData?.flatMap((schedule) => schedule.data) ?? [],
+      ),
+    [teacherScheduleData],
+  );
+  const defaultAcademicPeriodId = React.useMemo(
+    () => getDefaultAcademicPeriodId(availableAcademicPeriods),
+    [availableAcademicPeriods],
+  );
+  const academicPeriodId =
+    selectedAcademicPeriodId ?? defaultAcademicPeriodId;
+
+  React.useEffect(() => {
+    setSelectedAcademicPeriodId((currentPeriodId) => {
+      if (
+        currentPeriodId &&
+        availableAcademicPeriods.some(
+          (period) => period.id === currentPeriodId,
+        )
+      ) {
+        return currentPeriodId;
+      }
+
+      return defaultAcademicPeriodId;
+    });
+  }, [availableAcademicPeriods, defaultAcademicPeriodId]);
 
   return (
     <>
@@ -85,14 +128,39 @@ const TeacherLessons = () => {
             <Typography component="h1" variant="h6" align="center">
               Нагрузка преподавателя
             </Typography>
-            <Box sx={{ mt: 2 }}>
-              <SelectTeacherComponent
-                allowMultipleRef={allowMultipleTeachersRef}
-              />
-            </Box>
+            <Stack
+              direction={{ xs: 'column', sm: 'row' }}
+              spacing={2}
+              sx={{ mt: 2 }}>
+              <Box sx={{ flex: 1, minWidth: 0 }}>
+                <SelectTeacherComponent
+                  allowMultipleRef={allowMultipleTeachersRef}
+                />
+              </Box>
+              {availableAcademicPeriods.length > 0 && (
+                <FormControl size="small" sx={{ flex: 1, minWidth: 250 }}>
+                  <InputLabel id="teacher-lessons-period-label">
+                    Учебный период
+                  </InputLabel>
+                  <Select
+                    labelId="teacher-lessons-period-label"
+                    label="Учебный период"
+                    value={academicPeriodId ?? ''}
+                    onChange={(event) =>
+                      setSelectedAcademicPeriodId(event.target.value)
+                    }>
+                    {availableAcademicPeriods.map((period) => (
+                      <MenuItem key={period.id} value={period.id}>
+                        {period.label}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              )}
+            </Stack>
           </Paper>
         </Container>
-        <TeacherLessonsTable />
+        <TeacherLessonsTable academicPeriodId={academicPeriodId} />
       </Box>
     </>
   );

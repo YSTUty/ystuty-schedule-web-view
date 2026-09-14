@@ -17,6 +17,7 @@ import Typography from '@mui/material/Typography';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 
+import { filterByAcademicPeriod } from '@/utils/academic-period.utils';
 import * as lessonsUtils from '@/utils/lessons.utils';
 import { LessonData, LessonFlags } from '@/interfaces/schedule';
 import { useDispatch, useSelector } from '@/store';
@@ -130,7 +131,8 @@ const RowAccumulative = (props: { row: TeacherLessonType }) => {
   );
 };
 
-const TeacherLessonsTable: React.FC = () => {
+const TeacherLessonsTable = (props: { academicPeriodId?: string }) => {
+  const { academicPeriodId } = props;
   const dispatch = useDispatch();
   const {
     lessonTypes,
@@ -141,34 +143,35 @@ const TeacherLessonsTable: React.FC = () => {
     (state) => state.schedule.scheduleData.teacher,
   );
 
-  const [data, setData] = React.useState<LessonData[]>([]);
+  const data = React.useMemo<LessonData[]>(
+    () => scheduleData?.flatMap((schedule) => schedule.data) ?? [],
+    [scheduleData],
+  );
+  const filteredData = React.useMemo(
+    () => filterByAcademicPeriod(data, academicPeriodId),
+    [academicPeriodId, data],
+  );
 
   React.useEffect(() => {
-    if (!scheduleData) return;
+    const allowedLessonTypes: Partial<Record<LessonFlags, true>> = {};
 
-    const allowedLessonTypes: Partial<Record<LessonFlags, any>> = {};
-    const data = [
-      ...scheduleData.flatMap((data) =>
-        data.data.map((e) => {
-          for (const type of e.typeArr) {
-            allowedLessonTypes[type] = true;
-          }
-          return e;
-        }),
-      ),
-    ];
+    for (const lesson of filteredData) {
+      for (const type of lesson.typeArr) {
+        allowedLessonTypes[type] = true;
+      }
+    }
+
     dispatch(
       scheduleSlice.actions.setAllowedLessonTypes(
         Object.keys(allowedLessonTypes).map((e) => Number(e)) as LessonFlags[],
       ),
     );
-    setData(data);
-  }, [setData, scheduleData]);
+  }, [dispatch, filteredData]);
 
   const lowerCaseFilter = lessonFilter.toLowerCase();
   const dataMemo = React.useMemo(
     () =>
-      data
+      filteredData
         .filter(
           (item) =>
             lessonTypes.length < 1 ||
@@ -230,7 +233,7 @@ const TeacherLessonsTable: React.FC = () => {
           },
           {} as Record<string, TeacherLessonType>,
         ),
-    [data, lessonTypes, lowerCaseFilter],
+    [filteredData, lessonTypes, lowerCaseFilter],
   );
 
   if (fetchingSchedule) {
@@ -259,9 +262,17 @@ const TeacherLessonsTable: React.FC = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {Object.values(dataMemo).map((row) => (
-              <RowAccumulative key={row.lessonName} row={row} />
-            ))}
+            {Object.values(dataMemo).length > 0 ? (
+              Object.values(dataMemo).map((row) => (
+                <RowAccumulative key={row.lessonName} row={row} />
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={4} align="center">
+                  За выбранный учебный период занятий не найдено.
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </TableContainer>
