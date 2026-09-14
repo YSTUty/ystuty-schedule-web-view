@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Navigate, Route, Routes as RouterRoutes } from 'react-router-dom';
 
 import LazyLoadComponent from './components/LazyLoad.component';
+import NotFoundPage from './pages/NotFound/NotFound.page';
 
 const App = LazyLoadComponent(
   React.lazy(() => import('./pages/Main/App.page')),
@@ -33,7 +34,7 @@ export const Routes = () => {
       {/* <Route path="/audience" component={Audiencer} /> */}
       <Route path="/audience/*" element={<Navigate replace to="/by_audience" />} />
       <Route path="/teacher-lessons" element={<TeacherLessons />} />
-      <Route path="*" element={<b>not found</b>} />
+      <Route path="*" element={<NotFoundPage />} />
     </RouterRoutes>
   );
 };
