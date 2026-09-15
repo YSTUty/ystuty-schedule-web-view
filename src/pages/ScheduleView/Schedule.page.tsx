@@ -9,19 +9,19 @@ import { useScheduleLoader } from './scheduleLoader.hook';
 const SchedulePage = () => {
   const { pathname } = useLocation();
 
-  const [scheduleFor, setScheduleFor] = React.useState<ScheduleFor | null>(
-    null,
-  );
-
-  React.useEffect(() => {
+  const scheduleFor = React.useMemo<ScheduleFor | null>(() => {
     if (pathname.startsWith('/group')) {
-      setScheduleFor('group');
-    } else if (pathname.startsWith('/teacher')) {
-      setScheduleFor('teacher');
-    } else if (pathname.startsWith('/by_audience')) {
-      setScheduleFor('audience');
+      return 'group';
     }
-  }, [pathname, setScheduleFor]);
+    if (pathname.startsWith('/teacher')) {
+      return 'teacher';
+    }
+    if (pathname.startsWith('/by_audience')) {
+      return 'audience';
+    }
+
+    return null;
+  }, [pathname]);
 
   const [, , isScheduleCached, isScheduleServerCached] = useScheduleLoader({
     scheduleFor,

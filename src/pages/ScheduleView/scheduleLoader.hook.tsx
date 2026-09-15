@@ -18,6 +18,10 @@ import type { ScheduleMemoryCacheEntry } from '@/shared/schedule-memory-cache';
 import { notifyTelegramResult } from '@/shared/telegram/telegram.sdk';
 import { useDispatch, useSelector } from '@/store';
 import alertSlice from '@/store/reducer/alert/alert.slice';
+import {
+  EMPTY_SCHEDULE_ITEMS,
+  selectScheduleItems,
+} from '@/store/reducer/schedule/schedule.selectors';
 import scheduleSlice from '@/store/reducer/schedule/schedule.slice';
 
 export const useScheduleLoader = (props: {
@@ -48,11 +52,11 @@ export const useScheduleLoader = (props: {
   // const { online } = useNetworkState();
   const dispatch = useDispatch();
   const selectedItemsState = useSelector((state) =>
-    !scheduleFor ? [] : state.schedule.selectedItems[scheduleFor],
+    selectScheduleItems(state, scheduleFor),
   );
   const selectedItems: (string | number)[] = Array.isArray(selectedItemsState)
     ? selectedItemsState
-    : [];
+    : EMPTY_SCHEDULE_ITEMS;
 
   const [fetchApi, isFetching, isFetchings, abortControllers] = useApi();
   const [isCached, setIsCached] = React.useState(false);

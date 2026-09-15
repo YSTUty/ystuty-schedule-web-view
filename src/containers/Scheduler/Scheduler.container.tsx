@@ -57,6 +57,7 @@ import * as lessonsUtils from '@/utils/lessons.utils';
 import { LessonData, LessonFlags, WeekParityType } from '@/interfaces/schedule';
 import { ScheduleFor } from '@/interfaces/ystuty.types';
 import { useDispatch, useSelector } from '@/store';
+import { selectScheduleItems } from '@/store/reducer/schedule/schedule.selectors';
 import scheduleSlice from '@/store/reducer/schedule/schedule.slice';
 import {
   DayScaleCell,
@@ -641,7 +642,7 @@ const SchedulerContainer: React.FC<MaterialSchedulerProps> = (props) => {
   } = useSelector((state) => state.schedule);
 
   const selectedItems = useSelector((state) =>
-    !scheduleFor ? [] : state.schedule.selectedItems[scheduleFor],
+    selectScheduleItems(state, scheduleFor),
   );
   const scheduleData = useSelector(
     (state) => scheduleFor && state.schedule.scheduleData[scheduleFor],

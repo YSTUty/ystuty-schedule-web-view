@@ -1,7 +1,5 @@
 import React from 'react';
 
-import PropTypes from 'prop-types';
-
 import VKApi, { VKApiOptions } from './vkApi';
 import VKContext from './VKContext';
 
@@ -17,14 +15,24 @@ export type Props = {
   children: React.ReactNode;
 };
 
-const VK: React.FC<Props> = ({ onApiAvailable, apiId, options, children }) => {
+const DEFAULT_VK_OPTIONS: VKApiOptions = {
+  onlyWidgets: true,
+  version: 168,
+};
+
+const VK: React.FC<Props> = ({
+  apiId = null,
+  children,
+  onApiAvailable,
+  options = DEFAULT_VK_OPTIONS,
+}) => {
   const [vk, setVK] = React.useState<any>(null);
 
   React.useEffect(() => {
     let isMounted = true;
 
     if (isDOMReady) {
-      new VKApi(apiId!, options)
+      new VKApi(apiId, options)
         .load()
         .then((api) => {
           if (!isMounted) {
@@ -47,24 +55,6 @@ const VK: React.FC<Props> = ({ onApiAvailable, apiId, options, children }) => {
   }
 
   return <VKContext.Provider value={vk}>{children}</VKContext.Provider>;
-};
-
-VK.propTypes = {
-  apiId: PropTypes.number,
-  options: PropTypes.shape({
-    version: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    onlyWidgets: PropTypes.bool,
-  }),
-  onApiAvailable: PropTypes.func,
-};
-
-VK.defaultProps = {
-  apiId: null,
-  options: {
-    version: 168,
-    onlyWidgets: true,
-  },
-  onApiAvailable: () => {},
 };
 
 export default VK;

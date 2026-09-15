@@ -13,7 +13,7 @@ const NavLinkComponent = React.forwardRef<
     [P: string]: any;
   }
 >((props, ref) => {
-  let { to, href, children, isDisabled, tag, ...otherProps } = props;
+  let { to, href, children, isDisabled, tag = 'a', ...otherProps } = props;
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -56,9 +56,5 @@ const NavLinkComponent = React.forwardRef<
     </a>
   );
 });
-
-NavLinkComponent.defaultProps = {
-  tag: 'a' as const,
-};
 
 export default NavLinkComponent;

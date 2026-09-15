@@ -1,11 +1,9 @@
 import React from 'react';
 
-import PropTypes from 'prop-types';
-
 import VKContext from './VKContext';
 
 export type Props = {
-  elementId: string;
+  elementId?: string;
   options?: {
     type?: 'full' | 'button' | 'mini' | 'vertical' | null;
     width?: number | null;
@@ -22,10 +20,17 @@ export type Props = {
   onUnshare?: (quantity: number) => void;
 };
 
+const DEFAULT_LIKE_OPTIONS: NonNullable<Props['options']> = {
+  height: 22,
+  type: 'full',
+  verb: 0,
+  width: 350,
+};
+
 const Like: React.FC<Props> = ({
-  elementId,
-  options,
-  pageId,
+  elementId = 'vk_like',
+  options = DEFAULT_LIKE_OPTIONS,
+  pageId = null,
   onLike,
   onUnlike,
   onShare,
@@ -64,39 +69,6 @@ const Like: React.FC<Props> = ({
   }, [elementId, onLike, onShare, onUnlike, onUnshare, options, pageId, vk]);
 
   return <div id={elementId} ref={elementRef} />;
-};
-
-Like.propTypes = {
-  elementId: PropTypes.string.isRequired,
-  options: PropTypes.shape({
-    type: PropTypes.oneOf(['full', 'button', 'mini', 'vertical'] as const),
-    width: PropTypes.number,
-    height: PropTypes.number,
-    verb: PropTypes.oneOf([0, 1] as const),
-    pageUrl: PropTypes.string,
-    pageTitle: PropTypes.string,
-    pageImage: PropTypes.string,
-  }),
-  pageId: PropTypes.string,
-  onLike: PropTypes.func,
-  onUnlike: PropTypes.func,
-  onShare: PropTypes.func,
-  onUnshare: PropTypes.func,
-};
-
-Like.defaultProps = {
-  elementId: 'vk_like',
-  options: {
-    type: 'full',
-    width: 350,
-    height: 22,
-    verb: 0,
-  },
-  pageId: null,
-  onLike: () => {},
-  onUnlike: () => {},
-  onShare: () => {},
-  onUnshare: () => {},
 };
 
 export default Like;
