@@ -13,10 +13,17 @@ import {
   limitScheduleSelections,
   ScheduleSelectorPopper,
   shouldIgnoreAutocompleteRemoval,
-  shouldRefreshScheduleOptions,
 } from '@components/ScheduleSelector.shared';
 import { IAudienceData } from '@/interfaces/ystuty.types';
 import { useApi } from '@/shared/api.hook';
+import {
+  getCachedLookup,
+  setCachedLookup,
+} from '@/shared/schedule-cache.storage';
+import {
+  getMemoryCachedLookup,
+  setMemoryCachedLookup,
+} from '@/shared/schedule-lookup-memory-cache';
 import {
   buildSchedulePath,
   getScheduleSelectionFromPathname,
@@ -31,6 +38,7 @@ import scheduleSlice, {
 import { StyledAutocomplete } from './StylePulseAnimation.component';
 
 const STORE_CACHED_AUDIENCE_KEY = 'CACHED_V1_AUDIENCE::';
+const AUDIENCES_CACHE_KEY = 'actual-audiences';
 
 export const SelectAudienceComponent = (props: {
   allowMultipleRef: AllowMultipleRef;
@@ -46,7 +54,7 @@ export const SelectAudienceComponent = (props: {
     (state) => state.schedule.selectedItems['audience'],
   );
 
-  const { online, previous: previousOnline, since } = useNetworkState();
+  const { online, previous: previousOnline } = useNetworkState();
   const { pathname, search, hash } = useLocation();
   const navigate = useNavigate();
   const defaultValues = React.useMemo(() => {
@@ -59,21 +67,24 @@ export const SelectAudienceComponent = (props: {
     return values;
   }, [pathname]);
 
-  const [audiences, setAudiences] = React.useState<IAudienceData[]>([]);
+  const [audiences, setAudiences] = React.useState<IAudienceData[]>(
+    () => getMemoryCachedLookup<IAudienceData[]>(AUDIENCES_CACHE_KEY) ?? [],
+  );
   const [isCached, setIsCached] = React.useState(false);
   const [fetchApi, isFetching] = useApi();
 
   const applyAudiences = React.useCallback(
-    (items: IAudienceData[] | null) => {
+    (items: IAudienceData[] | null, isCache = false) => {
       if (!items) {
-        items = store2.get(STORE_CACHED_AUDIENCE_KEY, null);
-        if (!items) {
-          return;
-        }
-        setIsCached(true);
-      } else if (items.length > 0) {
+        return;
+      }
+
+      if (items.length > 0) {
+        setIsCached(isCache);
+      }
+
+      if (!isCache && items.length > 0) {
         store2.set(STORE_CACHED_AUDIENCE_KEY, items);
-        setIsCached(false);
       }
 
       items.sort((a, b) => {
@@ -96,54 +107,119 @@ export const SelectAudienceComponent = (props: {
     [setAudiences, setIsCached],
   );
 
-  const loadAudiences = React.useCallback(async () => {
-    if (isFetching) return;
+  const loadCachedAudiences = React.useCallback(async () => {
+    const cachedItems =
+      await getCachedLookup<IAudienceData[]>(AUDIENCES_CACHE_KEY);
+    if (cachedItems) {
+      applyAudiences(cachedItems, true);
+      setMemoryCachedLookup(AUDIENCES_CACHE_KEY, cachedItems);
+      return true;
+    }
 
-    try {
-      const response = await fetchApi<{
-        isCache: boolean;
-        items: IAudienceData[];
-        count: number;
-      }>(
-        `v1/schedule/actual_audiences`,
-        {},
-        {
-          setError: (message, options) =>
-            dispatch(
-              alertSlice.actions.add({
-                message: `Error: ${message}`,
-                severity: 'warning',
-                toastAutoClose: options?.toastAutoClose,
-              }),
-            ),
-        },
-      );
+    const legacyItems = store2.get(STORE_CACHED_AUDIENCE_KEY, null) as
+      | IAudienceData[]
+      | null;
+    if (!legacyItems) {
+      return false;
+    }
 
-      if (!response || 'error' in response || !('data' in response)) {
+    applyAudiences(legacyItems, true);
+    setMemoryCachedLookup(AUDIENCES_CACHE_KEY, legacyItems);
+    if (await setCachedLookup(AUDIENCES_CACHE_KEY, legacyItems)) {
+      store2.remove(STORE_CACHED_AUDIENCE_KEY);
+    }
+    return true;
+  }, [applyAudiences]);
+
+  const notifyCachedAudiences = React.useCallback(() => {
+    dispatch(
+      alertSlice.actions.add({
+        message: 'Используется сохранённый список аудиторий.',
+        severity: 'warning',
+      }),
+    );
+  }, [dispatch]);
+
+  const loadAudiences = React.useCallback(
+    async (forceRefresh = false) => {
+      if (isFetching) return;
+
+      const memoryCachedItems =
+        !forceRefresh &&
+        getMemoryCachedLookup<IAudienceData[]>(AUDIENCES_CACHE_KEY);
+      if (memoryCachedItems) {
+        applyAudiences(memoryCachedItems);
         return;
       }
 
-      applyAudiences(response.data.items);
-    } catch (err) {
-      // ??
-      applyAudiences(null);
-      if (online) {
-        dispatch(
-          alertSlice.actions.add({
-            message: `Error: ${(err as Error).message}`,
-            severity: 'error',
-          }),
-        );
-      } else {
-        dispatch(
-          alertSlice.actions.add({
-            message: formatMessage({ id: 't.api.offline.error' }),
-            severity: 'warning',
-          }),
-        );
+      if (!online) {
+        if (await loadCachedAudiences()) {
+          notifyCachedAudiences();
+        }
+        return;
       }
-    }
-  }, [applyAudiences, online]);
+
+      try {
+        const response = await fetchApi<{
+          isCache: boolean;
+          items: IAudienceData[];
+          count: number;
+        }>(
+          `v1/schedule/actual_audiences`,
+          {},
+          {
+            setError: (message, options) =>
+              dispatch(
+                alertSlice.actions.add({
+                  message: `Error: ${message}`,
+                  severity: 'warning',
+                  toastAutoClose: options?.toastAutoClose,
+                }),
+              ),
+          },
+        );
+
+        if (!response || 'error' in response || !('data' in response)) {
+          if (await loadCachedAudiences()) {
+            notifyCachedAudiences();
+          }
+          return;
+        }
+
+        applyAudiences(response.data.items);
+        setMemoryCachedLookup(AUDIENCES_CACHE_KEY, response.data.items);
+        void setCachedLookup(AUDIENCES_CACHE_KEY, response.data.items).then(
+          (isStored) => {
+            if (isStored) {
+              store2.remove(STORE_CACHED_AUDIENCE_KEY);
+            }
+          },
+        );
+      } catch (err) {
+        // При недоступности API сохраняем возможность выбрать аудиторию
+        // из последнего успешно сохранённого справочника.
+        const isCacheRestored = await loadCachedAudiences();
+        if (isCacheRestored) {
+          notifyCachedAudiences();
+        } else if (online) {
+          dispatch(
+            alertSlice.actions.add({
+              message: `Error: ${(err as Error).message}`,
+              severity: 'error',
+            }),
+          );
+        } else {
+          dispatch(
+            alertSlice.actions.add({
+              message: formatMessage({ id: 't.api.offline.error' }),
+              severity: 'warning',
+            }),
+          );
+        }
+      }
+    },
+    [applyAudiences, loadCachedAudiences, notifyCachedAudiences, online],
+  );
 
   const onChangeValues = React.useCallback(
     (value: string | string[] | null) => {
@@ -239,10 +315,9 @@ export const SelectAudienceComponent = (props: {
   }, [defaultValues]);
 
   React.useEffect(() => {
-    if (shouldRefreshScheduleOptions({ online, previousOnline, since })) {
-      loadAudiences();
-    }
-  }, [online, previousOnline, since]);
+    const isNetworkRestored = previousOnline === false && online === true;
+    void loadAudiences(isNetworkRestored);
+  }, [online, previousOnline]);
 
   React.useEffect(() => {
     allowMultipleRef.current = allowMultiple;

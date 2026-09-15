@@ -13,7 +13,6 @@ import {
   limitScheduleSelections,
   ScheduleSelectorPopper,
   shouldIgnoreAutocompleteRemoval,
-  shouldRefreshScheduleOptions,
 } from '@components/ScheduleSelector.shared';
 import { IInstituteGroupsData } from '@/interfaces/ystuty.types';
 import { useApi } from '@/shared/api.hook';
@@ -21,6 +20,10 @@ import {
   getCachedLookup,
   setCachedLookup,
 } from '@/shared/schedule-cache.storage';
+import {
+  getMemoryCachedLookup,
+  setMemoryCachedLookup,
+} from '@/shared/schedule-lookup-memory-cache';
 import {
   buildSchedulePath,
   getScheduleSelectionFromPathname,
@@ -52,7 +55,7 @@ export const SelectGroupComponent = (props: {
     (state) => state.schedule.selectedItems['group'],
   ) as string[];
 
-  const { online, previous: previousOnline, since } = useNetworkState();
+  const { online, previous: previousOnline } = useNetworkState();
   const { pathname, search, hash } = useLocation();
   const navigate = useNavigate();
   const defaultValues = React.useMemo(() => {
@@ -63,9 +66,13 @@ export const SelectGroupComponent = (props: {
   }, [pathname]);
   const [institutes, setInstitutes] = React.useState<
     { name: string; groups: string[] }[]
-  >([
-    // { name: 'Default', groups: defaultValues },
-  ]);
+  >(
+    () =>
+      getMemoryCachedLookup<IInstituteGroupsData[]>(INSTITUTES_CACHE_KEY) ??
+      [
+        // { name: 'Default', groups: defaultValues },
+      ],
+  );
   const [fetchApi, isFetching] = useApi();
   const [isCached, setIsCached] = React.useState(false);
 
@@ -85,78 +92,114 @@ export const SelectGroupComponent = (props: {
       await getCachedLookup<IInstituteGroupsData[]>(INSTITUTES_CACHE_KEY);
     if (cachedItems) {
       applyInstitutes(cachedItems, true);
-      return;
+      setMemoryCachedLookup(INSTITUTES_CACHE_KEY, cachedItems);
+      return true;
     }
 
     const legacyItems = store2.get(STORE_CACHED_INSTITUTES_KEY, null) as
       | IInstituteGroupsData[]
       | null;
     if (!legacyItems) {
-      return;
+      return false;
     }
 
     applyInstitutes(legacyItems, true);
+    setMemoryCachedLookup(INSTITUTES_CACHE_KEY, legacyItems);
     if (await setCachedLookup(INSTITUTES_CACHE_KEY, legacyItems)) {
       store2.remove(STORE_CACHED_INSTITUTES_KEY);
     }
+    return true;
   }, [applyInstitutes]);
 
-  const loadGroupsList = React.useCallback(async () => {
-    if (isFetching) return;
+  const notifyCachedInstitutes = React.useCallback(() => {
+    dispatch(
+      alertSlice.actions.add({
+        message: 'Используется сохранённый список групп.',
+        severity: 'warning',
+      }),
+    );
+  }, [dispatch]);
 
-    try {
-      const response = await fetchApi<{
-        name: string;
-        items: IInstituteGroupsData[];
-        isCache: boolean;
-      }>(
-        `v1/schedule/actual_groups`,
-        {},
-        {
-          setError: (message, options) =>
-            dispatch(
-              alertSlice.actions.add({
-                message: `Error: ${message}`,
-                severity: 'warning',
-                toastAutoClose: options?.toastAutoClose,
-              }),
-            ),
-        },
-      );
+  const loadGroupsList = React.useCallback(
+    async (forceRefresh = false) => {
+      if (isFetching) return;
 
-      if (!response || 'error' in response || !('data' in response)) {
-        await loadCachedInstitutes();
+      const memoryCachedItems =
+        !forceRefresh &&
+        getMemoryCachedLookup<IInstituteGroupsData[]>(INSTITUTES_CACHE_KEY);
+      if (memoryCachedItems) {
+        applyInstitutes(memoryCachedItems);
         return;
       }
 
-      applyInstitutes(response.data.items);
-      void setCachedLookup(INSTITUTES_CACHE_KEY, response.data.items).then(
-        (isStored) => {
-          if (isStored) {
-            store2.remove(STORE_CACHED_INSTITUTES_KEY);
-          }
-        },
-      );
-    } catch (err) {
-      // ??
-      await loadCachedInstitutes();
-      if (online) {
-        dispatch(
-          alertSlice.actions.add({
-            message: `Error: ${(err as Error).message}`,
-            severity: 'error',
-          }),
-        );
-      } else {
-        dispatch(
-          alertSlice.actions.add({
-            message: formatMessage({ id: 't.api.offline.error' }),
-            severity: 'warning',
-          }),
-        );
+      if (!online) {
+        if (await loadCachedInstitutes()) {
+          notifyCachedInstitutes();
+        }
+        return;
       }
-    }
-  }, [applyInstitutes, loadCachedInstitutes, online]);
+
+      try {
+        const response = await fetchApi<{
+          name: string;
+          items: IInstituteGroupsData[];
+          isCache: boolean;
+        }>(
+          `v1/schedule/actual_groups`,
+          {},
+          {
+            setError: (message, options) =>
+              dispatch(
+                alertSlice.actions.add({
+                  message: `Error: ${message}`,
+                  severity: 'warning',
+                  toastAutoClose: options?.toastAutoClose,
+                }),
+              ),
+          },
+        );
+
+        if (!response || 'error' in response || !('data' in response)) {
+          if (await loadCachedInstitutes()) {
+            notifyCachedInstitutes();
+          }
+          return;
+        }
+
+        applyInstitutes(response.data.items);
+        setMemoryCachedLookup(INSTITUTES_CACHE_KEY, response.data.items);
+        void setCachedLookup(INSTITUTES_CACHE_KEY, response.data.items).then(
+          (isStored) => {
+            if (isStored) {
+              store2.remove(STORE_CACHED_INSTITUTES_KEY);
+            }
+          },
+        );
+      } catch (err) {
+        // При недоступности API сохраняем возможность выбрать группу
+        // из последнего успешно сохранённого справочника.
+        const isCacheRestored = await loadCachedInstitutes();
+        if (isCacheRestored) {
+          notifyCachedInstitutes();
+        } else if (online) {
+          dispatch(
+            alertSlice.actions.add({
+              message: `Error: ${(err as Error).message}`,
+              severity: 'error',
+            }),
+          );
+        } else {
+          dispatch(
+            alertSlice.actions.add({
+              message: formatMessage({ id: 't.api.offline.error' }),
+              severity: 'warning',
+            }),
+          );
+        }
+      }
+    },
+    [applyInstitutes, loadCachedInstitutes, notifyCachedInstitutes, online],
+  );
 
   const onChangeValues = React.useCallback(
     (value: string | string[] | null) => {
@@ -245,10 +288,9 @@ export const SelectGroupComponent = (props: {
   }, [defaultValues]);
 
   React.useEffect(() => {
-    if (shouldRefreshScheduleOptions({ online, previousOnline, since })) {
-      loadGroupsList();
-    }
-  }, [online, previousOnline, since]);
+    const isNetworkRestored = previousOnline === false && online === true;
+    void loadGroupsList(isNetworkRestored);
+  }, [online, previousOnline]);
 
   React.useEffect(() => {
     allowMultipleRef.current = allowMultiple;

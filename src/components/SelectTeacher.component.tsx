@@ -13,10 +13,17 @@ import {
   limitScheduleSelections,
   ScheduleSelectorPopper,
   shouldIgnoreAutocompleteRemoval,
-  shouldRefreshScheduleOptions,
 } from '@components/ScheduleSelector.shared';
 import { ITeacherData } from '@/interfaces/ystuty.types';
 import { useApi } from '@/shared/api.hook';
+import {
+  getCachedLookup,
+  setCachedLookup,
+} from '@/shared/schedule-cache.storage';
+import {
+  getMemoryCachedLookup,
+  setMemoryCachedLookup,
+} from '@/shared/schedule-lookup-memory-cache';
 import { getTeacherSelectionPathRoute } from '@/shared/schedule-routing.utils';
 import { notifyTelegramSelectionChanged } from '@/shared/telegram/telegram.sdk';
 import { useDispatch, useSelector } from '@/store';
@@ -29,9 +36,11 @@ import { StyledAutocomplete } from './StylePulseAnimation.component';
 
 // const STORE_CACHED_TEACHERS_KEY_OLD = 'cachedTeachers';
 const STORE_CACHED_TEACHERS_KEY = 'CACHED_V3_TEACHERS::';
+const TEACHERS_CACHE_KEY = 'actual-teachers';
 
 export const getTeachers = () =>
-  store2.get(STORE_CACHED_TEACHERS_KEY, null) as ITeacherData[] | null;
+  getMemoryCachedLookup<ITeacherData[]>(TEACHERS_CACHE_KEY) ??
+  (store2.get(STORE_CACHED_TEACHERS_KEY, null) as ITeacherData[] | null);
 
 export const SelectTeacherComponent = (props: {
   allowMultipleRef: AllowMultipleRef;
@@ -46,12 +55,14 @@ export const SelectTeacherComponent = (props: {
   const selected = useSelector(
     (state) => state.schedule.selectedItems.teacher,
   ) as number[];
-  const { online, previous: previousOnline, since } = useNetworkState();
+  const { online, previous: previousOnline } = useNetworkState();
 
   const { pathname, search, hash } = useLocation();
   const navigate = useNavigate();
 
-  const [teachers, setTeachers] = React.useState<ITeacherData[]>([]);
+  const [teachers, setTeachers] = React.useState<ITeacherData[]>(
+    () => getMemoryCachedLookup<ITeacherData[]>(TEACHERS_CACHE_KEY) ?? [],
+  );
   const [fetchApi, isFetching] = useApi();
   const [isCached, setIsCached] = React.useState(false);
 
@@ -67,16 +78,17 @@ export const SelectTeacherComponent = (props: {
   }, [pathname]);
 
   const applyTeachers = React.useCallback(
-    (items: ITeacherData[] | null) => {
+    (items: ITeacherData[] | null, isCache = false) => {
       if (!items) {
-        items = store2.get(STORE_CACHED_TEACHERS_KEY, null);
-        if (!items) {
-          return;
-        }
-        setIsCached(true);
-      } else if (items.length > 0) {
+        return;
+      }
+
+      if (items.length > 0) {
+        setIsCached(isCache);
+      }
+
+      if (!isCache && items.length > 0) {
         store2.set(STORE_CACHED_TEACHERS_KEY, items);
-        setIsCached(false);
       }
 
       // items.sort();
@@ -85,49 +97,114 @@ export const SelectTeacherComponent = (props: {
     [setTeachers, setIsCached],
   );
 
-  const loadTeachersList = React.useCallback(async () => {
-    if (isFetching) return;
+  const loadCachedTeachers = React.useCallback(async () => {
+    const cachedItems =
+      await getCachedLookup<ITeacherData[]>(TEACHERS_CACHE_KEY);
+    if (cachedItems) {
+      applyTeachers(cachedItems, true);
+      setMemoryCachedLookup(TEACHERS_CACHE_KEY, cachedItems);
+      return true;
+    }
 
-    try {
-      const response = await fetchApi<{ items: ITeacherData[] }>(
-        `v1/schedule/actual_teachers`,
-        {},
-        {
-          setError: (message, options) =>
-            dispatch(
-              alertSlice.actions.add({
-                message: `Error: ${message}`,
-                severity: 'warning',
-                toastAutoClose: options?.toastAutoClose,
-              }),
-            ),
-        },
-      );
+    const legacyItems = store2.get(STORE_CACHED_TEACHERS_KEY, null) as
+      | ITeacherData[]
+      | null;
+    if (!legacyItems) {
+      return false;
+    }
 
-      if (!response || 'error' in response || !('data' in response)) {
+    applyTeachers(legacyItems, true);
+    setMemoryCachedLookup(TEACHERS_CACHE_KEY, legacyItems);
+    if (await setCachedLookup(TEACHERS_CACHE_KEY, legacyItems)) {
+      store2.remove(STORE_CACHED_TEACHERS_KEY);
+    }
+    return true;
+  }, [applyTeachers]);
+
+  const notifyCachedTeachers = React.useCallback(() => {
+    dispatch(
+      alertSlice.actions.add({
+        message: 'Используется сохранённый список преподавателей.',
+        severity: 'warning',
+      }),
+    );
+  }, [dispatch]);
+
+  const loadTeachersList = React.useCallback(
+    async (forceRefresh = false) => {
+      if (isFetching) return;
+
+      const memoryCachedItems =
+        !forceRefresh &&
+        getMemoryCachedLookup<ITeacherData[]>(TEACHERS_CACHE_KEY);
+      if (memoryCachedItems) {
+        applyTeachers(memoryCachedItems);
         return;
       }
-      applyTeachers(response.data.items);
-    } catch (err) {
-      // ??
-      applyTeachers(null);
-      if (online) {
-        dispatch(
-          alertSlice.actions.add({
-            message: `Error: ${(err as Error).message}`,
-            severity: 'error',
-          }),
-        );
-      } else {
-        dispatch(
-          alertSlice.actions.add({
-            message: formatMessage({ id: 't.api.offline.error' }),
-            severity: 'warning',
-          }),
-        );
+
+      if (!online) {
+        if (await loadCachedTeachers()) {
+          notifyCachedTeachers();
+        }
+        return;
       }
-    }
-  }, [applyTeachers, online]);
+
+      try {
+        const response = await fetchApi<{ items: ITeacherData[] }>(
+          `v1/schedule/actual_teachers`,
+          {},
+          {
+            setError: (message, options) =>
+              dispatch(
+                alertSlice.actions.add({
+                  message: `Error: ${message}`,
+                  severity: 'warning',
+                  toastAutoClose: options?.toastAutoClose,
+                }),
+              ),
+          },
+        );
+
+        if (!response || 'error' in response || !('data' in response)) {
+          if (await loadCachedTeachers()) {
+            notifyCachedTeachers();
+          }
+          return;
+        }
+        applyTeachers(response.data.items);
+        setMemoryCachedLookup(TEACHERS_CACHE_KEY, response.data.items);
+        void setCachedLookup(TEACHERS_CACHE_KEY, response.data.items).then(
+          (isStored) => {
+            if (isStored) {
+              store2.remove(STORE_CACHED_TEACHERS_KEY);
+            }
+          },
+        );
+      } catch (err) {
+        // При недоступности API сохраняем возможность выбрать преподавателя
+        // из последнего успешно сохранённого справочника.
+        const isCacheRestored = await loadCachedTeachers();
+        if (isCacheRestored) {
+          notifyCachedTeachers();
+        } else if (online) {
+          dispatch(
+            alertSlice.actions.add({
+              message: `Error: ${(err as Error).message}`,
+              severity: 'error',
+            }),
+          );
+        } else {
+          dispatch(
+            alertSlice.actions.add({
+              message: formatMessage({ id: 't.api.offline.error' }),
+              severity: 'warning',
+            }),
+          );
+        }
+      }
+    },
+    [applyTeachers, loadCachedTeachers, notifyCachedTeachers, online],
+  );
 
   const onChangeValues = React.useCallback(
     (value: number | number[] | null) => {
@@ -209,10 +286,9 @@ export const SelectTeacherComponent = (props: {
   }, [defaultValues]);
 
   React.useEffect(() => {
-    if (shouldRefreshScheduleOptions({ online, previousOnline, since })) {
-      loadTeachersList();
-    }
-  }, [online, previousOnline, since]);
+    const isNetworkRestored = previousOnline === false && online === true;
+    void loadTeachersList(isNetworkRestored);
+  }, [online, previousOnline]);
 
   React.useEffect(() => {
     allowMultipleRef.current = allowMultiple;

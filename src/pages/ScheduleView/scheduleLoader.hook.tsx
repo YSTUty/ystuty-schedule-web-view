@@ -9,6 +9,12 @@ import {
   getCachedSchedule,
   setCachedSchedule,
 } from '@/shared/schedule-cache.storage';
+import {
+  getMemoryCachedSchedule,
+  SCHEDULE_MEMORY_CACHE_TTL,
+  setMemoryCachedSchedule,
+} from '@/shared/schedule-memory-cache';
+import type { ScheduleMemoryCacheEntry } from '@/shared/schedule-memory-cache';
 import { notifyTelegramResult } from '@/shared/telegram/telegram.sdk';
 import { useDispatch, useSelector } from '@/store';
 import alertSlice from '@/store/reducer/alert/alert.slice';
@@ -52,10 +58,14 @@ export const useScheduleLoader = (props: {
   const [isCached, setIsCached] = React.useState(false);
 
   const [schedulesData, setSchedulesData] =
-    React.useState<Record<string, { time: number; sources: LessonData[] }>>();
+    React.useState<Record<string, ScheduleMemoryCacheEntry>>();
 
   const formatData = React.useCallback(
-    (itemKey: string | number, items: OneWeekDto[], loadedAt = Date.now()) => {
+    (
+      itemKey: string | number,
+      items: OneWeekDto[],
+      loadedAt = Date.now(),
+    ): LessonData[] => {
       const sources = items.reduce<LessonData[]>(
         (prev, week) => [
           ...prev,
@@ -84,6 +94,8 @@ export const useScheduleLoader = (props: {
           sources,
         },
       }));
+
+      return sources;
     },
     [setSchedulesData],
   );
@@ -132,12 +144,25 @@ export const useScheduleLoader = (props: {
     async (itemKey: string | number) => {
       if (
         schedulesData?.[itemKey] &&
-        Date.now() - schedulesData[itemKey].time < 30e3
+        Date.now() - schedulesData[itemKey].time < SCHEDULE_MEMORY_CACHE_TTL
       ) {
         return;
       }
 
       if (isFetchings[itemKey] || !scheduleFor) {
+        return;
+      }
+
+      const memoryCachedSchedule = getMemoryCachedSchedule(
+        scheduleFor,
+        itemKey,
+      );
+      if (memoryCachedSchedule) {
+        setSchedulesData((state) => ({
+          ...state,
+          [itemKey]: memoryCachedSchedule,
+        }));
+        setIsCached(false);
         return;
       }
 
@@ -167,7 +192,12 @@ export const useScheduleLoader = (props: {
           return;
         }
 
-        formatData(itemKey, response.data.items);
+        const loadedAt = Date.now();
+        const sources = formatData(itemKey, response.data.items, loadedAt);
+        setMemoryCachedSchedule(scheduleFor, itemKey, {
+          sources,
+          time: loadedAt,
+        });
         setIsCached(false);
         void setCachedSchedule(scheduleFor, itemKey, response.data.items);
         notifyTelegramResult('success');
