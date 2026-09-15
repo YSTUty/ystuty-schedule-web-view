@@ -7,7 +7,6 @@ import { toast } from 'react-toastify';
 // import { useAppSelector } from '@/store';
 import { apiPath } from '@/utils';
 import {
-  clearApiRateLimitState,
   getApiRateLimitCooldownSeconds,
   setApiRateLimitCooldown,
 } from './api.rate-limit.utils';
@@ -26,6 +25,8 @@ export type {
   ResponseError,
   ValidationItem,
 } from './api.types';
+
+const RATE_LIMIT_TOAST_ID = 'api-rate-limit';
 
 export const useApi = () => {
   // const { accessToken } = useAppSelector((e) => e.app);
@@ -118,6 +119,8 @@ export const useApi = () => {
         { retryAfter: rateLimit.resetAfter },
       );
       const message = details ? `${baseMessage} (${details})` : baseMessage;
+      const rateLimitToastAutoClose =
+        Math.max(2, rateLimit.resetAfter + 2) * 1e3;
 
       const isHandled =
         typeof handleRateLimit === 'function' &&
@@ -125,11 +128,17 @@ export const useApi = () => {
 
       if (!isHandled && isCooldownExtended) {
         if (setError) {
-          setError(message);
+          setError(message, { toastAutoClose: rateLimitToastAutoClose });
+        } else if (toast.isActive(RATE_LIMIT_TOAST_ID)) {
+          toast.update(RATE_LIMIT_TOAST_ID, {
+            autoClose: rateLimitToastAutoClose,
+            render: message,
+            type: 'warning',
+          });
         } else {
           toast.warning(message, {
-            autoClose: Math.max(2, rateLimit.resetAfter) * 1e3,
-            toastId: 'api-rate-limit',
+            autoClose: rateLimitToastAutoClose,
+            toastId: RATE_LIMIT_TOAST_ID,
           });
         }
       }
@@ -150,10 +159,6 @@ export const useApi = () => {
       .then(async (response) => {
         if (response.status === 429) {
           return reportRateLimit(response);
-        }
-
-        if (response.ok && getApiRateLimitCooldownSeconds() === 0) {
-          clearApiRateLimitState();
         }
 
         if (returnResponse) {

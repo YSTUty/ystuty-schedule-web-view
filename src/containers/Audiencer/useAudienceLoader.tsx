@@ -88,11 +88,12 @@ const useAudienceLoader = () => {
         {},
         {
           fKey: 'actual_audiences',
-          setError: (message) =>
+          setError: (message, options) =>
             dispatch(
               alertSlice.actions.add({
                 message: `Error: ${message}`,
                 severity: 'warning',
+                toastAutoClose: options?.toastAutoClose,
               }),
             ),
         },
@@ -125,11 +126,12 @@ const useAudienceLoader = () => {
         {},
         {
           fKey: 'accumulative',
-          setError: (message) =>
+          setError: (message, options) =>
             dispatch(
               alertSlice.actions.add({
                 message: `Error: ${message}`,
                 severity: 'warning',
+                toastAutoClose: options?.toastAutoClose,
               }),
             ),
         },

@@ -151,11 +151,12 @@ export const useScheduleLoader = (props: {
           {},
           {
             fKey: `${scheduleFor}/${itemKey}`,
-            setError: (error) =>
+            setError: (error, options) =>
               dispatch(
                 alertSlice.actions.add({
                   message: `Error: ${error}`,
                   severity: 'error',
+                  toastAutoClose: options?.toastAutoClose,
                 }),
               ),
           },

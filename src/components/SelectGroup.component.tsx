@@ -113,11 +113,12 @@ export const SelectGroupComponent = (props: {
         `v1/schedule/actual_groups`,
         {},
         {
-          setError: (message) =>
+          setError: (message, options) =>
             dispatch(
               alertSlice.actions.add({
                 message: `Error: ${message}`,
                 severity: 'warning',
+                toastAutoClose: options?.toastAutoClose,
               }),
             ),
         },

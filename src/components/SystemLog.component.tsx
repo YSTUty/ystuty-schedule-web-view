@@ -32,7 +32,7 @@ function formatLogDate(value: number): string {
 
 function showToast(alert: IAlert): void {
   toast[alert.severity](alert.message, {
-    autoClose: LOG_TOAST_AUTO_CLOSE,
+    autoClose: alert.toastAutoClose ?? LOG_TOAST_AUTO_CLOSE,
     toastId: `system-log-${alert.id}`,
   });
 }
@@ -82,7 +82,7 @@ export const SystemLogButton = () => {
 
   return (
     <>
-      <Tooltip title="Системный журнал">
+      <Tooltip placement="top-end" title="Системный журнал">
         <IconButton
           aria-label="Открыть системный журнал"
           color="inherit"

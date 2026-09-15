@@ -13,13 +13,18 @@ export type ResponseError = {
   payload?: unknown;
 };
 
+export type ApiErrorOptions = {
+  /** Время показа системного toast-уведомления в миллисекундах. */
+  toastAutoClose?: number;
+};
+
 export type ApiFetchParams = {
   fKey?: string;
   returnResponse?: boolean;
   checkError?: boolean;
   noAlert?: boolean;
   noRenavigate?: boolean;
-  setError?: (error: string) => void;
+  setError?: (error: string, options?: ApiErrorOptions) => void;
   handleError?: (error: ResponseError) => void;
   handleRateLimit?: false | ((timeout: number) => boolean | void);
 };

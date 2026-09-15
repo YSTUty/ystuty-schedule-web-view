@@ -7,6 +7,7 @@ export interface IAlert {
   severity: AlertColor;
   message: string;
   createdAt: number;
+  toastAutoClose?: number;
 }
 
 const initialState = {
@@ -20,7 +21,11 @@ export const alertSlice = createSlice({
   reducers: {
     add: (
       state,
-      action: PayloadAction<{ severity: AlertColor; message: string }>,
+      action: PayloadAction<{
+        severity: AlertColor;
+        message: string;
+        toastAutoClose?: number;
+      }>,
     ) => {
       const { alerts } = state;
       alerts.push({ id: ++iterId, createdAt: Date.now(), ...action.payload });
