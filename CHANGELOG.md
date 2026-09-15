@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://www.conventionalcommits.org/) for commit guidelines.
 
+## [0.3.6](https://github.com/YSTUty/ystuty-viewer-frontend/compare/v0.3.5...v0.3.6) (2026-09-15)
+
+### 🚀 Features
+
+* **rate-limit:** add dismissible recovery notice ([a354666](https://github.com/YSTUty/ystuty-viewer-frontend/commit/a35466608c99d7c2925f5fd1b4344bee31773ba0))
+* **schedule:** cache data and show its source ([0629b28](https://github.com/YSTUty/ystuty-viewer-frontend/commit/0629b287788bc6657e6b8b21fe832e535214d3b1))
+* **schedule:** cache recent requests in memory ([b10c4c2](https://github.com/YSTUty/ystuty-viewer-frontend/commit/b10c4c2b77a2377d6142d1c3bcb8d936c8819fb9))
+* **teachers:** show ids in selector ([84055a5](https://github.com/YSTUty/ystuty-viewer-frontend/commit/84055a58f4f023c1aa72a8f355e805fbb91b4024))
+* **telegram:** prevent mini app zoom ([5ed61e1](https://github.com/YSTUty/ystuty-viewer-frontend/commit/5ed61e110a39c6e0f59a52c46a3c91bc52e5a300))
+
+### 🐛 Bug Fixes
+
+* **calendar:** disable incompatible appointment form ([75f337c](https://github.com/YSTUty/ystuty-viewer-frontend/commit/75f337ce709a73117603d32698fdd69e4af187ac))
+* **deps:** update security patches ([fd8ba30](https://github.com/YSTUty/ystuty-viewer-frontend/commit/fd8ba303e5ca6b15319c06d6de4443aef17d53e0))
+* **deps:** update vulnerable packages ([00afa4e](https://github.com/YSTUty/ystuty-viewer-frontend/commit/00afa4e78d0fa73222c6e2b01e1f5f1c03f9de7d))
+* **selectors:** prevent cache tooltip from blocking dropdowns ([318aeb6](https://github.com/YSTUty/ystuty-viewer-frontend/commit/318aeb66e8b03cce1bcaebe1d5f9dc573fd952e9))
+* **teacher-lessons:** improve mobile table layout ([d34aeb3](https://github.com/YSTUty/ystuty-viewer-frontend/commit/d34aeb313ab73a6a18dddf9381cba149eb54dacf))
+
 ## [0.3.5](https://github.com/YSTUty/ystuty-viewer-frontend/compare/v0.3.4...v0.3.5) (2026-09-15)
 
 ### 🚀 Features
