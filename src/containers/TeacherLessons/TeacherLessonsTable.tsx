@@ -76,7 +76,7 @@ const RowAccumulative = (props: { row: TeacherLessonType }) => {
       </StyledTableRow>
 
       <TableRow>
-        <TableCell sx={{ pb: 0, pt: 0 }} colSpan={2}>
+        <TableCell sx={{ pb: 0, pt: 0 }} colSpan={3}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Box sx={{ margin: 1 }}>
               <Typography variant="h6" gutterBottom component="div">
@@ -253,7 +253,12 @@ const TeacherLessonsTable = (props: { academicPeriodId?: string }) => {
   return (
     <Box
       component="main"
-      sx={{ pb: 2, px: 10, width: '100%', overflow: 'hidden' }}>
+      sx={{
+        pb: 2,
+        px: { xs: 0, md: 10 },
+        width: '100%',
+        overflow: 'hidden',
+      }}>
       <TableContainer component={Paper}>
         <Table stickyHeader size="small">
           <TableHead>
