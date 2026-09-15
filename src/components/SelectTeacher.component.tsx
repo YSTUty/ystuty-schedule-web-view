@@ -332,6 +332,11 @@ export const SelectTeacherComponent = (props: {
     : teachers.length > 0
       ? selected[0]
       : null;
+  const getTeacherOptionLabel = (option: unknown) => {
+    const teacherId = Number(option);
+    const teacher = teachers.find((item) => item.id === teacherId);
+    return teacher ? `${teacher.name} [${teacher.id}]` : `#${teacherId}`;
+  };
 
   return (
     <StyledAutocomplete
@@ -344,10 +349,26 @@ export const SelectTeacherComponent = (props: {
       options={teachers.map((e) => e.id)}
       disableCloseOnSelect={isMultiple}
       disableListWrap
-      getOptionLabel={(option) =>
-        teachers.find((e) => option === e.id)?.name || 'NoName'
-      }
+      getOptionLabel={getTeacherOptionLabel}
       // groupBy={(option) => options[option]}
+      renderOption={(optionProps, option) => {
+        const teacherId = Number(option);
+        const teacher = teachers.find((item) => item.id === teacherId);
+
+        return (
+          <li {...optionProps}>
+            {teacher?.name || 'NoName'}
+            <span
+              style={{
+                fontSize: '0.8em',
+                marginLeft: 4,
+                opacity: 0.7,
+              }}>
+              [{teacherId}]
+            </span>
+          </li>
+        );
+      }}
       renderInput={(params) => {
         const input = (
           <TextField
