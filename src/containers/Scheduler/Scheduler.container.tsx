@@ -29,10 +29,13 @@ import {
   WeekView,
 } from '@devexpress/dx-react-scheduler-material-ui';
 
+import Badge from '@mui/material/Badge';
 import Box from '@mui/material/Box';
 import { blue, green, red, teal, yellow } from '@mui/material/colors';
 import Grid from '@mui/material/Grid';
+import IconButton from '@mui/material/IconButton';
 import Paper from '@mui/material/Paper';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import LessonIcon from '@mui/icons-material/BookRounded';
@@ -45,6 +48,7 @@ import OnlinePredictionIcon from '@mui/icons-material/OnlinePrediction';
 import DivisionGroupsIcon from '@mui/icons-material/PeopleOutlined';
 import TeacherIcon from '@mui/icons-material/PermIdentity';
 import RoomIcon from '@mui/icons-material/Room';
+import StorageOutlinedIcon from '@mui/icons-material/StorageOutlined';
 
 import GroupGroupingControl from '@components/GroupGroupingControl.component';
 import LessonFilter from '@components/LessonFilter.component';
@@ -498,12 +502,46 @@ const TitleCellComponent = () => (
 );
 
 const getFlexibleSpace =
-  (scheduleFor: ScheduleFor) =>
+  (
+    scheduleFor: ScheduleFor,
+    scheduleCached: boolean,
+    scheduleServerCached: boolean,
+  ) =>
   ({ ...props }: Toolbar.FlexibleSpaceProps) => (
     <StyledToolbarFlexibleSpace {...props} className={dxClasses.flexibleSpace}>
       <LessonFilter />
       <LessonTypeSelector />
       <GroupGroupingControl scheduleFor={scheduleFor} />
+      {scheduleCached && (
+        <Tooltip
+          enterTouchDelay={0}
+          leaveTouchDelay={2e3}
+          title={
+            <>
+              Расписание показано из кэша браузера или API.
+              {scheduleServerCached && <br />}
+              {scheduleServerCached && '* кэш на сервере.'}
+            </>
+          }>
+          <IconButton
+            aria-label="Расписание из кэша"
+            size="small"
+            sx={{
+              display: { xs: 'none', sm: 'inline-flex' },
+              ml: 0.5,
+              mr: 0.25,
+              p: 0.5,
+            }}>
+            <Badge
+              badgeContent="*"
+              color="default"
+              invisible={!scheduleServerCached}
+              overlap="circular">
+              <StorageOutlinedIcon fontSize="small" />
+            </Badge>
+          </IconButton>
+        </Tooltip>
+      )}
     </StyledToolbarFlexibleSpace>
   );
 
@@ -584,11 +622,13 @@ const getResources = (
 };
 
 export type MaterialSchedulerProps = {
+  scheduleCached: boolean;
+  scheduleServerCached: boolean;
   scheduleFor: ScheduleFor | null;
 };
 
 const SchedulerContainer: React.FC<MaterialSchedulerProps> = (props) => {
-  const { scheduleFor } = props;
+  const { scheduleCached, scheduleFor, scheduleServerCached } = props;
 
   const dispatch = useDispatch();
 
@@ -746,7 +786,11 @@ const SchedulerContainer: React.FC<MaterialSchedulerProps> = (props) => {
         />
         <Toolbar
           {...(fetchingSchedule ? { rootComponent: ToolbarWithLoading } : null)}
-          flexibleSpaceComponent={getFlexibleSpace(scheduleFor)}
+          flexibleSpaceComponent={getFlexibleSpace(
+            scheduleFor,
+            scheduleCached,
+            scheduleServerCached,
+          )}
         />
         <DateNavigator />
         <ViewSwitcher />

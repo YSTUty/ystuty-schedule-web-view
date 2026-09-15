@@ -3,14 +3,17 @@ import { useIntl } from 'react-intl';
 
 import { useMediaQuery, useTheme } from '@mui/material';
 import AppBar from '@mui/material/AppBar';
+import Badge from '@mui/material/Badge';
 import Divider from '@mui/material/Divider';
 import FormControl from '@mui/material/FormControl';
 import IconButton from '@mui/material/IconButton';
 import Toolbar from '@mui/material/Toolbar';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import HomeIcon from '@mui/icons-material/Home';
 import LocalPizzaIcon from '@mui/icons-material/LocalPizza';
 import SchoolIcon from '@mui/icons-material/School';
+import StorageOutlinedIcon from '@mui/icons-material/StorageOutlined';
 
 import * as envUtils from '@/utils/env.utils';
 import { ScheduleFor } from '@/interfaces/ystuty.types';
@@ -24,11 +27,17 @@ import { ThemeModeButton } from './ThemeMode.component';
 import VK, { Like } from './VK';
 
 export type TopPanelProps = {
+  scheduleCached?: boolean;
+  scheduleServerCached?: boolean;
   scheduleFor: ScheduleFor | null;
 };
 
 const TopPanel: React.FC<TopPanelProps> = (props) => {
-  const { scheduleFor } = props;
+  const {
+    scheduleCached = false,
+    scheduleFor,
+    scheduleServerCached = false,
+  } = props;
 
   const { formatMessage } = useIntl();
   const theme = useTheme();
@@ -85,6 +94,32 @@ const TopPanel: React.FC<TopPanelProps> = (props) => {
                   />
                 )}
               </FormControl>
+
+              {isSmall && scheduleCached && (
+                <Tooltip
+                  enterTouchDelay={0}
+                  leaveTouchDelay={2e3}
+                  title={
+                    <>
+                      Расписание показано из кэша браузера или API.
+                      {scheduleServerCached && <br />}
+                      {scheduleServerCached && '* кэш на сервере.'}
+                    </>
+                  }>
+                  <IconButton
+                    aria-label="Расписание из кэша"
+                    size="small"
+                    sx={{ ml: 0.25, p: 0.5 }}>
+                    <Badge
+                      badgeContent="*"
+                      color="default"
+                      invisible={!scheduleServerCached}
+                      overlap="circular">
+                      <StorageOutlinedIcon fontSize="small" />
+                    </Badge>
+                  </IconButton>
+                </Tooltip>
+              )}
 
               {!isSmall && <Divider orientation="vertical" flexItem />}
               <FormControl sx={{ pl: 1 }}>

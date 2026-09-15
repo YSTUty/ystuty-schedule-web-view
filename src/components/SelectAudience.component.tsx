@@ -6,6 +6,7 @@ import store2 from 'store2';
 import classNames from 'clsx';
 
 import TextField from '@mui/material/TextField';
+import Tooltip from '@mui/material/Tooltip';
 
 import {
   AllowMultipleRef,
@@ -70,18 +71,20 @@ export const SelectAudienceComponent = (props: {
   const [audiences, setAudiences] = React.useState<IAudienceData[]>(
     () => getMemoryCachedLookup<IAudienceData[]>(AUDIENCES_CACHE_KEY) ?? [],
   );
-  const [isCached, setIsCached] = React.useState(false);
+  const [isCached, setIsCached] = React.useState(
+    () => getMemoryCachedLookup<IAudienceData[]>(AUDIENCES_CACHE_KEY) !== null,
+  );
+  const [isServerCached, setIsServerCached] = React.useState(false);
   const [fetchApi, isFetching] = useApi();
 
   const applyAudiences = React.useCallback(
-    (items: IAudienceData[] | null, isCache = false) => {
+    (items: IAudienceData[] | null, isCache = false, isServerCache = false) => {
       if (!items) {
         return;
       }
 
-      if (items.length > 0) {
-        setIsCached(isCache);
-      }
+      setIsCached(isCache);
+      setIsServerCached(isServerCache);
 
       if (!isCache && items.length > 0) {
         store2.set(STORE_CACHED_AUDIENCE_KEY, items);
@@ -104,7 +107,7 @@ export const SelectAudienceComponent = (props: {
       // dispatch(audiencerSlice.actions.setAudiences(items));
       setAudiences(items);
     },
-    [setAudiences, setIsCached],
+    [setAudiences, setIsCached, setIsServerCached],
   );
 
   const loadCachedAudiences = React.useCallback(async () => {
@@ -148,7 +151,7 @@ export const SelectAudienceComponent = (props: {
         !forceRefresh &&
         getMemoryCachedLookup<IAudienceData[]>(AUDIENCES_CACHE_KEY);
       if (memoryCachedItems) {
-        applyAudiences(memoryCachedItems);
+        applyAudiences(memoryCachedItems, true);
         return;
       }
 
@@ -179,14 +182,29 @@ export const SelectAudienceComponent = (props: {
           },
         );
 
-        if (!response || 'error' in response || !('data' in response)) {
+        // `null` означает отменённый или уже заблокированный запрос. Например,
+        // это происходит при проверочном размонтировании React.StrictMode.
+        // В таком случае не считаем API недоступным и не показываем toast.
+        if (!response) {
+          return;
+        }
+
+        if ('error' in response) {
           if (await loadCachedAudiences()) {
             notifyCachedAudiences();
           }
           return;
         }
 
-        applyAudiences(response.data.items);
+        if (!('data' in response)) {
+          return;
+        }
+
+        applyAudiences(
+          response.data.items,
+          response.data.isCache,
+          response.data.isCache,
+        );
         setMemoryCachedLookup(AUDIENCES_CACHE_KEY, response.data.items);
         void setCachedLookup(AUDIENCES_CACHE_KEY, response.data.items).then(
           (isStored) => {
@@ -373,16 +391,27 @@ export const SelectAudienceComponent = (props: {
       disableListWrap
       getOptionLabel={(option) => option as string}
       groupBy={(option) => options[option as string]}
-      renderInput={(params) => (
-        <TextField
-          {...params}
-          label={`Аудитори${isMultiple ? 'и' : 'я'}${isCached ? '*' : ''}`}
-          placeholder={((e) =>
-            (e.length > 0 && e[Math.floor(Math.random() * e.length)]) || '...')(
-            Object.keys(options),
-          )}
-        />
-      )}
+      renderInput={(params) => {
+        const input = (
+          <TextField
+            {...params}
+            label={`Аудитори${isMultiple ? 'и' : 'я'}${
+              isCached ? ` (кэш${isServerCached ? '*' : ''})` : ''
+            }`}
+            placeholder={((e) =>
+              (e.length > 0 && e[Math.floor(Math.random() * e.length)]) ||
+              '...')(Object.keys(options))}
+          />
+        );
+
+        return isServerCached ? (
+          <Tooltip enterTouchDelay={0} title="* кэш на сервере.">
+            {input}
+          </Tooltip>
+        ) : (
+          input
+        );
+      }}
       slots={{ popper: ScheduleSelectorPopper }}
       value={value}
       onChange={(event, newValue, reason) => {

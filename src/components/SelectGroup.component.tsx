@@ -6,6 +6,7 @@ import store2 from 'store2';
 import classNames from 'clsx';
 
 import TextField from '@mui/material/TextField';
+import Tooltip from '@mui/material/Tooltip';
 
 import {
   AllowMultipleRef,
@@ -74,16 +75,20 @@ export const SelectGroupComponent = (props: {
       ],
   );
   const [fetchApi, isFetching] = useApi();
-  const [isCached, setIsCached] = React.useState(false);
+  const [isCached, setIsCached] = React.useState(
+    () =>
+      getMemoryCachedLookup<IInstituteGroupsData[]>(INSTITUTES_CACHE_KEY) !==
+      null,
+  );
+  const [isServerCached, setIsServerCached] = React.useState(false);
 
   const applyInstitutes = React.useCallback(
-    (items: IInstituteGroupsData[], isCache = false) => {
-      if (items.length > 0) {
-        setIsCached(isCache);
-        setInstitutes(items);
-      }
+    (items: IInstituteGroupsData[], isCache = false, isServerCache = false) => {
+      setIsCached(isCache);
+      setIsServerCached(isServerCache);
+      setInstitutes(items);
     },
-    [setInstitutes, setIsCached],
+    [setInstitutes, setIsCached, setIsServerCached],
   );
 
   /** Временно читает старый LocalStorage-кэш, пока он не будет перенесён. */
@@ -128,7 +133,7 @@ export const SelectGroupComponent = (props: {
         !forceRefresh &&
         getMemoryCachedLookup<IInstituteGroupsData[]>(INSTITUTES_CACHE_KEY);
       if (memoryCachedItems) {
-        applyInstitutes(memoryCachedItems);
+        applyInstitutes(memoryCachedItems, true);
         return;
       }
 
@@ -159,14 +164,29 @@ export const SelectGroupComponent = (props: {
           },
         );
 
-        if (!response || 'error' in response || !('data' in response)) {
+        // `null` означает отменённый или уже заблокированный запрос. Например,
+        // это происходит при проверочном размонтировании React.StrictMode.
+        // В таком случае не считаем API недоступным и не показываем toast.
+        if (!response) {
+          return;
+        }
+
+        if ('error' in response) {
           if (await loadCachedInstitutes()) {
             notifyCachedInstitutes();
           }
           return;
         }
 
-        applyInstitutes(response.data.items);
+        if (!('data' in response)) {
+          return;
+        }
+
+        applyInstitutes(
+          response.data.items,
+          response.data.isCache,
+          response.data.isCache,
+        );
         setMemoryCachedLookup(INSTITUTES_CACHE_KEY, response.data.items);
         void setCachedLookup(INSTITUTES_CACHE_KEY, response.data.items).then(
           (isStored) => {
@@ -344,16 +364,27 @@ export const SelectGroupComponent = (props: {
       disableListWrap
       getOptionLabel={(option) => option as string}
       groupBy={(option) => options[option as string]}
-      renderInput={(params) => (
-        <TextField
-          {...params}
-          label={`Групп${isMultiple ? 'ы' : 'а'}${isCached ? '*' : ''}`}
-          placeholder={((e) =>
-            (e.length > 0 && e[Math.floor(Math.random() * e.length)]) || '...')(
-            Object.keys(options),
-          )}
-        />
-      )}
+      renderInput={(params) => {
+        const input = (
+          <TextField
+            {...params}
+            label={`Групп${isMultiple ? 'ы' : 'а'}${
+              isCached ? ` (кэш${isServerCached ? '*' : ''})` : ''
+            }`}
+            placeholder={((e) =>
+              (e.length > 0 && e[Math.floor(Math.random() * e.length)]) ||
+              '...')(Object.keys(options))}
+          />
+        );
+
+        return isServerCached ? (
+          <Tooltip enterTouchDelay={0} title="* кэш на сервере.">
+            {input}
+          </Tooltip>
+        ) : (
+          input
+        );
+      }}
       slots={{ popper: ScheduleSelectorPopper }}
       value={value}
       onChange={(event, newValue, reason) => {

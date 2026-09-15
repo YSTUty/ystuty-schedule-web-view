@@ -6,6 +6,7 @@ import store2 from 'store2';
 import classNames from 'clsx';
 
 import TextField from '@mui/material/TextField';
+import Tooltip from '@mui/material/Tooltip';
 
 import {
   AllowMultipleRef,
@@ -64,7 +65,10 @@ export const SelectTeacherComponent = (props: {
     () => getMemoryCachedLookup<ITeacherData[]>(TEACHERS_CACHE_KEY) ?? [],
   );
   const [fetchApi, isFetching] = useApi();
-  const [isCached, setIsCached] = React.useState(false);
+  const [isCached, setIsCached] = React.useState(
+    () => getMemoryCachedLookup<ITeacherData[]>(TEACHERS_CACHE_KEY) !== null,
+  );
+  const [isServerCached, setIsServerCached] = React.useState(false);
 
   const defaultValues: number[] = React.useMemo(() => {
     const teacherIds = getLastTeachers();
@@ -78,14 +82,13 @@ export const SelectTeacherComponent = (props: {
   }, [pathname]);
 
   const applyTeachers = React.useCallback(
-    (items: ITeacherData[] | null, isCache = false) => {
+    (items: ITeacherData[] | null, isCache = false, isServerCache = false) => {
       if (!items) {
         return;
       }
 
-      if (items.length > 0) {
-        setIsCached(isCache);
-      }
+      setIsCached(isCache);
+      setIsServerCached(isServerCache);
 
       if (!isCache && items.length > 0) {
         store2.set(STORE_CACHED_TEACHERS_KEY, items);
@@ -94,7 +97,7 @@ export const SelectTeacherComponent = (props: {
       // items.sort();
       setTeachers(items);
     },
-    [setTeachers, setIsCached],
+    [setTeachers, setIsCached, setIsServerCached],
   );
 
   const loadCachedTeachers = React.useCallback(async () => {
@@ -138,7 +141,7 @@ export const SelectTeacherComponent = (props: {
         !forceRefresh &&
         getMemoryCachedLookup<ITeacherData[]>(TEACHERS_CACHE_KEY);
       if (memoryCachedItems) {
-        applyTeachers(memoryCachedItems);
+        applyTeachers(memoryCachedItems, true);
         return;
       }
 
@@ -150,7 +153,10 @@ export const SelectTeacherComponent = (props: {
       }
 
       try {
-        const response = await fetchApi<{ items: ITeacherData[] }>(
+        const response = await fetchApi<{
+          isCache?: boolean;
+          items: ITeacherData[];
+        }>(
           `v1/schedule/actual_teachers`,
           {},
           {
@@ -165,13 +171,29 @@ export const SelectTeacherComponent = (props: {
           },
         );
 
-        if (!response || 'error' in response || !('data' in response)) {
+        // `null` означает отменённый или уже заблокированный запрос. Например,
+        // это происходит при проверочном размонтировании React.StrictMode.
+        // В таком случае не считаем API недоступным и не показываем toast.
+        if (!response) {
+          return;
+        }
+
+        if ('error' in response) {
           if (await loadCachedTeachers()) {
             notifyCachedTeachers();
           }
           return;
         }
-        applyTeachers(response.data.items);
+
+        if (!('data' in response)) {
+          return;
+        }
+
+        applyTeachers(
+          response.data.items,
+          response.data.isCache ?? false,
+          response.data.isCache ?? false,
+        );
         setMemoryCachedLookup(TEACHERS_CACHE_KEY, response.data.items);
         void setCachedLookup(TEACHERS_CACHE_KEY, response.data.items).then(
           (isStored) => {
@@ -326,15 +348,27 @@ export const SelectTeacherComponent = (props: {
         teachers.find((e) => option === e.id)?.name || 'NoName'
       }
       // groupBy={(option) => options[option]}
-      renderInput={(params) => (
-        <TextField
-          {...params}
-          label={`Преподавател${isMultiple ? 'и' : 'ь'}${isCached ? '*' : ''}`}
-          placeholder={((e) =>
-            (e.length > 0 && e[Math.floor(Math.random() * e.length)].name) ||
-            '...')(teachers)}
-        />
-      )}
+      renderInput={(params) => {
+        const input = (
+          <TextField
+            {...params}
+            label={`Преподавател${isMultiple ? 'и' : 'ь'}${
+              isCached ? ` (кэш${isServerCached ? '*' : ''})` : ''
+            }`}
+            placeholder={((e) =>
+              (e.length > 0 && e[Math.floor(Math.random() * e.length)].name) ||
+              '...')(teachers)}
+          />
+        );
+
+        return isServerCached ? (
+          <Tooltip enterTouchDelay={0} title="* кэш на сервере.">
+            {input}
+          </Tooltip>
+        ) : (
+          input
+        );
+      }}
       slots={{ popper: ScheduleSelectorPopper }}
       value={value}
       onChange={(event, newValue, reason) => {

@@ -23,12 +23,22 @@ const SchedulePage = () => {
     }
   }, [pathname, setScheduleFor]);
 
-  useScheduleLoader({ scheduleFor });
+  const [, , isScheduleCached, isScheduleServerCached] = useScheduleLoader({
+    scheduleFor,
+  });
 
   return (
     <>
-      <TopPanelComponent scheduleFor={scheduleFor} />
-      <SchedulerContainer scheduleFor={scheduleFor} />
+      <TopPanelComponent
+        scheduleCached={isScheduleCached}
+        scheduleServerCached={isScheduleServerCached}
+        scheduleFor={scheduleFor}
+      />
+      <SchedulerContainer
+        scheduleCached={isScheduleCached}
+        scheduleServerCached={isScheduleServerCached}
+        scheduleFor={scheduleFor}
+      />
     </>
   );
 };

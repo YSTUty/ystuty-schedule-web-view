@@ -56,6 +56,7 @@ export const useScheduleLoader = (props: {
 
   const [fetchApi, isFetching, isFetchings, abortControllers] = useApi();
   const [isCached, setIsCached] = React.useState(false);
+  const [isServerCached, setIsServerCached] = React.useState(false);
 
   const [schedulesData, setSchedulesData] =
     React.useState<Record<string, ScheduleMemoryCacheEntry>>();
@@ -114,6 +115,7 @@ export const useScheduleLoader = (props: {
       if (cachedSchedule) {
         formatData(itemKey, cachedSchedule.items, cachedSchedule.updatedAt);
         setIsCached(true);
+        setIsServerCached(false);
         return true;
       }
 
@@ -130,6 +132,7 @@ export const useScheduleLoader = (props: {
 
       formatData(itemKey, legacySchedule.items, legacySchedule.time);
       setIsCached(true);
+      setIsServerCached(false);
 
       if (await setCachedSchedule(scheduleFor, itemKey, legacySchedule.items)) {
         store2.remove(legacyCacheKey);
@@ -162,7 +165,8 @@ export const useScheduleLoader = (props: {
           ...state,
           [itemKey]: memoryCachedSchedule,
         }));
-        setIsCached(false);
+        setIsCached(true);
+        setIsServerCached(false);
         return;
       }
 
@@ -187,8 +191,18 @@ export const useScheduleLoader = (props: {
           },
         );
 
-        if (!response || 'error' in response || !('data' in response)) {
+        // `null` возвращается для отменённых и временно заблокированных
+        // запросов. Не подменяем ими уже показываемые данные persistent-кэша.
+        if (!response) {
+          return;
+        }
+
+        if ('error' in response) {
           await loadCachedSchedule(itemKey);
+          return;
+        }
+
+        if (!('data' in response)) {
           return;
         }
 
@@ -198,7 +212,8 @@ export const useScheduleLoader = (props: {
           sources,
           time: loadedAt,
         });
-        setIsCached(false);
+        setIsCached(response.data.isCache);
+        setIsServerCached(response.data.isCache);
         void setCachedSchedule(scheduleFor, itemKey, response.data.items);
         notifyTelegramResult('success');
       } catch (err) {
@@ -317,5 +332,5 @@ export const useScheduleLoader = (props: {
     );
   }, [scheduleFor, STORE_CACHED_KEY, STORE_CACHED_OLD_KEYS]);
 
-  return [scheduleData, isFetching, isCached] as const;
+  return [scheduleData, isFetching, isCached, isServerCached] as const;
 };
