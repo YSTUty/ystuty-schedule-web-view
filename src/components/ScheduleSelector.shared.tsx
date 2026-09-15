@@ -1,8 +1,10 @@
 import React from 'react';
 
 import { autocompleteClasses } from '@mui/material/Autocomplete';
+import Box from '@mui/material/Box';
 import Popper, { PopperProps } from '@mui/material/Popper';
 import { styled } from '@mui/material/styles';
+import Tooltip from '@mui/material/Tooltip';
 import type { AutocompleteChangeReason } from '@mui/material/useAutocomplete';
 
 /** Максимальное число одновременно выбранных вариантов расписания. */
@@ -28,6 +30,26 @@ const StyledScheduleSelectorPopper = styled(Popper)({
 /** Общий Popper для селекторов группы, преподавателя и аудитории. */
 export const ScheduleSelectorPopper = (props: PopperProps) => (
   <StyledScheduleSelectorPopper {...props} style={{ width: 350 }} />
+);
+
+/** Подсказка о серверном кэше, не мешающая прокрутке выпадающего списка. */
+export const ServerCacheTooltip = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => (
+  <Tooltip
+    disableFocusListener
+    disableInteractive
+    enterTouchDelay={0}
+    title="* кэш на сервере.">
+    {/*
+      Tooltip получает обычный DOM-элемент с ref и обработчиками hover.
+      TextField не является надёжным anchor-элементом, когда его создаёт
+      Autocomplete через renderInput.
+    */}
+    <Box sx={{ width: '100%' }}>{children}</Box>
+  </Tooltip>
 );
 
 /** Проверяет, отличается ли новый набор значений от выбранного. */

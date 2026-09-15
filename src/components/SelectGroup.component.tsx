@@ -6,13 +6,13 @@ import store2 from 'store2';
 import classNames from 'clsx';
 
 import TextField from '@mui/material/TextField';
-import Tooltip from '@mui/material/Tooltip';
 
 import {
   AllowMultipleRef,
   areSameScheduleSelections,
   limitScheduleSelections,
   ScheduleSelectorPopper,
+  ServerCacheTooltip,
   shouldIgnoreAutocompleteRemoval,
 } from '@components/ScheduleSelector.shared';
 import { IInstituteGroupsData } from '@/interfaces/ystuty.types';
@@ -378,9 +378,7 @@ export const SelectGroupComponent = (props: {
         );
 
         return isServerCached ? (
-          <Tooltip enterTouchDelay={0} title="* кэш на сервере.">
-            {input}
-          </Tooltip>
+          <ServerCacheTooltip>{input}</ServerCacheTooltip>
         ) : (
           input
         );
