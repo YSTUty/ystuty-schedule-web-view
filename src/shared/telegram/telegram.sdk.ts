@@ -12,6 +12,8 @@ import {
   viewport,
 } from '@tma.js/sdk-react';
 
+import { configureTelegramMiniAppViewport } from './telegram-viewport.utils';
+
 let isTelegramMiniAppInitialized = false;
 
 /**
@@ -27,6 +29,7 @@ export function initializeTelegramMiniApp(): boolean {
 
   try {
     init();
+    configureTelegramMiniAppViewport();
 
     if (!themeParams.isMounted()) {
       themeParams.mount();
