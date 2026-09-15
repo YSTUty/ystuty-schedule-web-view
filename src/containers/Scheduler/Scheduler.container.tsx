@@ -13,7 +13,6 @@ import {
 } from '@devexpress/dx-react-scheduler';
 import {
   AllDayPanel,
-  AppointmentForm,
   Appointments,
   AppointmentTooltip,
   CurrentTimeIndicator,
@@ -773,7 +772,11 @@ const SchedulerContainer: React.FC<MaterialSchedulerProps> = (props) => {
         <AppointmentTooltip
           contentComponent={AppointmentTooltipContent as any}
         />
-        <AppointmentForm readOnly />
+        {/*
+          Редактирование расписания не поддерживается. AppointmentForm из
+          dx-react-scheduler 3 использует несовместимый с MUI X 9 picker и
+          открывается по двойному клику даже в режиме readOnly.
+        */}
         <Resources
           data={getResources(scheduleFor, selectedItems)}
           mainResourceName={mainResourceName}
