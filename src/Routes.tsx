@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Navigate, Route, Routes as RouterRoutes } from 'react-router-dom';
+import { Navigate, Route, Routes as RouterRoutes } from 'react-router';
 
 import LazyLoadComponent from './components/LazyLoad.component';
 import NotFoundPage from './pages/NotFound/NotFound.page';

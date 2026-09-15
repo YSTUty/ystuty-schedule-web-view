@@ -1,5 +1,5 @@
 import React from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router';
 
 import TopPanelComponent from '@components/TopPanel.component';
 import SchedulerContainer from '@/containers/Scheduler/Scheduler.container';
