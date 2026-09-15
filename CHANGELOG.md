@@ -2,6 +2,42 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://www.conventionalcommits.org/) for commit guidelines.
 
+## [0.3.5](https://github.com/YSTUty/ystuty-viewer-frontend/compare/v0.3.4...v0.3.5) (2026-09-15)
+
+### 🚀 Features
+
+* **api:** handle rate limits and add system log ([618c422](https://github.com/YSTUty/ystuty-viewer-frontend/commit/618c4225e3cf2b841a3d4f3037e8cf6a7acecd47))
+* **api:** show rate limit countdown ([a34eb6b](https://github.com/YSTUty/ystuty-viewer-frontend/commit/a34eb6b051aa4d538e67098db89c0b6c88dc91b8))
+* **cache:** move schedule data to indexeddb ([aacec4b](https://github.com/YSTUty/ystuty-viewer-frontend/commit/aacec4bd576d34408851bc8fe2e8a3b93da46caa))
+* **teacher-lessons:** add academic period filter ([8aca1c6](https://github.com/YSTUty/ystuty-viewer-frontend/commit/8aca1c6dfe1c03639d5ea7204dc611e8f5e5c1a5))
+* **teacher-lessons:** add period filter and fallback counts ([9b6af0f](https://github.com/YSTUty/ystuty-viewer-frontend/commit/9b6af0fbb108f75555d0f23d09c47e621d6fac14))
+* **telegram:** add mini app sdk integration ([26b6d4f](https://github.com/YSTUty/ystuty-viewer-frontend/commit/26b6d4f02c1a91cd577f4841594ac2b0882df7d2))
+* **telegram:** restore last mini app route ([13ce9dd](https://github.com/YSTUty/ystuty-viewer-frontend/commit/13ce9dd312a561f1245bde89c7c0b7168a6a44f4))
+* **ui:** add not found page ([12547a2](https://github.com/YSTUty/ystuty-viewer-frontend/commit/12547a2bd87be3989ddaecb509c8033547120442))
+
+### 🐛 Bug Fixes
+
+* **ci:** load pages environment variables ([59f4363](https://github.com/YSTUty/ystuty-viewer-frontend/commit/59f43635e0e80727a88719b45ee1de61f12336e2))
+* **telegram:** preserve paper color after app resume ([30d913b](https://github.com/YSTUty/ystuty-viewer-frontend/commit/30d913b08ee519b07a276b0dd0c578a17e351c2d))
+* **ui:** reduce mobile header title size ([3fa4deb](https://github.com/YSTUty/ystuty-viewer-frontend/commit/3fa4debaaed1425dc827b42212bc96a13df81b2e))
+* **ui:** show loading placeholder for lazy routes ([b6185b2](https://github.com/YSTUty/ystuty-viewer-frontend/commit/b6185b2b21a575f3cadf9ae697cb35555a791c94))
+* **vk:** prevent duplicate like widget initialization ([3906673](https://github.com/YSTUty/ystuty-viewer-frontend/commit/39066733513acb31555b140b40e045f76d443547))
+
+### ☯ Styling
+
+* format project sources ([75bf774](https://github.com/YSTUty/ystuty-viewer-frontend/commit/75bf7742218241001e33dc7c73ccdc055dfd1657))
+
+### 🔧 Code Refactoring
+
+* **routing:** move teacher lessons selection to path ([da9d73d](https://github.com/YSTUty/ystuty-viewer-frontend/commit/da9d73df3729906e1430be4b04c694d1dc917226))
+
+### 🛠️ CI
+
+* add build and test workflow ([d4cade0](https://github.com/YSTUty/ystuty-viewer-frontend/commit/d4cade00cccf545ddb5f576fe577f225b4900e6e))
+* deploy main branch to github pages ([dad021b](https://github.com/YSTUty/ystuty-viewer-frontend/commit/dad021be2017beb99dab80060ec7d9daca445703))
+* **pages:** configure deployment variables ([240ab2c](https://github.com/YSTUty/ystuty-viewer-frontend/commit/240ab2c24c242c5a6c629b9d6e011c6782cf4b7d))
+* use public registry url in yarn lock ([d6d9499](https://github.com/YSTUty/ystuty-viewer-frontend/commit/d6d94994985a36eb4130d12e999a61baafaddefe))
+
 ## [0.3.4](https://github.com/YSTUty/ystuty-viewer-frontend/compare/v0.3.3...v0.3.4) (2026-09-11)
 
 ### 🧹 Chore
