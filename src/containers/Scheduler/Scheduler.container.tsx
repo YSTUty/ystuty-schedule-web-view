@@ -54,11 +54,15 @@ import LessonFilter from '@components/LessonFilter.component';
 import LessonTypeSelector from '@components/LessonTypeSelector.component';
 import { getTeachers } from '@components/SelectTeacher.component';
 import * as lessonsUtils from '@/utils/lessons.utils';
-import { LessonData, LessonFlags, WeekParityType } from '@/interfaces/schedule';
+import { LessonFlags, WeekParityType } from '@/interfaces/schedule';
 import { ScheduleFor } from '@/interfaces/ystuty.types';
 import { useDispatch, useSelector } from '@/store';
 import { selectScheduleItems } from '@/store/reducer/schedule/schedule.selectors';
 import scheduleSlice from '@/store/reducer/schedule/schedule.slice';
+import {
+  MergedLessonData,
+  mergeMassLessonVariants,
+} from '@/utils/schedule-variants.utils';
 import {
   DayScaleCell,
   classes as dxClasses,
@@ -69,7 +73,7 @@ import {
   ToolbarWithLoading,
 } from './dx.components';
 
-export interface AppointmentModel extends LessonData {
+export interface AppointmentModel extends MergedLessonData {
   /** The start date. */
   startDate: SchedulerDateTime;
   /** The end date. */
@@ -133,6 +137,17 @@ const getTooltipResourceColor = (color?: string | Color) => {
   return color?.[300] ?? green[300];
 };
 
+const getAppointmentTeacherNames = (
+  data: Pick<
+    AppointmentModel,
+    'additionalTeacherName' | 'mergedTeacherNames' | 'teacherName'
+  >,
+) =>
+  data.mergedTeacherNames ??
+  [data.teacherName, data.additionalTeacherName].filter(
+    (teacherName): teacherName is string => Boolean(teacherName),
+  );
+
 const TooltipRow = ({ children, color, icon }: TooltipRowProps) => (
   <Grid container sx={{ alignItems: 'center', pb: 1.25 }}>
     <Grid
@@ -179,6 +194,7 @@ const AppointmentContent = ({
   data,
   ...restProps
 }: AppointmentContentProps) => {
+  const teacherNames = getAppointmentTeacherNames(data);
   let title = '';
   if (data.number) {
     title += `#${data.number}`;
@@ -220,10 +236,8 @@ const AppointmentContent = ({
   if (data.groups && data.groups.length > 0) {
     title += `• Группы: ${data.groups.join(', ')}\n`;
   }
-  if (data.teacherName || data.additionalTeacherName) {
-    title += `• Преподаватель: ${data.teacherName}${
-      data.additionalTeacherName ? `/${data.additionalTeacherName}` : ''
-    }\n`;
+  if (teacherNames.length > 0) {
+    title += `• ${data.mergedVariantsCount ? 'Преподаватели' : 'Преподаватель'}: ${teacherNames.join(', ')}\n`;
   }
 
   if (data.isDivision) {
@@ -314,12 +328,25 @@ const AppointmentContent = ({
           </div>
         )}
         {data.scheduleFor !== 'teacher' &&
-          (data.teacherName || data.additionalTeacherName) && (
+          teacherNames.length > 0 &&
+          (data.mergedVariantsCount ? (
+            <>
+              <div className={classNames(dxClasses.text, dxClasses.content)}>
+                • Преподаватели:
+              </div>
+              {teacherNames.map((teacherName) => (
+                <div
+                  className={classNames(dxClasses.text, dxClasses.content)}
+                  key={teacherName}>
+                  • {teacherName}
+                </div>
+              ))}
+            </>
+          ) : (
             <div className={classNames(dxClasses.text, dxClasses.content)}>
-              • Преподаватель: {data.teacherName}
-              {data.additionalTeacherName && `/${data.additionalTeacherName}`}
+              • Преподаватель: {teacherNames.join(', ')}
             </div>
-          )}
+          ))}
         {data.scheduleFor !== 'group' &&
           data.groups &&
           data.groups.length > 0 && (
@@ -353,147 +380,163 @@ const AppointmentTooltipContent = ({
   appointmentResources = [],
   formatDate,
   recurringIconComponent: RecurringIcon,
-}: AppointmentTooltipContentProps) => (
-  <Box sx={{ bgcolor: 'background.paper', lineHeight: 1.4, p: 2 }}>
-    <Grid container sx={{ alignItems: 'flex-start', pb: 2 }}>
-      <Grid
-        size={2}
-        sx={{ display: 'flex', justifyContent: 'center', pt: 0.25 }}>
-        <Box sx={{ height: 36, position: 'relative', width: 36 }}>
-          <Box
-            sx={{
-              bgcolor: getTooltipResourceColor(appointmentResources[0]?.color),
-              borderRadius: '50%',
-              height: '100%',
-              width: '100%',
-            }}
-          />
-          {appointmentData.rRule && (
+}: AppointmentTooltipContentProps) => {
+  const teacherNames = getAppointmentTeacherNames(appointmentData);
+
+  return (
+    <Box sx={{ bgcolor: 'background.paper', lineHeight: 1.4, p: 2 }}>
+      <Grid container sx={{ alignItems: 'flex-start', pb: 2 }}>
+        <Grid
+          size={2}
+          sx={{ display: 'flex', justifyContent: 'center', pt: 0.25 }}>
+          <Box sx={{ height: 36, position: 'relative', width: 36 }}>
             <Box
               sx={{
-                color: 'background.paper',
-                inset: 0,
-                position: 'absolute',
-              }}>
-              <RecurringIcon />
-            </Box>
-          )}
-        </Box>
+                bgcolor: getTooltipResourceColor(
+                  appointmentResources[0]?.color,
+                ),
+                borderRadius: '50%',
+                height: '100%',
+                width: '100%',
+              }}
+            />
+            {appointmentData.rRule && (
+              <Box
+                sx={{
+                  color: 'background.paper',
+                  inset: 0,
+                  position: 'absolute',
+                }}>
+                <RecurringIcon />
+              </Box>
+            )}
+          </Box>
+        </Grid>
+        <Grid size={10}>
+          <Typography sx={{ fontWeight: 500, lineHeight: 1.25 }}>
+            {appointmentData.title}
+          </Typography>
+          <Typography color="text.secondary" variant="body2">
+            {formatDate(appointmentData.startDate, dateFormatOptions)}
+          </Typography>
+        </Grid>
       </Grid>
-      <Grid size={10}>
-        <Typography sx={{ fontWeight: 500, lineHeight: 1.25 }}>
-          {appointmentData.title}
+
+      <TooltipRow icon={<AccessTimeIcon />}>
+        <Typography variant="body2">
+          {formatDate(appointmentData.startDate, timeFormatOptions)} –{' '}
+          {formatDate(appointmentData.endDate, timeFormatOptions)}
         </Typography>
-        <Typography color="text.secondary" variant="body2">
-          {formatDate(appointmentData.startDate, dateFormatOptions)}
-        </Typography>
-      </Grid>
-    </Grid>
+      </TooltipRow>
 
-    <TooltipRow icon={<AccessTimeIcon />}>
-      <Typography variant="body2">
-        {formatDate(appointmentData.startDate, timeFormatOptions)} –{' '}
-        {formatDate(appointmentData.endDate, timeFormatOptions)}
-      </Typography>
-    </TooltipRow>
+      {appointmentResources.map((resource) => (
+        <TooltipRow
+          icon={
+            <Box
+              sx={{
+                bgcolor: getTooltipResourceColor(resource.color),
+                borderRadius: '50%',
+                height: 12,
+                width: 12,
+              }}
+            />
+          }
+          key={`${resource.fieldName}_${resource.id}`}>
+          {resource.text}
+        </TooltipRow>
+      ))}
 
-    {appointmentResources.map((resource) => (
-      <TooltipRow
-        icon={
-          <Box
-            sx={{
-              bgcolor: getTooltipResourceColor(resource.color),
-              borderRadius: '50%',
-              height: 12,
-              width: 12,
-            }}
-          />
-        }
-        key={`${resource.fieldName}_${resource.id}`}>
-        {resource.text}
-      </TooltipRow>
-    ))}
-
-    {appointmentData.isDistant && (
-      <TooltipRow color={red[800]} icon={<OnlinePredictionIcon />}>
-        Дистант
-      </TooltipRow>
-    )}
-    {appointmentData.auditoryName && (
-      <TooltipRow icon={<RoomIcon />}>
-        <b>{appointmentData.auditoryName}</b>
-      </TooltipRow>
-    )}
-    {appointmentData.duration > 2 && (
-      <TooltipRow icon={<TimeIcon />}>
-        Продолжительность: <b>{appointmentData.duration} ч</b>
-      </TooltipRow>
-    )}
-    {appointmentData.type !== 0 && (
-      <TooltipRow icon={<LessonIcon />}>
-        Вид занятий:{' '}
-        <b>
-          {lessonsUtils.getLessonTypeStrArr(appointmentData.type).join(', ')}
-        </b>
-      </TooltipRow>
-    )}
-    {appointmentData.isStream && (
-      <TooltipRow icon={<StreamGroupsIcon />}>В потоке</TooltipRow>
-    )}
-    {appointmentData.isDivision && (
-      <TooltipRow icon={<DivisionGroupsIcon />}>По П/Г</TooltipRow>
-    )}
-    {appointmentData.scheduleFor !== 'teacher' &&
-      appointmentData.teacherName && (
+      {appointmentData.isDistant && (
+        <TooltipRow color={red[800]} icon={<OnlinePredictionIcon />}>
+          Дистант
+        </TooltipRow>
+      )}
+      {appointmentData.auditoryName && (
+        <TooltipRow icon={<RoomIcon />}>
+          <b>{appointmentData.auditoryName}</b>
+        </TooltipRow>
+      )}
+      {appointmentData.duration > 2 && (
+        <TooltipRow icon={<TimeIcon />}>
+          Продолжительность: <b>{appointmentData.duration} ч</b>
+        </TooltipRow>
+      )}
+      {appointmentData.type !== 0 && (
+        <TooltipRow icon={<LessonIcon />}>
+          Вид занятий:{' '}
+          <b>
+            {lessonsUtils.getLessonTypeStrArr(appointmentData.type).join(', ')}
+          </b>
+        </TooltipRow>
+      )}
+      {appointmentData.isStream && (
+        <TooltipRow icon={<StreamGroupsIcon />}>В потоке</TooltipRow>
+      )}
+      {appointmentData.isDivision && (
+        <TooltipRow icon={<DivisionGroupsIcon />}>По П/Г</TooltipRow>
+      )}
+      {appointmentData.scheduleFor !== 'teacher' && teacherNames.length > 0 && (
         <TooltipRow icon={<TeacherIcon />}>
-          {appointmentData.teacherName}
-          {appointmentData.additionalTeacherName &&
-            `/${appointmentData.additionalTeacherName}`}
+          {appointmentData.mergedVariantsCount ? (
+            <Box>
+              <Typography component="span" variant="body2">
+                Преподаватели:
+              </Typography>
+              <Box component="ul" sx={{ mb: 0, mt: 0.5, pl: 2.25 }}>
+                {teacherNames.map((teacherName) => (
+                  <li key={teacherName}>{teacherName}</li>
+                ))}
+              </Box>
+            </Box>
+          ) : (
+            teacherNames.join('/')
+          )}
         </TooltipRow>
       )}
-    {appointmentData.groups &&
-      (appointmentData.scheduleFor !== 'group' ||
-        appointmentData.groups.length > 1) &&
-      appointmentData.groups.length > 0 && (
-        <TooltipRow icon={<GroupsIcon />}>
-          {appointmentData.groups.join(', ')}
-        </TooltipRow>
-      )}
-    {appointmentData.subInfo && (
-      <TooltipRow icon={<InfoIcon />}>
-        {appointmentData.subInfo.startsWith('http') ? (
-          <a
-            href={appointmentData.subInfo}
-            target="_blank"
-            rel="noopener noreferrer">
+      {appointmentData.groups &&
+        (appointmentData.scheduleFor !== 'group' ||
+          appointmentData.groups.length > 1) &&
+        appointmentData.groups.length > 0 && (
+          <TooltipRow icon={<GroupsIcon />}>
+            {appointmentData.groups.join(', ')}
+          </TooltipRow>
+        )}
+      {appointmentData.subInfo && (
+        <TooltipRow icon={<InfoIcon />}>
+          {appointmentData.subInfo.startsWith('http') ? (
+            <a
+              href={appointmentData.subInfo}
+              target="_blank"
+              rel="noopener noreferrer">
+              <i>
+                <b>{appointmentData.subInfo}</b>
+              </i>
+            </a>
+          ) : (
             <i>
               <b>{appointmentData.subInfo}</b>
             </i>
-          </a>
-        ) : (
-          <i>
-            <b>{appointmentData.subInfo}</b>
-          </i>
-        )}
-      </TooltipRow>
-    )}
-    {appointmentData.parity !== WeekParityType.CUSTOM && (
-      <TooltipRow icon={<CalendarTodayIcon />}>
-        Только на{' '}
-        <b>
-          {appointmentData.parity === WeekParityType.EVEN ? '' : 'не'}четной
-        </b>{' '}
-        неделе
-      </TooltipRow>
-    )}
-    {!1 && isDev && (
-      <TooltipRow icon={<InfoIcon />}>
-        <code>{JSON.stringify(appointmentData)}</code>
-      </TooltipRow>
-    )}
-    {children}
-  </Box>
-);
+          )}
+        </TooltipRow>
+      )}
+      {appointmentData.parity !== WeekParityType.CUSTOM && (
+        <TooltipRow icon={<CalendarTodayIcon />}>
+          Только на{' '}
+          <b>
+            {appointmentData.parity === WeekParityType.EVEN ? '' : 'не'}четной
+          </b>{' '}
+          неделе
+        </TooltipRow>
+      )}
+      {!1 && isDev && (
+        <TooltipRow icon={<InfoIcon />}>
+          <code>{JSON.stringify(appointmentData)}</code>
+        </TooltipRow>
+      )}
+      {children}
+    </Box>
+  );
+};
 
 const TitleCellComponent = () => (
   <AllDayPanel.TitleCell
@@ -657,7 +700,7 @@ const SchedulerContainer: React.FC<MaterialSchedulerProps> = (props) => {
     const allowedLessonTypes: Partial<Record<LessonFlags, any>> = {};
     const data = [
       ...scheduleData.flatMap((data) =>
-        data.data.map((e) => {
+        mergeMassLessonVariants(data.data).map((e) => {
           for (const type of e.typeArr) {
             allowedLessonTypes[type] = true;
           }
