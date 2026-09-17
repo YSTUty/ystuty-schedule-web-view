@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://www.conventionalcommits.org/) for commit guidelines.
 
+## [0.3.7](https://github.com/YSTUty/ystuty-viewer-frontend/compare/v0.3.6...v0.3.7) (2026-09-17)
+
+### 🚀 Features
+
+* **scheduler:** merge mass subgroup lesson variants ([1d694f7](https://github.com/YSTUty/ystuty-viewer-frontend/commit/1d694f7857e7f4a1fe171a1dcb4d5342d792494b))
+* **schedule:** support new lesson type flags ([c2d3ff5](https://github.com/YSTUty/ystuty-viewer-frontend/commit/c2d3ff53284d286ad5a83aecbdf33894e8ea587a))
+
+### 🐛 Bug Fixes
+
+* **runtime:** remove unstable selectors and legacy default props ([cdb0897](https://github.com/YSTUty/ystuty-viewer-frontend/commit/cdb0897622676b254a9d2554cb99670aabcebaf1))
+* **scheduler:** improve responsive calendar toolbar ([2dba6dc](https://github.com/YSTUty/ystuty-viewer-frontend/commit/2dba6dc07f2433c119d88ed7a392dbd2c2e4a2f2))
+* **scheduler:** preserve filter toolbar and toggle states ([c4a6ea6](https://github.com/YSTUty/ystuty-viewer-frontend/commit/c4a6ea6eb1bee1311cba160614fd2e6d732692fe))
+
 ## [0.3.6](https://github.com/YSTUty/ystuty-viewer-frontend/compare/v0.3.5...v0.3.6) (2026-09-15)
 
 ### 🚀 Features
