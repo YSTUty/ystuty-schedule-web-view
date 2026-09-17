@@ -209,6 +209,16 @@ const TeacherLessonsTable = (props: { academicPeriodId?: string }) => {
               LessonFlags.Exam,
               LessonFlags.Library,
               LessonFlags.ResearchWork,
+              LessonFlags.OrganizationalMeeting,
+              LessonFlags.Practice,
+              LessonFlags.Event,
+              LessonFlags.MilitaryTraining,
+              LessonFlags.PhysicalTraining,
+              LessonFlags.Elective,
+              LessonFlags.External,
+              LessonFlags.Tenzor,
+              LessonFlags.School21,
+              LessonFlags.Unsupported,
             ];
 
             for (const group of item.groups!) {

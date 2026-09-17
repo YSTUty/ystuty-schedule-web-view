@@ -78,6 +78,14 @@ const LESSON_TYPES = [
   LessonFlags.Library,
   LessonFlags.ResearchWork,
   LessonFlags.OrganizationalMeeting,
+  LessonFlags.Practice,
+  LessonFlags.Event,
+  LessonFlags.MilitaryTraining,
+  LessonFlags.PhysicalTraining,
+  LessonFlags.Elective,
+  LessonFlags.External,
+  LessonFlags.Tenzor,
+  LessonFlags.School21,
   LessonFlags.Unsupported,
 ];
 const LESSON_TYPE_SHORT_NAMES = [
@@ -92,6 +100,14 @@ const LESSON_TYPE_SHORT_NAMES = [
   'БИБЛ',
   'НИР',
   'Соб',
+  'Прак',
+  'Соб',
+  'ВУЦ',
+  'Физ',
+  'Фак',
+  'Внеш',
+  'Тенз',
+  'Ш21',
   'N/A',
 ];
 const LESSON_TYPE_NAMES = [
@@ -106,6 +122,14 @@ const LESSON_TYPE_NAMES = [
   'Библиотека',
   'НИР',
   'Орг. собрание',
+  'Практика',
+  'Событие',
+  'ВУЦ',
+  'Физ. культура',
+  'Факультатив',
+  'Внешнее занятие',
+  'Тензор',
+  'Школа 21',
   'Другое',
 ];
 
