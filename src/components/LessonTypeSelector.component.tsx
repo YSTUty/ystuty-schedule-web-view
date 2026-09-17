@@ -1,8 +1,8 @@
 import classNames from 'clsx';
 
-import Button from '@mui/material/Button';
-import ButtonGroup from '@mui/material/ButtonGroup';
-import { styled } from '@mui/material/styles';
+import { alpha, styled } from '@mui/material/styles';
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 
 import { LessonFlags } from '@/interfaces/schedule';
 import { useDispatch, useSelector } from '@/store';
@@ -19,7 +19,7 @@ const classes = {
   shortButtonText: `${PREFIX}-shortButtonText`,
 };
 
-const StyledButtonGroup = styled(ButtonGroup)(
+const StyledButtonGroup = styled(ToggleButtonGroup)(
   ({ theme: { spacing, palette } }) => ({
     [`&.${classes.locationSelector}`]: {
       marginLeft: spacing(1),
@@ -51,16 +51,19 @@ const StyledButtonGroup = styled(ButtonGroup)(
         display: 'none',
       },
     },
-    [`& .${classes.selectedButton}`]: {
-      background: (palette.primary as any)[400],
-      color: (palette.primary as any)[50],
+    [`& .${classes.button}.${classes.selectedButton}`]: {
+      backgroundColor: alpha(palette.primary.main, 0.85),
+      borderColor: `${palette.primary.main}!important`,
+      color: palette.primary.contrastText,
       '&:hover': {
-        backgroundColor: (palette.primary as any)[500],
+        backgroundColor: palette.primary.dark,
       },
-      border: `1px solid ${(palette.primary as any)[400]}!important`,
-      borderLeft: `1px solid ${(palette.primary as any)[50]}!important`,
-      '&:first-of-type': {
-        borderLeft: `1px solid ${(palette.primary as any)[400]}!important`,
+      '&.Mui-selected': {
+        backgroundColor: alpha(palette.primary.main, 0.85),
+        color: palette.primary.contrastText,
+        '&:hover': {
+          backgroundColor: palette.primary.dark,
+        },
       },
     },
   }),
@@ -155,11 +158,12 @@ const LessonTypeSelector = (props: { isAudiencer?: boolean }) => {
         (type, index) =>
           !allowedLessonTypes ||
           (allowedLessonTypes.includes(type) && (
-            <Button
+            <ToggleButton
               className={classNames(
                 classes.button,
                 /* classes.longButtonText, */ getButtonClass(lessonTypes, type),
               )}
+              selected={lessonTypes.includes(type)}
               onClick={() =>
                 dispatch(
                   (props.isAudiencer
@@ -168,14 +172,15 @@ const LessonTypeSelector = (props: { isAudiencer?: boolean }) => {
                   ).actions.toggleSelectedTypeLessons(type),
                 )
               }
-              key={type}>
+              key={type}
+              value={String(type)}>
               <span className={classes.shortButtonText}>
                 {LESSON_TYPE_SHORT_NAMES[index]}
               </span>
               <span className={classes.longButtonText}>
                 {LESSON_TYPE_NAMES[index]}
               </span>
-            </Button>
+            </ToggleButton>
           )),
       )}
     </StyledButtonGroup>

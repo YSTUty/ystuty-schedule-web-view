@@ -544,13 +544,27 @@ const TitleCellComponent = () => (
   />
 );
 
-const getFlexibleSpace =
-  (
-    scheduleFor: ScheduleFor,
-    scheduleCached: boolean,
-    scheduleServerCached: boolean,
-  ) =>
-  ({ ...props }: Toolbar.FlexibleSpaceProps) => (
+type ToolbarContextValue = {
+  scheduleFor: ScheduleFor;
+  scheduleCached: boolean;
+  scheduleServerCached: boolean;
+};
+
+/**
+ * DevExpress размонтирует flexibleSpaceComponent при изменении ссылки на
+ * компонент. Контекст позволяет оставить ссылку стабильной и не мигать панели
+ * фильтра при каждом обновлении Redux.
+ */
+const ToolbarContext = React.createContext<ToolbarContextValue | null>(null);
+
+const ToolbarFlexibleSpace = (props: Toolbar.FlexibleSpaceProps) => {
+  const toolbarContext = React.useContext(ToolbarContext);
+
+  if (!toolbarContext) return null;
+
+  const { scheduleFor, scheduleCached, scheduleServerCached } = toolbarContext;
+
+  return (
     <StyledToolbarFlexibleSpace {...props} className={dxClasses.flexibleSpace}>
       <LessonFilter />
       <LessonTypeSelector />
@@ -587,6 +601,7 @@ const getFlexibleSpace =
       )}
     </StyledToolbarFlexibleSpace>
   );
+};
 
 const getResources = (
   scheduleFor: ScheduleFor,
@@ -782,79 +797,87 @@ const SchedulerContainer: React.FC<MaterialSchedulerProps> = (props) => {
           : 'auditoryName'
       : 'typeArr';
   const hasGroupingGroups = selectedItems.length > 1 && groupingGroups;
+  const toolbarContext = React.useMemo(
+    () => ({
+      scheduleFor,
+      scheduleCached,
+      scheduleServerCached,
+    }),
+    [scheduleCached, scheduleFor, scheduleServerCached],
+  );
 
   return (
-    <Paper style={{ height: 'calc(100vh - 56px)' }}>
-      <SchedulerWithPlugins locale="ru" data={dataMemo} firstDayOfWeek={1}>
-        <ViewState />
-        {hasGroupingGroups && (
-          <GroupingState
-            grouping={[{ resourceName: mainResourceName }]}
-            groupByDate={
-              !isGroupByDate
-                ? undefined
-                : (viewName) => viewName === 'Week' || viewName === 'Month'
-            }
+    <ToolbarContext.Provider value={toolbarContext}>
+      <Paper style={{ height: 'calc(100vh - 56px)' }}>
+        <SchedulerWithPlugins locale="ru" data={dataMemo} firstDayOfWeek={1}>
+          <ViewState />
+          {hasGroupingGroups && (
+            <GroupingState
+              grouping={[{ resourceName: mainResourceName }]}
+              groupByDate={
+                !isGroupByDate
+                  ? undefined
+                  : (viewName) => viewName === 'Week' || viewName === 'Month'
+              }
+            />
+          )}
+
+          <MonthView
+            displayName="Месяц"
+            dayScaleCellComponent={DayScaleCell}
+            timeTableCellComponent={getTimeTableCell(hasGroupingGroups)}
           />
-        )}
+          <WeekView
+            displayName="Неделя"
+            startDayHour={6}
+            endDayHour={23}
+            excludedDays={[0]}
+          />
+          <DayView
+            displayName="День"
+            startDayHour={6}
+            endDayHour={23}
+            intervalCount={1}
+          />
+          <AllDayPanel titleCellComponent={TitleCellComponent} />
 
-        <MonthView
-          displayName="Месяц"
-          dayScaleCellComponent={DayScaleCell}
-          timeTableCellComponent={getTimeTableCell(hasGroupingGroups)}
-        />
-        <WeekView
-          displayName="Неделя"
-          startDayHour={6}
-          endDayHour={23}
-          excludedDays={[0]}
-        />
-        <DayView
-          displayName="День"
-          startDayHour={6}
-          endDayHour={23}
-          intervalCount={1}
-        />
-        <AllDayPanel titleCellComponent={TitleCellComponent} />
-
-        <Appointments
-          appointmentComponent={Appointment as any}
-          appointmentContentComponent={AppointmentContent as any}
-        />
-        <AppointmentTooltip
-          contentComponent={AppointmentTooltipContent as any}
-        />
-        {/*
+          <Appointments
+            appointmentComponent={Appointment as any}
+            appointmentContentComponent={AppointmentContent as any}
+          />
+          <AppointmentTooltip
+            contentComponent={AppointmentTooltipContent as any}
+          />
+          {/*
           Редактирование расписания не поддерживается. AppointmentForm из
           dx-react-scheduler 3 использует несовместимый с MUI X 9 picker и
           открывается по двойному клику даже в режиме readOnly.
         */}
-        <Resources
-          data={getResources(scheduleFor, selectedItems)}
-          mainResourceName={mainResourceName}
-        />
+          <Resources
+            data={getResources(scheduleFor, selectedItems)}
+            mainResourceName={mainResourceName}
+          />
 
-        <CurrentTimeIndicator
-          shadePreviousCells
-          shadePreviousAppointments
-          updateInterval={60e3}
-        />
-        <Toolbar
-          {...(fetchingSchedule ? { rootComponent: ToolbarWithLoading } : null)}
-          flexibleSpaceComponent={getFlexibleSpace(
-            scheduleFor,
-            scheduleCached,
-            scheduleServerCached,
-          )}
-        />
-        <DateNavigator />
-        <ViewSwitcher />
-        <TodayButton messages={{ today: 'Сегодня' }} />
+          <CurrentTimeIndicator
+            shadePreviousCells
+            shadePreviousAppointments
+            updateInterval={60e3}
+          />
+          <Toolbar
+            {...(fetchingSchedule
+              ? { rootComponent: ToolbarWithLoading }
+              : null)}
+            flexibleSpaceComponent={ToolbarFlexibleSpace}
+          />
+          <DateNavigator />
+          <ViewSwitcher />
+          <TodayButton messages={{ today: 'Сегодня' }} />
 
-        {hasGroupingGroups && <IntegratedGrouping />}
-        {hasGroupingGroups && <GroupingPanel />}
-      </SchedulerWithPlugins>
-    </Paper>
+          {hasGroupingGroups && <IntegratedGrouping />}
+          {hasGroupingGroups && <GroupingPanel />}
+        </SchedulerWithPlugins>
+      </Paper>
+    </ToolbarContext.Provider>
   );
 };
 
