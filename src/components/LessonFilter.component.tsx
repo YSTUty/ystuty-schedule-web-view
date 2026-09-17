@@ -12,17 +12,24 @@ const classes = {
 
 const StyledTextField = styled(TextField)(({ theme: { spacing } }) => ({
   [`&.${classes.textField}`]: {
-    width: '75px',
-    '@media (min-width: 800px)': {
-      width: '90px',
-    },
-    '@media (min-width: 1200px)': {
-      width: '240px',
-    },
-    marginLeft: spacing(1),
+    flex: '0 1 240px',
+    minWidth: '90px',
     marginTop: 0,
     marginBottom: 0,
     height: spacing(4.875),
+
+    '@media (max-width: 1439.95px)': {
+      flexBasis: '90px',
+    },
+
+    '@media (max-width: 1023.95px)': {
+      flex: '1 1 160px',
+    },
+
+    '@media (max-width: 599.95px)': {
+      flex: '1 1 0',
+      minWidth: 0,
+    },
   },
 }));
 

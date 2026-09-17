@@ -46,8 +46,11 @@ const GroupGroupingControl: React.FC<GroupGroupingControlProps> = (props) => {
 
   const show = selectedItems.length > 1;
 
+  // Скрытый Collapse сохранял горизонтальные padding и занимал место в панели.
+  if (!show) return null;
+
   return (
-    <Collapse sx={{ px: 1 }} in={show}>
+    <Collapse sx={{ px: 1 }} in>
       <StyledToggleButtonGroup exclusive onChange={handleChange}>
         <ToggleButton
           value="groupingGroups"

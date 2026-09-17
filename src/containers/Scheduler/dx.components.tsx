@@ -2,8 +2,11 @@ import classNames from 'clsx';
 
 import {
   Appointments,
+  DateNavigator,
   MonthView,
+  TodayButton,
   Toolbar,
+  ViewSwitcher,
 } from '@devexpress/dx-react-scheduler-material-ui';
 
 import { red, yellow } from '@mui/material/colors';
@@ -26,6 +29,9 @@ export const classes = {
   icon: `${PREFIX}-icon`,
   textCenter: `${PREFIX}-textCenter`,
   toolbarRoot: `${PREFIX}-toolbarRoot`,
+  todayButton: `${PREFIX}-todayButton`,
+  dateNavigator: `${PREFIX}-dateNavigator`,
+  viewSwitcher: `${PREFIX}-viewSwitcher`,
   progress: `${PREFIX}-progress`,
   flexibleSpace: `${PREFIX}-flexibleSpace`,
   weekCellFullSize: `${PREFIX}-weekCellFullSize`,
@@ -103,13 +109,129 @@ export const StyledIcon = styled('div')(({ theme: { palette } }) => ({
   },
 }));
 
-export const StyledToolbarFlexibleSpace = styled(Toolbar.FlexibleSpace)(() => ({
-  [`&.${classes.flexibleSpace}`]: {
-    margin: '0 auto 0 0',
-    display: 'flex',
-    alignItems: 'center',
+export const ResponsiveToolbarRoot = styled(Toolbar.Root)(({ theme }) => ({
+  alignItems: 'center',
+  columnGap: theme.spacing(1),
+  display: 'grid',
+  gridTemplateAreas: '"today navigator filters view"',
+  gridTemplateColumns: 'auto auto minmax(0, 1fr) auto',
+  minHeight: theme.spacing(7),
+  paddingBottom: theme.spacing(0.5),
+  paddingTop: theme.spacing(0.5),
+  rowGap: theme.spacing(0.75),
+
+  [`& > .${classes.todayButton}`]: {
+    gridArea: 'today',
+  },
+  [`& > .${classes.dateNavigator}`]: {
+    gridArea: 'navigator',
+  },
+  [`& > .${classes.viewSwitcher}`]: {
+    gridArea: 'view',
+  },
+  [`& > .${classes.flexibleSpace}`]: {
+    gridArea: 'filters',
+  },
+
+  '@media (max-width: 1023.95px)': {
+    gridTemplateAreas: `
+      "today navigator view"
+      "filters filters filters"
+    `,
+    gridTemplateColumns: 'auto minmax(0, 1fr) auto',
+    paddingBottom: theme.spacing(0.75),
+    paddingTop: theme.spacing(0.75),
+  },
+
+  '@media (max-width: 599.95px)': {
+    columnGap: theme.spacing(0.5),
+    paddingLeft: theme.spacing(1),
+    paddingRight: theme.spacing(1),
   },
 }));
+
+const StyledResponsiveDateNavigatorRoot = styled(DateNavigator.Root)(
+  ({ theme }) => ({
+    alignItems: 'center',
+    display: 'inline-flex',
+    flexShrink: 0,
+    marginLeft: 0,
+    whiteSpace: 'nowrap',
+
+    '@media (max-width: 599.95px)': {
+      '& .MuiIconButton-root': {
+        height: theme.spacing(4),
+        padding: 0,
+        width: theme.spacing(4),
+      },
+    },
+  }),
+);
+
+const StyledResponsiveViewSwitcher = styled(ViewSwitcher.Switcher)(() => ({
+  flexShrink: 0,
+}));
+
+export const ResponsiveDateNavigatorRoot = (
+  props: DateNavigator.RootProps & { className?: string },
+) => (
+  <StyledResponsiveDateNavigatorRoot
+    {...props}
+    className={classNames(props.className, classes.dateNavigator)}
+  />
+);
+
+export const ResponsiveViewSwitcher = (
+  props: ViewSwitcher.SwitcherProps & { className?: string },
+) => (
+  <StyledResponsiveViewSwitcher
+    {...props}
+    className={classNames(props.className, classes.viewSwitcher)}
+  />
+);
+
+export const ResponsiveTodayButton = (
+  props: TodayButton.ButtonProps & { className?: string },
+) => (
+  <TodayButton.Button
+    {...props}
+    className={classNames(props.className, classes.todayButton)}
+  />
+);
+
+export const StyledToolbarFlexibleSpace = styled(Toolbar.FlexibleSpace)(
+  ({ theme }) => ({
+    [`&.${classes.flexibleSpace}`]: {
+      alignItems: 'center',
+      display: 'flex',
+      flex: '1 1 auto',
+      gap: theme.spacing(1),
+      margin: 0,
+      minWidth: 0,
+      width: 'auto',
+    },
+
+    '@media (max-width: 1023.95px)': {
+      flexBasis: '100%',
+      paddingBottom: theme.spacing(0.75),
+      width: '100%',
+    },
+
+    '@media (max-width: 599.95px)': {
+      gap: theme.spacing(0.75),
+    },
+  }),
+);
+
+export const ToolbarWithLoading = ({
+  children,
+  ...restProps
+}: Toolbar.RootProps) => (
+  <StyledDiv className={classes.toolbarRoot}>
+    <ResponsiveToolbarRoot {...restProps}>{children}</ResponsiveToolbarRoot>
+    <StyledLinearProgress className={classes.progress} />
+  </StyledDiv>
+);
 
 const StyledMonthViewDayScaleCell = styled(MonthView.DayScaleCell)(
   ({ theme: { palette } }) => ({
@@ -139,16 +261,6 @@ const StyledMonthViewTimeTableCell = styled(MonthView.TimeTableCell)(
       },
     },
   }),
-);
-
-export const ToolbarWithLoading = ({
-  children,
-  ...restProps
-}: Toolbar.RootProps) => (
-  <StyledDiv className={classes.toolbarRoot}>
-    <Toolbar.Root {...restProps}>{children}</Toolbar.Root>
-    <StyledLinearProgress className={classes.progress} />
-  </StyledDiv>
 );
 
 const isWeekEnd = (date: Date) => date.getDay() === 0;

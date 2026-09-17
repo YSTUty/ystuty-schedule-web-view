@@ -67,6 +67,10 @@ import {
   DayScaleCell,
   classes as dxClasses,
   getTimeTableCell,
+  ResponsiveDateNavigatorRoot,
+  ResponsiveTodayButton,
+  ResponsiveToolbarRoot,
+  ResponsiveViewSwitcher,
   StyledAppointmentsAppointment,
   StyledAppointmentsAppointmentContent,
   StyledToolbarFlexibleSpace,
@@ -864,14 +868,17 @@ const SchedulerContainer: React.FC<MaterialSchedulerProps> = (props) => {
             updateInterval={60e3}
           />
           <Toolbar
-            {...(fetchingSchedule
-              ? { rootComponent: ToolbarWithLoading }
-              : null)}
+            rootComponent={
+              fetchingSchedule ? ToolbarWithLoading : ResponsiveToolbarRoot
+            }
             flexibleSpaceComponent={ToolbarFlexibleSpace}
           />
-          <DateNavigator />
-          <ViewSwitcher />
-          <TodayButton messages={{ today: 'Сегодня' }} />
+          <DateNavigator rootComponent={ResponsiveDateNavigatorRoot} />
+          <ViewSwitcher switcherComponent={ResponsiveViewSwitcher} />
+          <TodayButton
+            buttonComponent={ResponsiveTodayButton}
+            messages={{ today: 'Сегодня' }}
+          />
 
           {hasGroupingGroups && <IntegratedGrouping />}
           {hasGroupingGroups && <GroupingPanel />}

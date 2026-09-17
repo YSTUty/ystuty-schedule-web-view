@@ -1,8 +1,16 @@
+import { useState } from 'react';
 import classNames from 'clsx';
 
+import Badge from '@mui/material/Badge';
+import Button from '@mui/material/Button';
+import Checkbox from '@mui/material/Checkbox';
+import ListItemText from '@mui/material/ListItemText';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 import { alpha, styled } from '@mui/material/styles';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import FilterListIcon from '@mui/icons-material/FilterList';
 
 import { LessonFlags } from '@/interfaces/schedule';
 import { useDispatch, useSelector } from '@/store';
@@ -17,35 +25,40 @@ const classes = {
   selectedButton: `${PREFIX}-selectedButton`,
   longButtonText: `${PREFIX}-longButtonText`,
   shortButtonText: `${PREFIX}-shortButtonText`,
+  mobileButton: `${PREFIX}-mobileButton`,
 };
 
 const StyledButtonGroup = styled(ToggleButtonGroup)(
   ({ theme: { spacing, palette } }) => ({
     [`&.${classes.locationSelector}`]: {
-      marginLeft: spacing(1),
-      height: spacing(4.875),
+      flex: '0 1 auto',
+      height: 'auto',
+      margin: 0,
+      maxWidth: '100%',
+      overflowX: 'auto',
     },
     [`& .${classes.longButtonText}`]: {
-      '@media (max-width: 1200px)': {
+      '@media (max-width: 1439.95px)': {
         display: 'none',
       },
     },
     [`& .${classes.shortButtonText}`]: {
-      '@media (min-width: 1200px)': {
+      '@media (min-width: 1440px)': {
         display: 'none',
       },
     },
     [`& .${classes.button}`]: {
+      flexShrink: 0,
+      minWidth: spacing(11),
       paddingLeft: spacing(1),
       paddingRight: spacing(1),
-      width: spacing(12),
-      '@media (max-width: 1200px)': {
-        width: spacing(2),
+      whiteSpace: 'nowrap',
+      '@media (max-width: 1439.95px)': {
+        minWidth: spacing(6),
         fontSize: '0.75rem',
       },
-      '@media (max-width: 800px)': {
-        width: spacing(1),
-        fontSize: '0.70rem',
+      '@media (max-width: 1023.95px)': {
+        minWidth: spacing(5.5),
       },
       '@media (max-width: 600px)': {
         display: 'none',
@@ -68,6 +81,19 @@ const StyledButtonGroup = styled(ToggleButtonGroup)(
     },
   }),
 );
+
+const MobileTypesButton = styled(Button)(({ theme: { spacing } }) => ({
+  [`&.${classes.mobileButton}`]: {
+    display: 'none',
+    flexShrink: 0,
+
+    '@media (max-width: 599.95px)': {
+      display: 'inline-flex',
+      marginLeft: 'auto',
+      minWidth: spacing(8),
+    },
+  },
+}));
 
 const LESSON_TYPES = [
   LessonFlags.Lecture,
@@ -136,42 +162,47 @@ const LESSON_TYPE_NAMES = [
   'Другое',
 ];
 
-const getButtonClass = (lessonTypes: LessonFlags[], type: LessonFlags) =>
-  lessonTypes.includes(type) && classes.selectedButton;
-
 const LessonTypeSelector = (props: { isAudiencer?: boolean }) => {
   let { lessonTypes, allowedLessonTypes } = useSelector(
     (state) => state.schedule,
   );
   const audiencerState = useSelector((state) => state.audiencer);
   const dispatch = useDispatch();
+  const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
 
   if (props.isAudiencer) {
     allowedLessonTypes = LESSON_TYPES;
     lessonTypes = audiencerState.lessonTypes;
   }
 
-  // TODO: add drop-down list for mobile
+  const visibleLessonTypes = LESSON_TYPES.filter(
+    (type) => !allowedLessonTypes || allowedLessonTypes.includes(type),
+  );
+  const selectedVisibleTypes = visibleLessonTypes.filter((type) =>
+    lessonTypes.includes(type),
+  );
+  const toggleLessonType = (type: LessonFlags) =>
+    dispatch(
+      (props.isAudiencer
+        ? audiencerSlice
+        : scheduleSlice
+      ).actions.toggleSelectedTypeLessons(type),
+    );
+
   return (
-    <StyledButtonGroup className={classes.locationSelector}>
-      {LESSON_TYPES.map(
-        (type, index) =>
-          !allowedLessonTypes ||
-          (allowedLessonTypes.includes(type) && (
+    <>
+      <StyledButtonGroup className={classes.locationSelector}>
+        {visibleLessonTypes.map((type) => {
+          const index = LESSON_TYPES.indexOf(type);
+
+          return (
             <ToggleButton
               className={classNames(
                 classes.button,
-                /* classes.longButtonText, */ getButtonClass(lessonTypes, type),
+                lessonTypes.includes(type) && classes.selectedButton,
               )}
               selected={lessonTypes.includes(type)}
-              onClick={() =>
-                dispatch(
-                  (props.isAudiencer
-                    ? audiencerSlice
-                    : scheduleSlice
-                  ).actions.toggleSelectedTypeLessons(type),
-                )
-              }
+              onClick={() => toggleLessonType(type)}
               key={type}
               value={String(type)}>
               <span className={classes.shortButtonText}>
@@ -181,9 +212,49 @@ const LessonTypeSelector = (props: { isAudiencer?: boolean }) => {
                 {LESSON_TYPE_NAMES[index]}
               </span>
             </ToggleButton>
-          )),
-      )}
-    </StyledButtonGroup>
+          );
+        })}
+      </StyledButtonGroup>
+      <MobileTypesButton
+        aria-controls={menuAnchor ? 'lesson-types-menu' : undefined}
+        aria-expanded={Boolean(menuAnchor)}
+        aria-haspopup="menu"
+        className={classes.mobileButton}
+        color="primary"
+        onClick={(event) => setMenuAnchor(event.currentTarget)}
+        startIcon={<FilterListIcon />}
+        variant="outlined">
+        <Badge
+          badgeContent={selectedVisibleTypes.length}
+          color="primary"
+          max={99}
+          showZero>
+          Типы
+        </Badge>
+      </MobileTypesButton>
+      <Menu
+        anchorEl={menuAnchor}
+        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+        id="lesson-types-menu"
+        onClose={() => setMenuAnchor(null)}
+        open={Boolean(menuAnchor)}
+        transformOrigin={{ horizontal: 'right', vertical: 'top' }}>
+        {visibleLessonTypes.map((type) => {
+          const index = LESSON_TYPES.indexOf(type);
+          const selected = lessonTypes.includes(type);
+
+          return (
+            <MenuItem
+              key={type}
+              onClick={() => toggleLessonType(type)}
+              selected={selected}>
+              <Checkbox checked={selected} edge="start" tabIndex={-1} />
+              <ListItemText primary={LESSON_TYPE_NAMES[index]} />
+            </MenuItem>
+          );
+        })}
+      </Menu>
+    </>
   );
 };
 
