@@ -23,6 +23,7 @@ import {
   selectScheduleItems,
 } from '@/store/reducer/schedule/schedule.selectors';
 import scheduleSlice from '@/store/reducer/schedule/schedule.slice';
+import { getScheduleLessonTitle } from './schedule-title.utils';
 
 export const useScheduleLoader = (props: {
   scheduleFor: ScheduleFor | null;
@@ -81,7 +82,10 @@ export const useScheduleLoader = (props: {
                   ...lesson,
                   start: lesson.startAt!,
                   end: lesson.endAt!,
-                  title: lesson.lessonName || '...',
+                  title: getScheduleLessonTitle(
+                    lesson.lessonName,
+                    lesson.subInfo,
+                  ),
                   typeArr: (Object.values(LessonFlags) as LessonFlags[]).filter(
                     (e) => (lesson.type & e) === e && e !== LessonFlags.None,
                   ),
