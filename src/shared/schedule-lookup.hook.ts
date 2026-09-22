@@ -3,7 +3,9 @@ import { useIntl } from 'react-intl';
 import { useNetworkState } from 'react-use';
 import store2 from 'store2';
 
+import type { ScheduleCacheableResponse } from '@/interfaces/schedule-api.dto';
 import { useApi } from '@/shared/api.hook';
+import { getScheduleCacheState } from '@/shared/schedule-api';
 import {
   getCachedLookup,
   setCachedLookup,
@@ -15,9 +17,8 @@ import {
 import { useDispatch } from '@/store';
 import alertSlice from '@/store/reducer/alert/alert.slice';
 
-export type ScheduleLookupResponse<T> = {
+export type ScheduleLookupResponse<T> = ScheduleCacheableResponse & {
   items: T[];
-  isCache?: boolean;
 };
 
 /**
@@ -35,7 +36,6 @@ export type ScheduleLookupConfig<
   writeLegacyCacheOnApiSuccess?: boolean;
   normalizeItems?: (items: T[]) => T[];
   getItems?: (response: TResponse) => T[];
-  isServerCached?: (response: TResponse) => boolean;
 };
 
 type ScheduleLookupState<T> = {
@@ -187,15 +187,14 @@ export function useScheduleLookup<
         const responseItems = config.getItems
           ? config.getItems(responseData)
           : responseData.items;
-        const serverCached = config.isServerCached
-          ? config.isServerCached(responseData)
-          : responseData.isCache === true;
+        const { isCached: isServerCached } =
+          getScheduleCacheState(responseData);
 
         applyItems(responseItems, {
           // Серверный кэш тоже отмечаем как кэш в интерфейсе. Так сохраняется
           // прежняя маркировка «кэш*», где звёздочка поясняет источник данных.
-          isCached: serverCached,
-          isServerCached: serverCached,
+          isCached: isServerCached,
+          isServerCached,
         });
         setMemoryCachedLookup(config.cacheKey, responseItems);
 

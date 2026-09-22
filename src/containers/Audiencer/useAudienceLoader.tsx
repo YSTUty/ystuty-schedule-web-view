@@ -1,8 +1,10 @@
 import React from 'react';
 import store2 from 'store2';
 
+import type { ActualAudiencesResponseDto } from '@/interfaces/schedule-api.dto';
 import { AccumulativeSchedule, IAudienceData } from '@/interfaces/ystuty.types';
 import { useApi } from '@/shared/api.hook';
+import { scheduleApi } from '@/shared/schedule-api';
 import { useDispatch } from '@/store';
 import alertSlice from '@/store/reducer/alert/alert.slice';
 import audiencerSlice from '@/store/reducer/audiencer/audiencer.slice';
@@ -79,12 +81,8 @@ const useAudienceLoader = () => {
     if (isFetchings['actual_audiences']) return;
 
     try {
-      const response = await fetchApi<{
-        isCache: boolean;
-        items: IAudienceData[];
-        count: number;
-      }>(
-        `v1/schedule/actual_audiences`,
+      const response = await fetchApi<ActualAudiencesResponseDto>(
+        scheduleApi.actualAudiences(),
         {},
         {
           fKey: 'actual_audiences',

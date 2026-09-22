@@ -13,7 +13,8 @@ import {
   ServerCacheTooltip,
   shouldIgnoreAutocompleteRemoval,
 } from '@components/ScheduleSelector.shared';
-import { IInstituteGroupsData } from '@/interfaces/ystuty.types';
+import type { ActualGroupsResponseDto } from '@/interfaces/schedule-api.dto';
+import { scheduleApi } from '@/shared/schedule-api';
 import {
   ScheduleLookupConfig,
   useScheduleLookup,
@@ -33,17 +34,12 @@ import { StyledAutocomplete } from './StylePulseAnimation.component';
 // const STORE_CACHED_INSTITUTES_KEY_OLD = 'CACHED_INSTITUTES';
 const STORE_CACHED_INSTITUTES_KEY = 'CACHED_V3_INSTITUTES::';
 const INSTITUTES_CACHE_KEY = 'actual-groups';
-type GroupsLookupResponse = {
-  name: string;
-  items: IInstituteGroupsData[];
-  isCache: boolean;
-};
 
 const GROUPS_LOOKUP: ScheduleLookupConfig<
-  IInstituteGroupsData,
-  GroupsLookupResponse
+  ActualGroupsResponseDto['items'][number],
+  ActualGroupsResponseDto
 > = {
-  apiPath: 'v1/schedule/actual_groups',
+  apiPath: scheduleApi.actualGroups(),
   cacheKey: INSTITUTES_CACHE_KEY,
   cachedMessage: 'Используется сохранённый список групп.',
   legacyStorageKey: STORE_CACHED_INSTITUTES_KEY,

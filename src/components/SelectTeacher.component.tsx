@@ -13,7 +13,8 @@ import {
   ServerCacheTooltip,
   shouldIgnoreAutocompleteRemoval,
 } from '@components/ScheduleSelector.shared';
-import { ITeacherData } from '@/interfaces/ystuty.types';
+import type { ActualTeachersResponseDto } from '@/interfaces/schedule-api.dto';
+import { scheduleApi } from '@/shared/schedule-api';
 import {
   getScheduleLookupSnapshot,
   ScheduleLookupConfig,
@@ -31,16 +32,12 @@ import { StyledAutocomplete } from './StylePulseAnimation.component';
 // const STORE_CACHED_TEACHERS_KEY_OLD = 'cachedTeachers';
 const STORE_CACHED_TEACHERS_KEY = 'CACHED_V3_TEACHERS::';
 const TEACHERS_CACHE_KEY = 'actual-teachers';
-type TeachersLookupResponse = {
-  isCache?: boolean;
-  items: ITeacherData[];
-};
 
 const TEACHERS_LOOKUP: ScheduleLookupConfig<
-  ITeacherData,
-  TeachersLookupResponse
+  ActualTeachersResponseDto['items'][number],
+  ActualTeachersResponseDto
 > = {
-  apiPath: 'v1/schedule/actual_teachers',
+  apiPath: scheduleApi.actualTeachers(),
   cacheKey: TEACHERS_CACHE_KEY,
   cachedMessage: 'Используется сохранённый список преподавателей.',
   legacyStorageKey: STORE_CACHED_TEACHERS_KEY,

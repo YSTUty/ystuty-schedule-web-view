@@ -3,8 +3,13 @@ import { useDebounce } from 'react-use';
 import store2 from 'store2';
 
 import { LessonData, LessonFlags, OneWeekDto } from '@/interfaces/schedule';
-import { ITeacherData, ScheduleFor } from '@/interfaces/ystuty.types';
+import type {
+  ScheduleItemsResponseDto,
+  TeacherScheduleResponseDto,
+} from '@/interfaces/schedule-api.dto';
+import { ScheduleFor } from '@/interfaces/ystuty.types';
 import { useApi } from '@/shared/api.hook';
+import { getScheduleCacheState, scheduleApi } from '@/shared/schedule-api';
 import {
   getCachedSchedule,
   setCachedSchedule,
@@ -179,12 +184,10 @@ export const useScheduleLoader = (props: {
       }
 
       try {
-        const response = await fetchApi<{
-          isCache: boolean;
-          items: OneWeekDto[];
-          teacher?: ITeacherData;
-        }>(
-          `v1/schedule/${scheduleFor}/${itemKey}`,
+        const response = await fetchApi<
+          ScheduleItemsResponseDto | TeacherScheduleResponseDto
+        >(
+          scheduleApi.schedule(scheduleFor, itemKey),
           {},
           {
             fKey: `${scheduleFor}/${itemKey}`,
@@ -216,12 +219,15 @@ export const useScheduleLoader = (props: {
 
         const loadedAt = Date.now();
         const sources = formatData(itemKey, response.data.items, loadedAt);
+        const { isCached: isServerCached } = getScheduleCacheState(
+          response.data,
+        );
         setMemoryCachedSchedule(scheduleFor, itemKey, {
           sources,
           time: loadedAt,
         });
-        setIsCached(response.data.isCache);
-        setIsServerCached(response.data.isCache);
+        setIsCached(isServerCached);
+        setIsServerCached(isServerCached);
         void setCachedSchedule(scheduleFor, itemKey, response.data.items);
         notifyTelegramResult('success');
       } catch (err) {

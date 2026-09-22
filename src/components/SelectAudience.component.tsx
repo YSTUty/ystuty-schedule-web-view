@@ -13,7 +13,8 @@ import {
   ServerCacheTooltip,
   shouldIgnoreAutocompleteRemoval,
 } from '@components/ScheduleSelector.shared';
-import { IAudienceData } from '@/interfaces/ystuty.types';
+import type { ActualAudiencesResponseDto } from '@/interfaces/schedule-api.dto';
+import { scheduleApi } from '@/shared/schedule-api';
 import {
   ScheduleLookupConfig,
   useScheduleLookup,
@@ -32,17 +33,12 @@ import { StyledAutocomplete } from './StylePulseAnimation.component';
 
 const STORE_CACHED_AUDIENCE_KEY = 'CACHED_V1_AUDIENCE::';
 const AUDIENCES_CACHE_KEY = 'actual-audiences';
-type AudiencesLookupResponse = {
-  count: number;
-  isCache: boolean;
-  items: IAudienceData[];
-};
 
 const AUDIENCES_LOOKUP: ScheduleLookupConfig<
-  IAudienceData,
-  AudiencesLookupResponse
+  ActualAudiencesResponseDto['items'][number],
+  ActualAudiencesResponseDto
 > = {
-  apiPath: 'v1/schedule/actual_audiences',
+  apiPath: scheduleApi.actualAudiences(),
   cacheKey: AUDIENCES_CACHE_KEY,
   cachedMessage: 'Используется сохранённый список аудиторий.',
   legacyStorageKey: STORE_CACHED_AUDIENCE_KEY,
