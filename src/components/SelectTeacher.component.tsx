@@ -1,7 +1,5 @@
 import React from 'react';
-import { useIntl } from 'react-intl';
 import { useLocation, useNavigate } from 'react-router';
-import { useNetworkState } from 'react-use';
 import store2 from 'store2';
 import classNames from 'clsx';
 
@@ -16,19 +14,14 @@ import {
   shouldIgnoreAutocompleteRemoval,
 } from '@components/ScheduleSelector.shared';
 import { ITeacherData } from '@/interfaces/ystuty.types';
-import { useApi } from '@/shared/api.hook';
 import {
-  getCachedLookup,
-  setCachedLookup,
-} from '@/shared/schedule-cache.storage';
-import {
-  getMemoryCachedLookup,
-  setMemoryCachedLookup,
-} from '@/shared/schedule-lookup-memory-cache';
+  getScheduleLookupSnapshot,
+  ScheduleLookupConfig,
+  useScheduleLookup,
+} from '@/shared/schedule-lookup.hook';
 import { getTeacherSelectionPathRoute } from '@/shared/schedule-routing.utils';
 import { notifyTelegramSelectionChanged } from '@/shared/telegram/telegram.sdk';
 import { useDispatch, useSelector } from '@/store';
-import alertSlice from '@/store/reducer/alert/alert.slice';
 import scheduleSlice, {
   getLastTeachers,
   STORE_TEACHER_NAME_KEY,
@@ -38,17 +31,29 @@ import { StyledAutocomplete } from './StylePulseAnimation.component';
 // const STORE_CACHED_TEACHERS_KEY_OLD = 'cachedTeachers';
 const STORE_CACHED_TEACHERS_KEY = 'CACHED_V3_TEACHERS::';
 const TEACHERS_CACHE_KEY = 'actual-teachers';
+type TeachersLookupResponse = {
+  isCache?: boolean;
+  items: ITeacherData[];
+};
 
-export const getTeachers = () =>
-  getMemoryCachedLookup<ITeacherData[]>(TEACHERS_CACHE_KEY) ??
-  (store2.get(STORE_CACHED_TEACHERS_KEY, null) as ITeacherData[] | null);
+const TEACHERS_LOOKUP: ScheduleLookupConfig<
+  ITeacherData,
+  TeachersLookupResponse
+> = {
+  apiPath: 'v1/schedule/actual_teachers',
+  cacheKey: TEACHERS_CACHE_KEY,
+  cachedMessage: 'Используется сохранённый список преподавателей.',
+  legacyStorageKey: STORE_CACHED_TEACHERS_KEY,
+  writeLegacyCacheOnApiSuccess: true,
+};
+
+export const getTeachers = () => getScheduleLookupSnapshot(TEACHERS_LOOKUP);
 
 export const SelectTeacherComponent = (props: {
   allowMultipleRef: AllowMultipleRef;
 }) => {
   const { allowMultipleRef } = props;
   const dispatch = useDispatch();
-  const { formatMessage } = useIntl();
   const { fetchingSchedule } = useSelector((state) => state.schedule);
   const allowedMultiple = useSelector(
     (state) => state.schedule.allowedMultiple.teacher,
@@ -56,19 +61,8 @@ export const SelectTeacherComponent = (props: {
   const selected = useSelector(
     (state) => state.schedule.selectedItems.teacher,
   ) as number[];
-  const { online, previous: previousOnline } = useNetworkState();
-
   const { pathname, search, hash } = useLocation();
   const navigate = useNavigate();
-
-  const [teachers, setTeachers] = React.useState<ITeacherData[]>(
-    () => getMemoryCachedLookup<ITeacherData[]>(TEACHERS_CACHE_KEY) ?? [],
-  );
-  const [fetchApi, isFetching] = useApi();
-  const [isCached, setIsCached] = React.useState(
-    () => getMemoryCachedLookup<ITeacherData[]>(TEACHERS_CACHE_KEY) !== null,
-  );
-  const [isServerCached, setIsServerCached] = React.useState(false);
 
   const defaultValues: number[] = React.useMemo(() => {
     const teacherIds = getLastTeachers();
@@ -81,152 +75,11 @@ export const SelectTeacherComponent = (props: {
     return values;
   }, [pathname]);
 
-  const applyTeachers = React.useCallback(
-    (items: ITeacherData[] | null, isCache = false, isServerCache = false) => {
-      if (!items) {
-        return;
-      }
-
-      setIsCached(isCache);
-      setIsServerCached(isServerCache);
-
-      if (!isCache && items.length > 0) {
-        store2.set(STORE_CACHED_TEACHERS_KEY, items);
-      }
-
-      // items.sort();
-      setTeachers(items);
-    },
-    [setTeachers, setIsCached, setIsServerCached],
-  );
-
-  const loadCachedTeachers = React.useCallback(async () => {
-    const cachedItems =
-      await getCachedLookup<ITeacherData[]>(TEACHERS_CACHE_KEY);
-    if (cachedItems) {
-      applyTeachers(cachedItems, true);
-      setMemoryCachedLookup(TEACHERS_CACHE_KEY, cachedItems);
-      return true;
-    }
-
-    const legacyItems = store2.get(STORE_CACHED_TEACHERS_KEY, null) as
-      | ITeacherData[]
-      | null;
-    if (!legacyItems) {
-      return false;
-    }
-
-    applyTeachers(legacyItems, true);
-    setMemoryCachedLookup(TEACHERS_CACHE_KEY, legacyItems);
-    if (await setCachedLookup(TEACHERS_CACHE_KEY, legacyItems)) {
-      store2.remove(STORE_CACHED_TEACHERS_KEY);
-    }
-    return true;
-  }, [applyTeachers]);
-
-  const notifyCachedTeachers = React.useCallback(() => {
-    dispatch(
-      alertSlice.actions.add({
-        message: 'Используется сохранённый список преподавателей.',
-        severity: 'warning',
-      }),
-    );
-  }, [dispatch]);
-
-  const loadTeachersList = React.useCallback(
-    async (forceRefresh = false) => {
-      if (isFetching) return;
-
-      const memoryCachedItems =
-        !forceRefresh &&
-        getMemoryCachedLookup<ITeacherData[]>(TEACHERS_CACHE_KEY);
-      if (memoryCachedItems) {
-        applyTeachers(memoryCachedItems, true);
-        return;
-      }
-
-      if (!online) {
-        if (await loadCachedTeachers()) {
-          notifyCachedTeachers();
-        }
-        return;
-      }
-
-      try {
-        const response = await fetchApi<{
-          isCache?: boolean;
-          items: ITeacherData[];
-        }>(
-          `v1/schedule/actual_teachers`,
-          {},
-          {
-            setError: (message, options) =>
-              dispatch(
-                alertSlice.actions.add({
-                  message: `Error: ${message}`,
-                  severity: 'warning',
-                  toastAutoClose: options?.toastAutoClose,
-                }),
-              ),
-          },
-        );
-
-        // `null` означает отменённый или уже заблокированный запрос. Например,
-        // это происходит при проверочном размонтировании React.StrictMode.
-        // В таком случае не считаем API недоступным и не показываем toast.
-        if (!response) {
-          return;
-        }
-
-        if ('error' in response) {
-          if (await loadCachedTeachers()) {
-            notifyCachedTeachers();
-          }
-          return;
-        }
-
-        if (!('data' in response)) {
-          return;
-        }
-
-        applyTeachers(
-          response.data.items,
-          response.data.isCache ?? false,
-          response.data.isCache ?? false,
-        );
-        setMemoryCachedLookup(TEACHERS_CACHE_KEY, response.data.items);
-        void setCachedLookup(TEACHERS_CACHE_KEY, response.data.items).then(
-          (isStored) => {
-            if (isStored) {
-              store2.remove(STORE_CACHED_TEACHERS_KEY);
-            }
-          },
-        );
-      } catch (err) {
-        // При недоступности API сохраняем возможность выбрать преподавателя
-        // из последнего успешно сохранённого справочника.
-        const isCacheRestored = await loadCachedTeachers();
-        if (isCacheRestored) {
-          notifyCachedTeachers();
-        } else if (online) {
-          dispatch(
-            alertSlice.actions.add({
-              message: `Error: ${(err as Error).message}`,
-              severity: 'error',
-            }),
-          );
-        } else {
-          dispatch(
-            alertSlice.actions.add({
-              message: formatMessage({ id: 't.api.offline.error' }),
-              severity: 'warning',
-            }),
-          );
-        }
-      }
-    },
-    [applyTeachers, loadCachedTeachers, notifyCachedTeachers, online],
-  );
+  const {
+    items: teachers,
+    isCached,
+    isServerCached,
+  } = useScheduleLookup(TEACHERS_LOOKUP);
 
   const onChangeValues = React.useCallback(
     (value: number | number[] | null) => {
@@ -306,11 +159,6 @@ export const SelectTeacherComponent = (props: {
       fixSelected(defaultValues);
     }
   }, [defaultValues]);
-
-  React.useEffect(() => {
-    const isNetworkRestored = previousOnline === false && online === true;
-    void loadTeachersList(isNetworkRestored);
-  }, [online, previousOnline]);
 
   React.useEffect(() => {
     allowMultipleRef.current = allowMultiple;

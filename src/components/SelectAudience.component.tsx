@@ -1,7 +1,5 @@
 import React from 'react';
-import { useIntl } from 'react-intl';
 import { useLocation, useNavigate } from 'react-router';
-import { useNetworkState } from 'react-use';
 import store2 from 'store2';
 import classNames from 'clsx';
 
@@ -16,22 +14,16 @@ import {
   shouldIgnoreAutocompleteRemoval,
 } from '@components/ScheduleSelector.shared';
 import { IAudienceData } from '@/interfaces/ystuty.types';
-import { useApi } from '@/shared/api.hook';
 import {
-  getCachedLookup,
-  setCachedLookup,
-} from '@/shared/schedule-cache.storage';
-import {
-  getMemoryCachedLookup,
-  setMemoryCachedLookup,
-} from '@/shared/schedule-lookup-memory-cache';
+  ScheduleLookupConfig,
+  useScheduleLookup,
+} from '@/shared/schedule-lookup.hook';
 import {
   buildSchedulePath,
   getScheduleSelectionFromPathname,
 } from '@/shared/schedule-routing.utils';
 import { notifyTelegramSelectionChanged } from '@/shared/telegram/telegram.sdk';
 import { useDispatch, useSelector } from '@/store';
-import alertSlice from '@/store/reducer/alert/alert.slice';
 import scheduleSlice, {
   getLastAudiences,
   STORE_AUDIENCE_NAME_KEY,
@@ -40,13 +32,42 @@ import { StyledAutocomplete } from './StylePulseAnimation.component';
 
 const STORE_CACHED_AUDIENCE_KEY = 'CACHED_V1_AUDIENCE::';
 const AUDIENCES_CACHE_KEY = 'actual-audiences';
+type AudiencesLookupResponse = {
+  count: number;
+  isCache: boolean;
+  items: IAudienceData[];
+};
+
+const AUDIENCES_LOOKUP: ScheduleLookupConfig<
+  IAudienceData,
+  AudiencesLookupResponse
+> = {
+  apiPath: 'v1/schedule/actual_audiences',
+  cacheKey: AUDIENCES_CACHE_KEY,
+  cachedMessage: 'Используется сохранённый список аудиторий.',
+  legacyStorageKey: STORE_CACHED_AUDIENCE_KEY,
+  normalizeItems: (items) =>
+    items.sort((a, b) => {
+      const [a1, a2] = a.name.split('-');
+      const [b1, b2] = b.name.split('-');
+      if (a1 === b1) {
+        const a2n = Number(a2);
+        const b2n = Number(b2);
+        if (Number.isNaN(a2n) || Number.isNaN(b2n)) {
+          return a2.localeCompare(b2);
+        }
+        return a2n - b2n;
+      }
+      return a1.localeCompare(b1);
+    }),
+  writeLegacyCacheOnApiSuccess: true,
+};
 
 export const SelectAudienceComponent = (props: {
   allowMultipleRef: AllowMultipleRef;
 }) => {
   const { allowMultipleRef } = props;
   const dispatch = useDispatch();
-  const { formatMessage } = useIntl();
   const { fetchingSchedule } = useSelector((state) => state.schedule);
   const allowedMultiple = useSelector(
     (state) => state.schedule.allowedMultiple.audience,
@@ -55,7 +76,6 @@ export const SelectAudienceComponent = (props: {
     (state) => state.schedule.selectedItems['audience'],
   );
 
-  const { online, previous: previousOnline } = useNetworkState();
   const { pathname, search, hash } = useLocation();
   const navigate = useNavigate();
   const defaultValues = React.useMemo(() => {
@@ -68,176 +88,11 @@ export const SelectAudienceComponent = (props: {
     return values;
   }, [pathname]);
 
-  const [audiences, setAudiences] = React.useState<IAudienceData[]>(
-    () => getMemoryCachedLookup<IAudienceData[]>(AUDIENCES_CACHE_KEY) ?? [],
-  );
-  const [isCached, setIsCached] = React.useState(
-    () => getMemoryCachedLookup<IAudienceData[]>(AUDIENCES_CACHE_KEY) !== null,
-  );
-  const [isServerCached, setIsServerCached] = React.useState(false);
-  const [fetchApi, isFetching] = useApi();
-
-  const applyAudiences = React.useCallback(
-    (items: IAudienceData[] | null, isCache = false, isServerCache = false) => {
-      if (!items) {
-        return;
-      }
-
-      setIsCached(isCache);
-      setIsServerCached(isServerCache);
-
-      if (!isCache && items.length > 0) {
-        store2.set(STORE_CACHED_AUDIENCE_KEY, items);
-      }
-
-      items.sort((a, b) => {
-        const [a1, a2] = a.name.split('-');
-        const [b1, b2] = b.name.split('-');
-        if (a1 === b1) {
-          const a2n = Number(a2);
-          const b2n = Number(b2);
-          if (isNaN(a2n) || isNaN(b2n)) {
-            return a2.localeCompare(b2);
-          }
-          return a2n - b2n;
-        }
-        return a1.localeCompare(b1);
-      });
-
-      // dispatch(audiencerSlice.actions.setAudiences(items));
-      setAudiences(items);
-    },
-    [setAudiences, setIsCached, setIsServerCached],
-  );
-
-  const loadCachedAudiences = React.useCallback(async () => {
-    const cachedItems =
-      await getCachedLookup<IAudienceData[]>(AUDIENCES_CACHE_KEY);
-    if (cachedItems) {
-      applyAudiences(cachedItems, true);
-      setMemoryCachedLookup(AUDIENCES_CACHE_KEY, cachedItems);
-      return true;
-    }
-
-    const legacyItems = store2.get(STORE_CACHED_AUDIENCE_KEY, null) as
-      | IAudienceData[]
-      | null;
-    if (!legacyItems) {
-      return false;
-    }
-
-    applyAudiences(legacyItems, true);
-    setMemoryCachedLookup(AUDIENCES_CACHE_KEY, legacyItems);
-    if (await setCachedLookup(AUDIENCES_CACHE_KEY, legacyItems)) {
-      store2.remove(STORE_CACHED_AUDIENCE_KEY);
-    }
-    return true;
-  }, [applyAudiences]);
-
-  const notifyCachedAudiences = React.useCallback(() => {
-    dispatch(
-      alertSlice.actions.add({
-        message: 'Используется сохранённый список аудиторий.',
-        severity: 'warning',
-      }),
-    );
-  }, [dispatch]);
-
-  const loadAudiences = React.useCallback(
-    async (forceRefresh = false) => {
-      if (isFetching) return;
-
-      const memoryCachedItems =
-        !forceRefresh &&
-        getMemoryCachedLookup<IAudienceData[]>(AUDIENCES_CACHE_KEY);
-      if (memoryCachedItems) {
-        applyAudiences(memoryCachedItems, true);
-        return;
-      }
-
-      if (!online) {
-        if (await loadCachedAudiences()) {
-          notifyCachedAudiences();
-        }
-        return;
-      }
-
-      try {
-        const response = await fetchApi<{
-          isCache: boolean;
-          items: IAudienceData[];
-          count: number;
-        }>(
-          `v1/schedule/actual_audiences`,
-          {},
-          {
-            setError: (message, options) =>
-              dispatch(
-                alertSlice.actions.add({
-                  message: `Error: ${message}`,
-                  severity: 'warning',
-                  toastAutoClose: options?.toastAutoClose,
-                }),
-              ),
-          },
-        );
-
-        // `null` означает отменённый или уже заблокированный запрос. Например,
-        // это происходит при проверочном размонтировании React.StrictMode.
-        // В таком случае не считаем API недоступным и не показываем toast.
-        if (!response) {
-          return;
-        }
-
-        if ('error' in response) {
-          if (await loadCachedAudiences()) {
-            notifyCachedAudiences();
-          }
-          return;
-        }
-
-        if (!('data' in response)) {
-          return;
-        }
-
-        applyAudiences(
-          response.data.items,
-          response.data.isCache,
-          response.data.isCache,
-        );
-        setMemoryCachedLookup(AUDIENCES_CACHE_KEY, response.data.items);
-        void setCachedLookup(AUDIENCES_CACHE_KEY, response.data.items).then(
-          (isStored) => {
-            if (isStored) {
-              store2.remove(STORE_CACHED_AUDIENCE_KEY);
-            }
-          },
-        );
-      } catch (err) {
-        // При недоступности API сохраняем возможность выбрать аудиторию
-        // из последнего успешно сохранённого справочника.
-        const isCacheRestored = await loadCachedAudiences();
-        if (isCacheRestored) {
-          notifyCachedAudiences();
-        } else if (online) {
-          dispatch(
-            alertSlice.actions.add({
-              message: `Error: ${(err as Error).message}`,
-              severity: 'error',
-            }),
-          );
-        } else {
-          dispatch(
-            alertSlice.actions.add({
-              message: formatMessage({ id: 't.api.offline.error' }),
-              severity: 'warning',
-            }),
-          );
-        }
-      }
-    },
-    [applyAudiences, loadCachedAudiences, notifyCachedAudiences, online],
-  );
+  const {
+    items: audiences,
+    isCached,
+    isServerCached,
+  } = useScheduleLookup(AUDIENCES_LOOKUP);
 
   const onChangeValues = React.useCallback(
     (value: string | string[] | null) => {
@@ -331,11 +186,6 @@ export const SelectAudienceComponent = (props: {
       fixSelected(defaultValues);
     }
   }, [defaultValues]);
-
-  React.useEffect(() => {
-    const isNetworkRestored = previousOnline === false && online === true;
-    void loadAudiences(isNetworkRestored);
-  }, [online, previousOnline]);
 
   React.useEffect(() => {
     allowMultipleRef.current = allowMultiple;

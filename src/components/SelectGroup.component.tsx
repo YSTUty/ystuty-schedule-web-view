@@ -1,7 +1,5 @@
 import React from 'react';
-import { useIntl } from 'react-intl';
 import { useLocation, useNavigate } from 'react-router';
-import { useNetworkState } from 'react-use';
 import store2 from 'store2';
 import classNames from 'clsx';
 
@@ -16,22 +14,16 @@ import {
   shouldIgnoreAutocompleteRemoval,
 } from '@components/ScheduleSelector.shared';
 import { IInstituteGroupsData } from '@/interfaces/ystuty.types';
-import { useApi } from '@/shared/api.hook';
 import {
-  getCachedLookup,
-  setCachedLookup,
-} from '@/shared/schedule-cache.storage';
-import {
-  getMemoryCachedLookup,
-  setMemoryCachedLookup,
-} from '@/shared/schedule-lookup-memory-cache';
+  ScheduleLookupConfig,
+  useScheduleLookup,
+} from '@/shared/schedule-lookup.hook';
 import {
   buildSchedulePath,
   getScheduleSelectionFromPathname,
 } from '@/shared/schedule-routing.utils';
 import { notifyTelegramSelectionChanged } from '@/shared/telegram/telegram.sdk';
 import { useDispatch, useSelector } from '@/store';
-import alertSlice from '@/store/reducer/alert/alert.slice';
 import scheduleSlice, {
   getLastGroups,
   STORE_GROUP_NAME_KEY,
@@ -41,13 +33,27 @@ import { StyledAutocomplete } from './StylePulseAnimation.component';
 // const STORE_CACHED_INSTITUTES_KEY_OLD = 'CACHED_INSTITUTES';
 const STORE_CACHED_INSTITUTES_KEY = 'CACHED_V3_INSTITUTES::';
 const INSTITUTES_CACHE_KEY = 'actual-groups';
+type GroupsLookupResponse = {
+  name: string;
+  items: IInstituteGroupsData[];
+  isCache: boolean;
+};
+
+const GROUPS_LOOKUP: ScheduleLookupConfig<
+  IInstituteGroupsData,
+  GroupsLookupResponse
+> = {
+  apiPath: 'v1/schedule/actual_groups',
+  cacheKey: INSTITUTES_CACHE_KEY,
+  cachedMessage: 'Используется сохранённый список групп.',
+  legacyStorageKey: STORE_CACHED_INSTITUTES_KEY,
+};
 
 export const SelectGroupComponent = (props: {
   allowMultipleRef: AllowMultipleRef;
 }) => {
   const { allowMultipleRef } = props;
   const dispatch = useDispatch();
-  const { formatMessage } = useIntl();
   const { fetchingSchedule } = useSelector((state) => state.schedule);
   const allowedMultiple = useSelector(
     (state) => state.schedule.allowedMultiple.group,
@@ -56,7 +62,6 @@ export const SelectGroupComponent = (props: {
     (state) => state.schedule.selectedItems['group'],
   ) as string[];
 
-  const { online, previous: previousOnline } = useNetworkState();
   const { pathname, search, hash } = useLocation();
   const navigate = useNavigate();
   const defaultValues = React.useMemo(() => {
@@ -65,161 +70,11 @@ export const SelectGroupComponent = (props: {
     values = values.length > 0 ? values : groupNames;
     return values;
   }, [pathname]);
-  const [institutes, setInstitutes] = React.useState<
-    { name: string; groups: string[] }[]
-  >(
-    () =>
-      getMemoryCachedLookup<IInstituteGroupsData[]>(INSTITUTES_CACHE_KEY) ??
-      [
-        // { name: 'Default', groups: defaultValues },
-      ],
-  );
-  const [fetchApi, isFetching] = useApi();
-  const [isCached, setIsCached] = React.useState(
-    () =>
-      getMemoryCachedLookup<IInstituteGroupsData[]>(INSTITUTES_CACHE_KEY) !==
-      null,
-  );
-  const [isServerCached, setIsServerCached] = React.useState(false);
-
-  const applyInstitutes = React.useCallback(
-    (items: IInstituteGroupsData[], isCache = false, isServerCache = false) => {
-      setIsCached(isCache);
-      setIsServerCached(isServerCache);
-      setInstitutes(items);
-    },
-    [setInstitutes, setIsCached, setIsServerCached],
-  );
-
-  /** Временно читает старый LocalStorage-кэш, пока он не будет перенесён. */
-  const loadCachedInstitutes = React.useCallback(async () => {
-    const cachedItems =
-      await getCachedLookup<IInstituteGroupsData[]>(INSTITUTES_CACHE_KEY);
-    if (cachedItems) {
-      applyInstitutes(cachedItems, true);
-      setMemoryCachedLookup(INSTITUTES_CACHE_KEY, cachedItems);
-      return true;
-    }
-
-    const legacyItems = store2.get(STORE_CACHED_INSTITUTES_KEY, null) as
-      | IInstituteGroupsData[]
-      | null;
-    if (!legacyItems) {
-      return false;
-    }
-
-    applyInstitutes(legacyItems, true);
-    setMemoryCachedLookup(INSTITUTES_CACHE_KEY, legacyItems);
-    if (await setCachedLookup(INSTITUTES_CACHE_KEY, legacyItems)) {
-      store2.remove(STORE_CACHED_INSTITUTES_KEY);
-    }
-    return true;
-  }, [applyInstitutes]);
-
-  const notifyCachedInstitutes = React.useCallback(() => {
-    dispatch(
-      alertSlice.actions.add({
-        message: 'Используется сохранённый список групп.',
-        severity: 'warning',
-      }),
-    );
-  }, [dispatch]);
-
-  const loadGroupsList = React.useCallback(
-    async (forceRefresh = false) => {
-      if (isFetching) return;
-
-      const memoryCachedItems =
-        !forceRefresh &&
-        getMemoryCachedLookup<IInstituteGroupsData[]>(INSTITUTES_CACHE_KEY);
-      if (memoryCachedItems) {
-        applyInstitutes(memoryCachedItems, true);
-        return;
-      }
-
-      if (!online) {
-        if (await loadCachedInstitutes()) {
-          notifyCachedInstitutes();
-        }
-        return;
-      }
-
-      try {
-        const response = await fetchApi<{
-          name: string;
-          items: IInstituteGroupsData[];
-          isCache: boolean;
-        }>(
-          `v1/schedule/actual_groups`,
-          {},
-          {
-            setError: (message, options) =>
-              dispatch(
-                alertSlice.actions.add({
-                  message: `Error: ${message}`,
-                  severity: 'warning',
-                  toastAutoClose: options?.toastAutoClose,
-                }),
-              ),
-          },
-        );
-
-        // `null` означает отменённый или уже заблокированный запрос. Например,
-        // это происходит при проверочном размонтировании React.StrictMode.
-        // В таком случае не считаем API недоступным и не показываем toast.
-        if (!response) {
-          return;
-        }
-
-        if ('error' in response) {
-          if (await loadCachedInstitutes()) {
-            notifyCachedInstitutes();
-          }
-          return;
-        }
-
-        if (!('data' in response)) {
-          return;
-        }
-
-        applyInstitutes(
-          response.data.items,
-          response.data.isCache,
-          response.data.isCache,
-        );
-        setMemoryCachedLookup(INSTITUTES_CACHE_KEY, response.data.items);
-        void setCachedLookup(INSTITUTES_CACHE_KEY, response.data.items).then(
-          (isStored) => {
-            if (isStored) {
-              store2.remove(STORE_CACHED_INSTITUTES_KEY);
-            }
-          },
-        );
-      } catch (err) {
-        // При недоступности API сохраняем возможность выбрать группу
-        // из последнего успешно сохранённого справочника.
-        const isCacheRestored = await loadCachedInstitutes();
-        if (isCacheRestored) {
-          notifyCachedInstitutes();
-        } else if (online) {
-          dispatch(
-            alertSlice.actions.add({
-              message: `Error: ${(err as Error).message}`,
-              severity: 'error',
-            }),
-          );
-        } else {
-          dispatch(
-            alertSlice.actions.add({
-              message: formatMessage({ id: 't.api.offline.error' }),
-              severity: 'warning',
-            }),
-          );
-        }
-      }
-    },
-    [applyInstitutes, loadCachedInstitutes, notifyCachedInstitutes, online],
-  );
+  const {
+    items: institutes,
+    isCached,
+    isServerCached,
+  } = useScheduleLookup(GROUPS_LOOKUP);
 
   const onChangeValues = React.useCallback(
     (value: string | string[] | null) => {
@@ -306,11 +161,6 @@ export const SelectGroupComponent = (props: {
       fixSelected(defaultValues);
     }
   }, [defaultValues]);
-
-  React.useEffect(() => {
-    const isNetworkRestored = previousOnline === false && online === true;
-    void loadGroupsList(isNetworkRestored);
-  }, [online, previousOnline]);
 
   React.useEffect(() => {
     allowMultipleRef.current = allowMultiple;
