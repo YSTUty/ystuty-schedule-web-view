@@ -6,15 +6,23 @@ import appVersion from '@/utils/app-version';
 
 const buildTimestamp = __BUILD_TIMESTAMP__;
 
+const StyledVersion = styled('div')(({ theme }) => ({
+  color: theme.palette.text.disabled,
+  fontSize: '0.6rem',
+  lineHeight: 1.2,
+  // На iPhone нижняя системная область может перекрывать последний текст.
+  paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 2px)',
+}));
+
 const StyledDate = styled('div')(() => ({
   display: 'inline',
-  '@media (max-width: 540px)': {
-    display: 'none',
-  },
+  // '@media (max-width: 540px)': {
+  //   display: 'none',
+  // },
 }));
 
 const VersionComponent = () => (
-  <div style={{ fontSize: '0.6rem', color: '#9e9e9e' }}>
+  <StyledVersion>
     Beta [{appVersion.version}]
     <StyledDate>
       {' ('}
@@ -27,7 +35,7 @@ const VersionComponent = () => (
       />
       )
     </StyledDate>
-  </div>
+  </StyledVersion>
 );
 
 export default VersionComponent;
